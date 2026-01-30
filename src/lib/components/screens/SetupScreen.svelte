@@ -7,17 +7,24 @@
   import { disconnectMoco, disconnectJira, disconnectOutlook } from '../../stores/connections.svelte';
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-background p-8">
+<div class="flex min-h-screen items-center justify-center bg-background p-8 animate-fade-in">
   <div class="w-full max-w-md">
-    <div class="mb-8 text-center">
-      <h1 class="text-3xl font-bold text-foreground">Roots</h1>
-      <p class="mt-2 text-muted-foreground">
-        Verbinde deine Zeiterfassung, um loszulegen.
-      </p>
+    <div class="mb-8 flex flex-col items-center gap-4">
+      <img
+        src="/roots-logo-sm.svg"
+        alt="Roots Logo"
+        class="h-14 w-14"
+      />
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-foreground tracking-tight">Roots</h1>
+        <p class="mt-1.5 text-sm text-muted-foreground">
+          Verbinde deine Zeiterfassung, um loszulegen.
+        </p>
+      </div>
     </div>
 
     <!-- Moco -->
-    <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
+    <div class="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full" style="background-color: #10B981"></div>
@@ -43,7 +50,7 @@
     </div>
 
     <!-- Jira -->
-    <div class="mt-4 rounded-lg border border-border bg-card p-6 shadow-sm">
+    <div class="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full" style="background-color: #3B82F6"></div>
@@ -69,7 +76,7 @@
     </div>
 
     <!-- Outlook -->
-    <div class="mt-4 rounded-lg border border-border bg-card p-6 shadow-sm">
+    <div class="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full" style="background-color: #8B5CF6"></div>
@@ -96,7 +103,7 @@
 
     <!-- Future services -->
     <div class="mt-4 space-y-3">
-      <div class="rounded-lg border border-border bg-card/50 p-4 opacity-50">
+      <div class="rounded-xl border border-border bg-card/50 p-4 opacity-50">
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full bg-muted-foreground/30"></div>
           <span class="text-sm font-medium text-muted-foreground">Personio</span>
