@@ -21,7 +21,7 @@
 
 <div class="space-y-4">
   <!-- Week summary bar -->
-  <div class="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
+  <div class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
     <div class="flex items-center gap-4">
       <span class="text-sm text-muted-foreground">
         Gesamt:
@@ -41,13 +41,13 @@
 
   <!-- Loading indicator -->
   {#if loading}
-    <div class="text-center text-sm text-muted-foreground py-2">
+    <div class="text-center text-sm text-muted-foreground py-3 animate-pulse">
       Lade Eintraege...
     </div>
   {/if}
 
   <!-- Day columns grid -->
-  <div class="grid grid-cols-5 gap-3">
+  <div class="grid grid-cols-5 gap-4">
     {#each dayOverviews as day (day.date)}
       <DayColumn {day} />
     {/each}

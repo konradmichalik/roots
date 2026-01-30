@@ -112,7 +112,7 @@
 
 <div class="mx-auto max-w-4xl space-y-4">
   <!-- Day header -->
-  <div class="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
+  <div class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
     <span class="text-sm font-medium text-foreground">
       {formatDateLong(dateNavState.selectedDate)}
     </span>
@@ -134,7 +134,7 @@
   </div>
 
   {#if loading}
-    <div class="text-center text-sm text-muted-foreground py-2">
+    <div class="text-center text-sm text-muted-foreground py-3 animate-pulse">
       Lade Eintraege...
     </div>
   {/if}
@@ -164,7 +164,7 @@
         <div class="grid grid-cols-2 gap-4">
           <!-- Moco cell -->
           {#if row.mocoEntry}
-            <div class="rounded-md border border-border bg-card p-2.5 {row.matchColor ? `border-l-4 ${row.matchColor}` : ''}">
+            <div class="rounded-xl border border-border bg-card p-2.5 shadow-sm {row.matchColor ? `border-l-4 ${row.matchColor}` : ''}">
               <div class="flex items-start justify-between gap-2">
                 <div class="flex-1 min-w-0">
                   <span class="text-sm font-medium text-foreground truncate block">{row.mocoEntry.title}</span>
@@ -181,14 +181,14 @@
               </div>
             </div>
           {:else}
-            <div class="rounded-md border border-dashed border-border/50 p-2.5 flex items-center justify-center">
+            <div class="rounded-xl border border-dashed border-border/50 p-2.5 flex items-center justify-center">
               <span class="text-xs text-muted-foreground/50 italic">Nicht in Moco</span>
             </div>
           {/if}
 
           <!-- Jira cell -->
           {#if row.jiraEntry}
-            <div class="rounded-md border border-border bg-card p-2.5 {row.matchColor ? `border-l-4 ${row.matchColor}` : ''}">
+            <div class="rounded-xl border border-border bg-card p-2.5 shadow-sm {row.matchColor ? `border-l-4 ${row.matchColor}` : ''}">
               <div class="flex items-start justify-between gap-2">
                 <div class="flex-1 min-w-0">
                   <span class="text-sm font-medium text-foreground truncate block">{row.jiraEntry.title}</span>
@@ -202,7 +202,7 @@
               </div>
             </div>
           {:else}
-            <div class="rounded-md border border-dashed border-border/50 p-2.5 flex items-center justify-center">
+            <div class="rounded-xl border border-dashed border-border/50 p-2.5 flex items-center justify-center">
               <span class="text-xs text-muted-foreground/50 italic">Kein Jira-Worklog</span>
             </div>
           {/if}
@@ -210,7 +210,12 @@
       {/each}
     </div>
   {:else}
-    <div class="text-center text-muted-foreground py-8">Keine Eintraege fuer diesen Tag.</div>
+    <div class="flex flex-col items-center gap-2 py-12 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
+      </svg>
+      <p class="text-sm text-muted-foreground/50">Keine Eintraege fuer diesen Tag.</p>
+    </div>
   {/if}
 
   <!-- Outlook events (if any) -->
@@ -225,7 +230,7 @@
       </div>
       <div class="grid grid-cols-2 gap-1.5">
         {#each entries.outlook as entry (entry.id)}
-          <div class="rounded-md border border-border bg-card p-2.5">
+          <div class="rounded-xl border border-border bg-card p-2.5 shadow-sm">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1 min-w-0">
                 <span class="text-sm font-medium text-foreground truncate block">{entry.title}</span>

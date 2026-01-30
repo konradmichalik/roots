@@ -12,10 +12,10 @@
 </script>
 
 <div
-  class="flex flex-col rounded-lg border border-border bg-card {day.isToday ? 'ring-2 ring-primary/30' : ''} {day.isWeekend ? 'opacity-60' : ''}"
+  class="flex flex-col rounded-xl border border-border bg-card shadow-sm {day.isToday ? 'ring-[3px] ring-primary/25 border-primary/30' : ''} {day.isWeekend ? 'opacity-50' : ''}"
 >
   <!-- Day header -->
-  <div class="flex items-center justify-between border-b border-border px-3 py-2">
+  <div class="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2">
     <div class="flex items-center gap-1.5">
       <span class="text-xs font-medium text-muted-foreground">
         {getShortDayName(day.date)}
@@ -33,7 +33,7 @@
   </div>
 
   <!-- Day summary footer -->
-  <div class="border-t border-border px-3 py-1.5 flex items-center justify-between">
+  <div class="border-t border-border bg-muted/20 px-3 py-1.5 flex items-center justify-between">
     <span class="text-xs text-muted-foreground">
       Soll: {day.requiredHours}h
     </span>
