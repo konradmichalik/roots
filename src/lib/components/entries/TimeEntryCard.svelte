@@ -12,7 +12,7 @@
   let outlookMeta = $derived(entry.metadata.source === 'outlook' ? entry.metadata as OutlookMetadata : null);
 </script>
 
-<div class="group rounded-md border border-border bg-card p-2.5 hover:bg-card/80 transition-colors">
+<div class="group rounded-xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150">
   <div class="flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-1.5 mb-0.5">
