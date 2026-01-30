@@ -37,17 +37,21 @@
 <div class="flex h-screen flex-col">
   <TopBar />
 
-  <main class="flex-1 overflow-auto p-4">
-    {#if reconciliationState.isOpen}
-      <ReconciliationView />
-    {:else if dateNavState.viewMode === 'week'}
-      <WeekView />
-    {:else if dateNavState.viewMode === 'day'}
-      <DayView />
-    {:else}
-      <div class="text-center text-muted-foreground py-12">
-        Monatsansicht folgt
+  <main class="flex-1 overflow-auto p-4 dot-grid-bg">
+    {#key reconciliationState.isOpen ? 'recon' : dateNavState.viewMode}
+      <div class="animate-slide-up">
+        {#if reconciliationState.isOpen}
+          <ReconciliationView />
+        {:else if dateNavState.viewMode === 'week'}
+          <WeekView />
+        {:else if dateNavState.viewMode === 'day'}
+          <DayView />
+        {:else}
+          <div class="text-center text-muted-foreground py-12">
+            Monatsansicht folgt
+          </div>
+        {/if}
       </div>
-    {/if}
+    {/key}
   </main>
 </div>
