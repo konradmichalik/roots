@@ -17,7 +17,7 @@
   {#each filters as filter}
     <button
       onclick={() => setReconciliationFilter(filter.value)}
-      class="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors
+      class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150
         {reconciliationState.filter === filter.value
           ? 'bg-primary text-primary-foreground'
           : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}"

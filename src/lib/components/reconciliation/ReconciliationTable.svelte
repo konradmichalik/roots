@@ -22,8 +22,11 @@
 </script>
 
 {#if matches.length === 0}
-  <div class="text-center text-muted-foreground py-8">
-    Keine Eintraege fuer den aktiven Filter.
+  <div class="flex flex-col items-center gap-2 py-12 text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18" /><path d="M3 12h18" /><path d="M3 18h18" />
+    </svg>
+    <p class="text-sm text-muted-foreground/50">Keine Eintraege fuer den aktiven Filter.</p>
   </div>
 {:else}
   <div class="space-y-4">
