@@ -100,7 +100,7 @@
       bind:value={baseUrl}
       oninput={handleUrlInput}
       placeholder={instanceType === 'cloud' ? 'firma.atlassian.net' : 'https://jira.firma.de'}
-      class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
 
@@ -115,7 +115,7 @@
         type="email"
         bind:value={email}
         placeholder="name@firma.de"
-        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
     </div>
 
@@ -128,7 +128,7 @@
         type="password"
         bind:value={apiToken}
         placeholder="Atlassian API Token"
-        class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
       <p class="mt-1 text-xs text-muted-foreground">
         <a
@@ -165,7 +165,7 @@
           type="password"
           bind:value={personalAccessToken}
           placeholder="PAT aus Jira-Profil"
-          class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
     {:else}
@@ -178,7 +178,7 @@
           type="text"
           bind:value={username}
           placeholder="Benutzername"
-          class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
       <div>
@@ -190,20 +190,20 @@
           type="password"
           bind:value={password}
           placeholder="Passwort"
-          class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
     {/if}
   {/if}
 
   {#if connectionsState.jira.error}
-    <p class="text-sm text-red-500">{connectionsState.jira.error}</p>
+    <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.jira.error}</p>
   {/if}
 
   <button
     type="submit"
     disabled={connectionsState.jira.isConnecting || !isValid()}
-    class="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
   >
     {connectionsState.jira.isConnecting ? 'Verbinde...' : 'Verbinden'}
   </button>

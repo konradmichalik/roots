@@ -27,7 +27,7 @@
         type="text"
         bind:value={domain}
         placeholder="firma"
-        class="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        class="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
       <span class="text-sm text-muted-foreground">.mocoapp.com</span>
     </div>
@@ -42,7 +42,7 @@
       type="password"
       bind:value={apiKey}
       placeholder="API Key aus deinem Moco-Profil"
-      class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
     <p class="mt-1 text-xs text-muted-foreground">
       Zu finden unter Profil &rarr; Integrationen
@@ -50,13 +50,13 @@
   </div>
 
   {#if connectionsState.moco.error}
-    <p class="text-sm text-red-500">{connectionsState.moco.error}</p>
+    <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.moco.error}</p>
   {/if}
 
   <button
     type="submit"
     disabled={connectionsState.moco.isConnecting || !domain.trim() || !apiKey.trim()}
-    class="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
   >
     {connectionsState.moco.isConnecting ? 'Verbinde...' : 'Verbinden'}
   </button>

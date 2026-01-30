@@ -31,7 +31,7 @@
       type="text"
       bind:value={clientId}
       placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
 
@@ -44,7 +44,7 @@
       type="text"
       bind:value={tenantId}
       placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
     <p class="mt-1 text-xs text-muted-foreground">
       Azure Portal &rarr; App registrations &rarr; Deine App
@@ -52,14 +52,14 @@
   </div>
 
   {#if connectionsState.outlook.error}
-    <p class="text-sm text-red-500">{connectionsState.outlook.error}</p>
+    <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.outlook.error}</p>
   {/if}
 
   <button
     type="button"
     onclick={handleLogin}
     disabled={connectionsState.outlook.isConnecting || !isValid}
-    class="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
   >
     {connectionsState.outlook.isConnecting ? 'Verbinde...' : 'Mit Microsoft anmelden'}
   </button>

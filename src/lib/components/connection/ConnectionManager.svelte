@@ -25,7 +25,7 @@
 
     <div class="space-y-6 py-4">
       <!-- Moco -->
-      <div class="rounded-lg border border-border p-4">
+      <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('moco')}"></div>
@@ -49,7 +49,7 @@
       </div>
 
       <!-- Jira -->
-      <div class="rounded-lg border border-border p-4">
+      <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('jira')}"></div>
@@ -73,7 +73,7 @@
       </div>
 
       <!-- Outlook -->
-      <div class="rounded-lg border border-border p-4">
+      <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('outlook')}"></div>
@@ -97,7 +97,7 @@
       </div>
 
       <!-- Future services -->
-      <div class="rounded-lg border border-border p-4 opacity-50">
+      <div class="rounded-xl border border-border p-4 opacity-50">
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full bg-muted-foreground/30"></div>
           <span class="font-semibold text-muted-foreground">Personio</span>
