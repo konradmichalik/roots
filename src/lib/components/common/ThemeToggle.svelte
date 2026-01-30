@@ -4,7 +4,7 @@
 
 <button
   onclick={toggleTheme}
-  class="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+  class="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150"
   title={themeState.resolvedTheme === 'dark' ? 'Helles Design' : 'Dunkles Design'}
 >
   {#if themeState.resolvedTheme === 'dark'}
