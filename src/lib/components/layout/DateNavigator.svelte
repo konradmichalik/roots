@@ -10,7 +10,7 @@
 <div class="flex items-center gap-2">
   <button
     onclick={navigateBackward}
-    class="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+    class="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-150"
     title="Zurueck"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -18,14 +18,14 @@
 
   <button
     onclick={goToToday}
-    class="rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+    class="rounded-lg px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground hover:shadow-sm transition-all duration-150"
   >
     Heute
   </button>
 
   <button
     onclick={navigateForward}
-    class="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+    class="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-150"
     title="Vor"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>

@@ -8,9 +8,9 @@
   import { reconciliationState, toggleReconciliation } from '../../stores/reconciliation.svelte';
 </script>
 
-<header class="flex h-14 items-center justify-between border-b border-border bg-card px-4">
+<header class="flex h-14 items-center justify-between border-b border-border bg-card px-5 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]">
   <div class="flex items-center gap-4">
-    <h1 class="text-lg font-bold text-foreground">Roots</h1>
+    <h1 class="text-lg font-bold text-foreground tracking-tight">Roots</h1>
     <div class="hidden sm:block">
       <DateNavigator />
     </div>
@@ -22,7 +22,7 @@
     {#if connectionsState.moco.isConnected && connectionsState.jira.isConnected}
       <button
         onclick={toggleReconciliation}
-        class="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors
+        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150
           {reconciliationState.isOpen
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}"
@@ -37,7 +37,7 @@
 
     <ConnectionManager>
       <button
-        class="flex items-center gap-1.5 rounded-md px-2 py-1.5 hover:bg-accent transition-colors"
+        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-accent transition-all duration-150"
         title="Verbindungen verwalten"
       >
         <ServiceStatusDot service="moco" />

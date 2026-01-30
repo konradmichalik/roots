@@ -9,11 +9,11 @@
   ];
 </script>
 
-<div class="flex rounded-md border border-border bg-secondary/50">
+<div class="flex rounded-lg border border-border bg-secondary/50 overflow-hidden">
   {#each views as view}
     <button
       onclick={() => setViewMode(view.mode)}
-      class="px-3 py-1 text-xs font-medium transition-colors first:rounded-l-md last:rounded-r-md {dateNavState.viewMode === view.mode ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
+      class="px-3 py-1.5 text-xs font-medium transition-all duration-150 first:rounded-l-[calc(var(--radius)-1px)] last:rounded-r-[calc(var(--radius)-1px)] {dateNavState.viewMode === view.mode ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}"
     >
       {view.label}
     </button>
