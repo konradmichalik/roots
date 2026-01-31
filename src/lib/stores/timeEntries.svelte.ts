@@ -19,18 +19,15 @@ export const timeEntriesState = $state({
   mocoActivities: [] as UnifiedTimeEntry[],
   jiraWorklogs: [] as UnifiedTimeEntry[],
   outlookEvents: [] as UnifiedTimeEntry[],
-  personioAbsences: [] as UnifiedTimeEntry[],
   loading: {
     moco: false,
     jira: false,
-    outlook: false,
-    personio: false
+    outlook: false
   },
   errors: {
     moco: null as string | null,
     jira: null as string | null,
-    outlook: null as string | null,
-    personio: null as string | null
+    outlook: null as string | null
   },
   lastFetched: null as string | null,
   fetchedDate: null as string | null
@@ -494,8 +491,7 @@ export function isAnyLoading(): boolean {
     monthCacheState.loading ||
     timeEntriesState.loading.moco ||
     timeEntriesState.loading.jira ||
-    timeEntriesState.loading.outlook ||
-    timeEntriesState.loading.personio
+    timeEntriesState.loading.outlook
   );
 }
 
@@ -503,7 +499,6 @@ export function hasAnyError(): boolean {
   return !!(
     timeEntriesState.errors.moco ||
     timeEntriesState.errors.jira ||
-    timeEntriesState.errors.outlook ||
-    timeEntriesState.errors.personio
+    timeEntriesState.errors.outlook
   );
 }
