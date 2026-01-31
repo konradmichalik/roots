@@ -37,7 +37,7 @@ export class OutlookClient {
   private async request<T>(endpoint: string): Promise<T> {
     const token = await this.getAccessToken();
     const url = `${GRAPH_BASE}${endpoint}`;
-    const timer = logger.time(`GET ${endpoint}`);
+    const timer = logger.time();
 
     logger.apiRequest('GET', `[Outlook] ${endpoint}`);
 

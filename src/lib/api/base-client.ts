@@ -43,7 +43,7 @@ export abstract class ApiClient {
     extraHeaders?: Record<string, string>
   ): Promise<T> {
     const url = `${this.effectiveBaseUrl}${endpoint}`;
-    const timer = logger.time(`${method} ${endpoint}`);
+    const timer = logger.time();
     const timeout = this.config.timeout ?? 30000;
 
     const headers: Record<string, string> = {
