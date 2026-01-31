@@ -6,7 +6,7 @@ import type { JiraWorklogClient } from './jira-worklog-client';
 import { OutlookClient } from './outlook-client';
 
 export { ApiClient, ApiError, type ApiClientConfig } from './base-client';
-export { MocoClient, type MocoClientConfig } from './moco-client';
+export { MocoClient } from './moco-client';
 export { JiraWorklogClient, type WorklogWithIssue } from './jira-worklog-client';
 export { JiraCloudWorklogClient } from './jira-cloud-worklog';
 export { JiraServerWorklogClient } from './jira-server-worklog';
