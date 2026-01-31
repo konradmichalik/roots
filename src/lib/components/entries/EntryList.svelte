@@ -2,7 +2,7 @@
   import type { UnifiedTimeEntry } from '../../types';
   import TimeEntryCard from './TimeEntryCard.svelte';
 
-  let { entries, emptyMessage = 'Keine Eintraege' }: {
+  let { entries, emptyMessage = 'No entries' }: {
     entries: UnifiedTimeEntry[];
     emptyMessage?: string;
   } = $props();
