@@ -4,7 +4,6 @@
   import JiraConnectionForm from './JiraConnectionForm.svelte';
   import OutlookConnectionForm from './OutlookConnectionForm.svelte';
   import { connectionsState, disconnectMoco, disconnectJira, disconnectOutlook } from '../../stores/connections.svelte';
-  import { getSourceColor } from '../../stores/settings.svelte';
   import type { Snippet } from 'svelte';
 
   let { children }: { children: Snippet } = $props();
@@ -96,14 +95,6 @@
         {/if}
       </div>
 
-      <!-- Future services -->
-      <div class="rounded-xl border border-border p-4 opacity-50">
-        <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-full bg-muted-foreground/30"></div>
-          <span class="font-semibold text-muted-foreground">Personio</span>
-          <span class="ml-auto text-xs text-muted-foreground">Coming soon</span>
-        </div>
-      </div>
     </div>
   </Dialog.Content>
 </Dialog.Root>
