@@ -23,7 +23,6 @@ import { logger } from '../utils/logger';
 export const connectionsState = $state<AllConnectionsState>({
   moco: createInitialServiceState('moco'),
   jira: createInitialServiceState('jira'),
-  personio: createInitialServiceState('personio'),
   outlook: createInitialServiceState('outlook')
 });
 
@@ -221,7 +220,6 @@ export function isAnyServiceConnected(): boolean {
   return (
     connectionsState.moco.isConnected ||
     connectionsState.jira.isConnected ||
-    connectionsState.personio.isConnected ||
     connectionsState.outlook.isConnected
   );
 }

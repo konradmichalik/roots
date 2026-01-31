@@ -10,7 +10,7 @@ export interface UnifiedTimeEntry {
   title: string;
   description?: string;
   category?: string;
-  metadata: MocoMetadata | JiraMetadata | OutlookMetadata | PersonioMetadata;
+  metadata: MocoMetadata | JiraMetadata | OutlookMetadata;
 }
 
 export interface MocoMetadata {
@@ -45,14 +45,6 @@ export interface OutlookMetadata {
   webLink: string;
 }
 
-export interface PersonioMetadata {
-  source: 'personio';
-  absenceId: number;
-  absenceType: string;
-  status: string;
-  halfDay: boolean;
-}
-
 // Per-weekday target hours: index 0=Mon, 1=Tue, ..., 5=Sat, 6=Sun
 export type WeekdayHours = [number, number, number, number, number, number, number];
 
@@ -82,7 +74,6 @@ export interface DayOverview {
   isToday: boolean;
   requiredHours: number;
   presence?: DayPresence;
-  absence?: PersonioMetadata;
   manualAbsence?: ManualAbsence;
   entries: {
     moco: UnifiedTimeEntry[];

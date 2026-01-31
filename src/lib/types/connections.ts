@@ -1,4 +1,4 @@
-export type ServiceType = 'moco' | 'jira' | 'personio' | 'outlook';
+export type ServiceType = 'moco' | 'jira' | 'outlook';
 
 export interface MocoConnectionConfig {
   domain: string;
@@ -29,12 +29,6 @@ export interface JiraServerCredentials {
   personalAccessToken?: string;
 }
 
-export interface PersonioConnectionConfig {
-  clientId: string;
-  clientSecret: string;
-  employeeId?: number;
-}
-
 export interface OutlookConnectionConfig {
   clientId: string;
   tenantId: string;
@@ -52,7 +46,6 @@ export interface ServiceConnectionState {
 export interface AllConnectionsState {
   moco: ServiceConnectionState;
   jira: ServiceConnectionState;
-  personio: ServiceConnectionState;
   outlook: ServiceConnectionState;
 }
 

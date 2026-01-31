@@ -7,7 +7,6 @@ export interface AppSettings {
     moco: string;
     jira: string;
     outlook: string;
-    personio: string;
   };
   showWeekends: boolean;
   weekStartsOn: number;
@@ -25,8 +24,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   sourceColors: {
     moco: '#a3be8c',
     jira: '#5e81ac',
-    outlook: '#b48ead',
-    personio: '#d08770'
+    outlook: '#b48ead'
   },
   showWeekends: false,
   weekStartsOn: 1,
@@ -56,6 +54,6 @@ export function updateSettings(partial: Partial<AppSettings>): void {
   logger.store('settings', 'Updated', partial);
 }
 
-export function getSourceColor(source: 'moco' | 'jira' | 'outlook' | 'personio'): string {
+export function getSourceColor(source: 'moco' | 'jira' | 'outlook'): string {
   return settingsState.sourceColors[source];
 }

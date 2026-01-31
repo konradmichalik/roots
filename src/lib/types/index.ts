@@ -5,7 +5,6 @@ export type {
   JiraCredentials,
   JiraCloudCredentials,
   JiraServerCredentials,
-  PersonioConnectionConfig,
   OutlookConnectionConfig,
   ServiceConnectionState,
   AllConnectionsState
@@ -48,7 +47,6 @@ export type {
   MocoMetadata,
   JiraMetadata,
   OutlookMetadata,
-  PersonioMetadata,
   WeekdayHours,
   AbsenceType,
   ManualAbsence,

@@ -8,8 +8,7 @@
   const labels: Record<ServiceType, string> = {
     moco: 'Moco',
     jira: 'Jira',
-    outlook: 'Outlook',
-    personio: 'Personio'
+    outlook: 'Outlook'
   };
 
   let isConnected = $derived(connectionsState[service].isConnected);

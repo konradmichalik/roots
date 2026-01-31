@@ -156,7 +156,6 @@ html[data-color-mode='dark'] {
   --color-source-moco: #a3be8c;
   --color-source-jira: #5e81ac;
   --color-source-outlook: #b48ead;
-  --color-source-personio: #d08770;
 
   /* Semantic colors mapped to Tailwind classes */
   --color-success: var(--ds-background-success-bold);

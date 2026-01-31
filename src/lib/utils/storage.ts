@@ -25,10 +25,8 @@ export const STORAGE_KEYS = {
   SETTINGS: 'settings',
   MOCO_CONFIG: 'moco-config',
   JIRA_CONFIG: 'jira-config',
-  PERSONIO_CONFIG: 'personio-config',
   OUTLOOK_CONFIG: 'outlook-config',
   OUTLOOK_TOKENS: 'outlook-tokens',
-  PERSONIO_TOKENS: 'personio-tokens',
   ABSENCES: 'absences',
   FAVORITES: 'favorites'
 } as const;
