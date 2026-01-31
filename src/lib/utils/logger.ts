@@ -64,7 +64,7 @@ class Logger {
     return `[${now.toLocaleTimeString('en-US')}.${now.getMilliseconds().toString().padStart(3, '0')}]`;
   }
 
-  private formatMessage(icon: string, _category: string, message: string): string {
+  private formatMessage(icon: string, message: string): string {
     const timestamp = this.getTimestamp();
     return `${this.prefix} ${timestamp} ${icon} ${message}`;
   }
@@ -72,7 +72,7 @@ class Logger {
   connection(message: string, data?: unknown): void {
     if (!this.shouldLog('info')) return;
     console.log(
-      `%c${this.formatMessage(ICONS.connection, 'connection', message)}`,
+      `%c${this.formatMessage(ICONS.connection, message)}`,
       LOG_STYLES.connection,
       data ?? ''
     );
@@ -81,7 +81,7 @@ class Logger {
   connectionSuccess(message: string): void {
     if (!this.shouldLog('info')) return;
     console.log(
-      `%c${this.formatMessage(ICONS.success, 'connection', message)}`,
+      `%c${this.formatMessage(ICONS.success, message)}`,
       LOG_STYLES.success
     );
   }
@@ -89,7 +89,7 @@ class Logger {
   apiRequest(method: string, endpoint: string, details?: Record<string, unknown>): void {
     if (!this.shouldLog('debug')) return;
     console.groupCollapsed(
-      `%c${this.formatMessage(ICONS.api, 'api', `${ICONS.request} ${method} ${endpoint}`)}`,
+      `%c${this.formatMessage(ICONS.api, `${ICONS.request} ${method} ${endpoint}`)}`,
       LOG_STYLES.api
     );
     if (details) {
@@ -110,7 +110,7 @@ class Logger {
     if (!this.shouldLog('debug')) return;
     const statusColor = status >= 200 && status < 300 ? LOG_STYLES.success : LOG_STYLES.error;
     console.groupCollapsed(
-      `%c${this.formatMessage(ICONS.api, 'api', `${ICONS.response} ${method} ${endpoint}`)} %c${status} %c(${duration}ms)`,
+      `%c${this.formatMessage(ICONS.api, `${ICONS.response} ${method} ${endpoint}`)} %c${status} %c(${duration}ms)`,
       LOG_STYLES.api,
       statusColor,
       LOG_STYLES.timing
@@ -126,7 +126,7 @@ class Logger {
   apiError(method: string, endpoint: string, error: unknown): void {
     if (!this.shouldLog('error')) return;
     console.error(
-      `%c${this.formatMessage(ICONS.error, 'api', `${method} ${endpoint} failed`)}`,
+      `%c${this.formatMessage(ICONS.error, `${method} ${endpoint} failed`)}`,
       LOG_STYLES.error,
       error
     );
@@ -135,7 +135,7 @@ class Logger {
   store(storeName: string, action: string, data?: unknown): void {
     if (!this.shouldLog('debug')) return;
     console.log(
-      `%c${this.formatMessage(ICONS.store, 'store', `[${storeName}] ${action}`)}`,
+      `%c${this.formatMessage(ICONS.store, `[${storeName}] ${action}`)}`,
       LOG_STYLES.store,
       data ?? ''
     );
@@ -144,7 +144,7 @@ class Logger {
   error(message: string, error?: unknown): void {
     if (!this.shouldLog('error')) return;
     console.error(
-      `%c${this.formatMessage(ICONS.error, 'error', message)}`,
+      `%c${this.formatMessage(ICONS.error, message)}`,
       LOG_STYLES.error,
       error ?? ''
     );
@@ -153,7 +153,7 @@ class Logger {
   info(message: string, data?: unknown): void {
     if (!this.shouldLog('info')) return;
     console.log(
-      `%c${this.formatMessage('\u2139\uFE0F', 'info', message)}`,
+      `%c${this.formatMessage('\u2139\uFE0F', message)}`,
       'color: #5e81ac;',
       data ?? ''
     );
@@ -162,7 +162,7 @@ class Logger {
   debug(message: string, data?: unknown): void {
     if (!this.shouldLog('debug')) return;
     console.log(
-      `%c${this.formatMessage('\u{1F41B}', 'debug', message)}`,
+      `%c${this.formatMessage('\u{1F41B}', message)}`,
       'color: #4c566a;',
       data ?? ''
     );
