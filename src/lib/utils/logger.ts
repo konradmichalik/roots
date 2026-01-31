@@ -14,18 +14,12 @@ const LOG_LEVELS: Record<LogLevel, number> = {
 };
 
 const LOG_STYLES = {
-  prefix: 'color: #4c566a; font-weight: bold;',
   connection: 'color: #5e81ac;',
   api: 'color: #b48ead;',
   store: 'color: #ebcb8b;',
-  warn: 'color: #d08770;',
   error: 'color: #bf616a;',
   success: 'color: #a3be8c;',
-  timing: 'color: #4c566a; font-style: italic;',
-  moco: 'color: #a3be8c;',
-  jira: 'color: #5e81ac;',
-  outlook: 'color: #b48ead;',
-  personio: 'color: #d08770;'
+  timing: 'color: #4c566a; font-style: italic;'
 };
 
 const ICONS = {
@@ -33,11 +27,9 @@ const ICONS = {
   api: '\u{1F4E1}',
   store: '\u{1F4BE}',
   success: '\u2713',
-  warn: '\u26A0\uFE0F',
   error: '\u274C',
   request: '\u2192',
-  response: '\u2190',
-  time: '\u23F1\uFE0F'
+  response: '\u2190'
 };
 
 class Logger {
