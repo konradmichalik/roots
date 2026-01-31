@@ -3,8 +3,7 @@ import type {
   MocoConnectionConfig,
   JiraConnectionConfig,
   OutlookConnectionConfig,
-  OAuthTokens,
-  ServiceType
+  OAuthTokens
 } from '../types';
 import { createInitialServiceState } from '../types';
 import {
@@ -227,11 +226,3 @@ export function isAnyServiceConnected(): boolean {
   );
 }
 
-export function getConnectedServices(): ServiceType[] {
-  const services: ServiceType[] = [];
-  if (connectionsState.moco.isConnected) services.push('moco');
-  if (connectionsState.jira.isConnected) services.push('jira');
-  if (connectionsState.personio.isConnected) services.push('personio');
-  if (connectionsState.outlook.isConnected) services.push('outlook');
-  return services;
-}
