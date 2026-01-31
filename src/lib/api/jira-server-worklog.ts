@@ -1,7 +1,7 @@
 import { JiraWorklogClient, type JiraWorklogClientConfig } from './jira-worklog-client';
 import type { JiraUser, JiraWorklogAuthor } from '../types';
 
-export interface JiraServerConfig extends JiraWorklogClientConfig {
+interface JiraServerConfig extends JiraWorklogClientConfig {
   authMethod: 'basic' | 'pat';
   username?: string;
   password?: string;

@@ -1,7 +1,7 @@
 import { JiraWorklogClient, type JiraWorklogClientConfig } from './jira-worklog-client';
 import type { JiraUser, JiraWorklogAuthor } from '../types';
 
-export interface JiraCloudConfig extends JiraWorklogClientConfig {
+interface JiraCloudConfig extends JiraWorklogClientConfig {
   email: string;
   apiToken: string;
 }
