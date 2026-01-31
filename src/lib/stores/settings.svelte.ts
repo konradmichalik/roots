@@ -11,7 +11,6 @@ export interface AppSettings {
   };
   showWeekends: boolean;
   weekStartsOn: number;
-  hoursFormat: 'decimal' | 'hhmm';
   sidebarLeft: boolean;
   sidebarRight: boolean;
   outlookFilter: {
@@ -31,7 +30,6 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
   showWeekends: false,
   weekStartsOn: 1,
-  hoursFormat: 'decimal',
   sidebarLeft: true,
   sidebarRight: false,
   outlookFilter: {
