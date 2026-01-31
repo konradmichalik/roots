@@ -51,13 +51,6 @@ export function getWeekEnd(dateStr: string): string {
   return addDays(start, 4);
 }
 
-/**
- * Get the Sunday of the week containing the given date
- */
-export function getWeekEndSunday(dateStr: string): string {
-  const start = getWeekStart(dateStr);
-  return addDays(start, 6);
-}
 
 /**
  * Get all dates (Mon-Fri) in the week containing the given date
