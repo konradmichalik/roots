@@ -9,9 +9,7 @@
     isWeekend
   } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
-  import { settingsState, getSourceColor } from '../../stores/settings.svelte';
-
-  let fmt = $derived(settingsState.hoursFormat);
+  import { getSourceColor } from '../../stores/settings.svelte';
 
   // Current day stats
   let dayOverview = $derived(getDayOverview(dateNavState.selectedDate));
@@ -66,12 +64,12 @@
     <div class="flex items-center justify-between">
       <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Today</span>
       <span class="font-mono text-sm font-medium {getBalanceClass(dayOverview.balance)}">
-        {formatBalance(dayOverview.balance, fmt)}
+        {formatBalance(dayOverview.balance)}
       </span>
     </div>
     <div class="flex items-center justify-between text-xs text-muted-foreground">
-      <span>Actual: <span class="font-mono font-medium text-foreground">{formatHours(dayOverview.totals.actual, fmt)}</span></span>
-      <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(dayOverview.requiredHours, fmt)}</span></span>
+      <span>Actual: <span class="font-mono font-medium text-foreground">{formatHours(dayOverview.totals.actual)}</span></span>
+      <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(dayOverview.requiredHours)}</span></span>
     </div>
     <div class="h-1.5 rounded-full bg-muted overflow-hidden">
       <div
@@ -86,12 +84,12 @@
     <div class="flex items-center justify-between">
       <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Week</span>
       <span class="font-mono text-sm font-medium {getBalanceClass(weekTotals.balance)}">
-        {formatBalance(weekTotals.balance, fmt)}
+        {formatBalance(weekTotals.balance)}
       </span>
     </div>
     <div class="flex items-center justify-between text-xs text-muted-foreground">
-      <span>Actual: <span class="font-mono font-medium text-foreground">{formatHours(weekTotals.actual, fmt)}</span></span>
-      <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(weekTotals.required, fmt)}</span></span>
+      <span>Actual: <span class="font-mono font-medium text-foreground">{formatHours(weekTotals.actual)}</span></span>
+      <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(weekTotals.required)}</span></span>
     </div>
     <div class="h-1.5 rounded-full bg-muted overflow-hidden">
       <div
@@ -106,12 +104,12 @@
     <div class="flex items-center justify-between">
       <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Month</span>
       <span class="font-mono text-sm font-medium {getBalanceClass(monthTotals.balance)}">
-        {formatBalance(monthTotals.balance, fmt)}
+        {formatBalance(monthTotals.balance)}
       </span>
     </div>
     <div class="flex items-center justify-between text-xs text-muted-foreground">
-      <span>Actual: <span class="font-mono font-medium text-foreground">{formatHours(monthTotals.actual, fmt)}</span></span>
-      <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(monthTotals.required, fmt)}</span></span>
+      <span>Actual: <span class="font-mono font-medium text-foreground">{formatHours(monthTotals.actual)}</span></span>
+      <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(monthTotals.required)}</span></span>
     </div>
     <div class="h-1.5 rounded-full bg-muted overflow-hidden">
       <div
@@ -134,7 +132,7 @@
           <div class="h-2 w-2 rounded-full" style="background-color: {getSourceColor('moco')}"></div>
           <span class="text-xs text-muted-foreground">Moco</span>
         </div>
-        <span class="text-xs font-mono font-medium text-foreground">{formatHours(dayOverview.totals.moco, fmt)}</span>
+        <span class="text-xs font-mono font-medium text-foreground">{formatHours(dayOverview.totals.moco)}</span>
       </div>
       <div class="h-1 rounded-full bg-muted overflow-hidden">
         <div
@@ -151,7 +149,7 @@
           <div class="h-2 w-2 rounded-full" style="background-color: {getSourceColor('jira')}"></div>
           <span class="text-xs text-muted-foreground">Jira</span>
         </div>
-        <span class="text-xs font-mono font-medium text-foreground">{formatHours(dayOverview.totals.jira, fmt)}</span>
+        <span class="text-xs font-mono font-medium text-foreground">{formatHours(dayOverview.totals.jira)}</span>
       </div>
       <div class="h-1 rounded-full bg-muted overflow-hidden">
         <div
@@ -168,7 +166,7 @@
           <div class="h-2 w-2 rounded-full" style="background-color: {getSourceColor('outlook')}"></div>
           <span class="text-xs text-muted-foreground">Outlook</span>
         </div>
-        <span class="text-xs font-mono font-medium text-foreground">{formatHours(dayOverview.totals.outlook, fmt)}</span>
+        <span class="text-xs font-mono font-medium text-foreground">{formatHours(dayOverview.totals.outlook)}</span>
       </div>
       <div class="h-1 rounded-full bg-muted overflow-hidden">
         <div

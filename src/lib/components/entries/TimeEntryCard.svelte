@@ -2,7 +2,6 @@
   import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../../types';
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import { formatHours } from '../../utils/time-format';
-  import { settingsState } from '../../stores/settings.svelte';
   import { getSourceColor } from '../../stores/settings.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
@@ -118,7 +117,7 @@
     </div>
     <div class="flex flex-col items-end flex-shrink-0">
       <span class="text-sm font-mono font-medium text-foreground">
-        {formatHours(entry.hours, settingsState.hoursFormat)}
+        {formatHours(entry.hours)}
       </span>
       {#if outlookMeta && matchedFavorite && isMocoConnected}
         <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 mt-0.5">

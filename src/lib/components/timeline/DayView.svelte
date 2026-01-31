@@ -6,13 +6,11 @@
   import { connectionsState } from '../../stores/connections.svelte';
   import { formatDateLong } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
-  import { settingsState } from '../../stores/settings.svelte';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
 
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira));
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
-  let fmt = $derived(settingsState.hoursFormat);
 </script>
 
 <div class="mx-auto max-w-6xl space-y-4">
@@ -23,10 +21,10 @@
     </span>
     <div class="flex items-center gap-3 text-sm">
       <span class="text-muted-foreground">
-        Actual: <span class="font-mono font-medium text-foreground">{formatHours(overview.totals.actual, fmt)}</span>
+        Actual: <span class="font-mono font-medium text-foreground">{formatHours(overview.totals.actual)}</span>
       </span>
       <span class="text-muted-foreground">
-        Target: <span class="font-mono font-medium text-foreground">{formatHours(overview.requiredHours, fmt)}</span>
+        Target: <span class="font-mono font-medium text-foreground">{formatHours(overview.requiredHours)}</span>
       </span>
       {#if overview.presence}
         <span class="inline-flex items-center gap-1 rounded-full bg-success-subtle px-2 py-0.5 text-xs font-medium text-success-text">
@@ -42,7 +40,7 @@
         </span>
       {/if}
       <span class="font-mono font-medium {getBalanceClass(overview.balance)}">
-        {formatBalance(overview.balance, fmt)}
+        {formatBalance(overview.balance)}
       </span>
       {#if overview.manualAbsence}
         <span class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text">

@@ -2,7 +2,7 @@
  * Format decimal hours to display string
  * e.g., 2.5 -> "2h 30m", 1.0 -> "1h", 0.5 -> "30m"
  */
-export function formatHours(hours: number, _format?: 'decimal' | 'hhmm'): string {
+export function formatHours(hours: number): string {
   const abs = Math.abs(hours);
   const h = Math.floor(abs);
   const m = Math.round((abs - h) * 60);
@@ -26,9 +26,9 @@ export function secondsToHours(seconds: number): number {
  * Format a balance value with sign and color hint
  * e.g., 1.5 -> "+1,5h", -0.5 -> "-0,5h"
  */
-export function formatBalance(hours: number, format: 'decimal' | 'hhmm' = 'decimal'): string {
+export function formatBalance(hours: number): string {
   const sign = hours >= 0 ? '+' : '';
-  return `${sign}${formatHours(hours, format)}`;
+  return `${sign}${formatHours(hours)}`;
 }
 
 /**

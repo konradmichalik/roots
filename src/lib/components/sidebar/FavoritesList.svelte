@@ -4,7 +4,6 @@
 	import { getSortedFavorites, removeFavorite } from '../../stores/favorites.svelte';
 	import { dateNavState } from '../../stores/dateNavigation.svelte';
 	import { formatHours } from '../../utils/time-format';
-	import { settingsState } from '../../stores/settings.svelte';
 	import type { Favorite } from '../../types';
 
 	let showForm = $state(false);
@@ -111,7 +110,7 @@
 							</div>
 							{#if favorite.defaultHours}
 								<span class="text-xs font-mono text-muted-foreground flex-shrink-0">
-									{formatHours(favorite.defaultHours, settingsState.hoursFormat)}
+									{formatHours(favorite.defaultHours)}
 								</span>
 							{/if}
 						</div>

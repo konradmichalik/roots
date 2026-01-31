@@ -3,7 +3,6 @@
   import type { Snippet } from 'svelte';
   import TimeEntryCard from '../entries/TimeEntryCard.svelte';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
-  import { settingsState } from '../../stores/settings.svelte';
   import { getSourceColor } from '../../stores/settings.svelte';
 
   let { source, entries, loading = false, emphasized = false, entryGroupMap, dayTarget, headerAction }: {
@@ -31,7 +30,6 @@
   let sourceColor = $derived(getSourceColor(source));
   let total = $derived(entries.reduce((sum, e) => sum + e.hours, 0));
   let label = $derived(LABELS[source]);
-  let fmt = $derived(settingsState.hoursFormat);
   let balance = $derived(dayTarget ? total - dayTarget.requiredHours : null);
   let isFullyBooked = $derived(balance !== null && balance >= -0.01);
 </script>
@@ -56,7 +54,7 @@
       </div>
       <div class="flex items-center gap-2">
         <span class="font-mono text-sm font-medium text-foreground">
-          {formatHours(total, fmt)}
+          {formatHours(total)}
         </span>
         {#if headerAction}
           {@render headerAction()}
@@ -106,10 +104,10 @@
       {#if dayTarget && dayTarget.requiredHours > 0}
         <div class="flex items-center gap-2">
           <span class="text-xs text-muted-foreground">
-            {formatHours(total, fmt)} / {formatHours(dayTarget.requiredHours, fmt)}
+            {formatHours(total)} / {formatHours(dayTarget.requiredHours)}
           </span>
           <span class="text-xs font-mono font-medium {getBalanceClass(balance ?? 0)}">
-            {formatBalance(balance ?? 0, fmt)}
+            {formatBalance(balance ?? 0)}
           </span>
           {#if isFullyBooked}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
