@@ -125,19 +125,6 @@ export function getDayOfWeekIndex(dateStr: string): number {
   return day === 0 ? 6 : day - 1; // Convert Sun=0..Sat=6 to Mon=0..Sun=6
 }
 
-/**
- * Get day of week name
- */
-export function getDayName(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
-}
-
-/**
- * Get short day name (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
- */
-export function getShortDayName(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
-}
 
 /**
  * Format date for display (e.g., "Jan 15")
