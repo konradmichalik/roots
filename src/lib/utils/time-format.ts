@@ -21,12 +21,6 @@ export function secondsToHours(seconds: number): number {
   return Math.round((seconds / 3600) * 100) / 100;
 }
 
-/**
- * Convert minutes to decimal hours
- */
-export function minutesToHours(minutes: number): number {
-  return Math.round((minutes / 60) * 100) / 100;
-}
 
 /**
  * Format a balance value with sign and color hint
