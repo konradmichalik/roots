@@ -40,3 +40,40 @@ export interface MocoUser {
   firstname: string;
   lastname: string;
 }
+
+export interface MocoProjectAssigned {
+  id: number;
+  name: string;
+  billable: boolean;
+  customer: MocoCustomer;
+  tasks: MocoTask[];
+}
+
+export interface MocoCreateActivity {
+  date: string;
+  project_id: number;
+  task_id: number;
+  hours: number;
+  description?: string;
+  remote_service?: string;
+  remote_id?: string;
+  remote_url?: string;
+}
+
+export interface MocoUpdateActivity {
+  project_id?: number;
+  task_id?: number;
+  hours?: number;
+  description?: string;
+}
+
+export interface MocoPresence {
+  id: number;
+  date: string;
+  from: string;
+  to: string | null;
+  is_home_office: boolean;
+  user: MocoUser;
+  created_at: string;
+  updated_at: string;
+}

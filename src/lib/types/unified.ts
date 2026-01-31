@@ -16,6 +16,8 @@ export interface UnifiedTimeEntry {
 export interface MocoMetadata {
   source: 'moco';
   activityId: number;
+  projectId: number;
+  taskId: number;
   projectName: string;
   taskName: string;
   customerName: string;
@@ -51,13 +53,37 @@ export interface PersonioMetadata {
   halfDay: boolean;
 }
 
+// Per-weekday target hours: index 0=Mon, 1=Tue, ..., 5=Sat, 6=Sun
+export type WeekdayHours = [number, number, number, number, number, number, number];
+
+export type AbsenceType = 'vacation' | 'sick' | 'public_holiday' | 'personal' | 'other';
+
+export interface ManualAbsence {
+  id: string;
+  type: AbsenceType;
+  startDate: string;   // YYYY-MM-DD
+  endDate: string;     // YYYY-MM-DD (same as startDate for single-day)
+  halfDay: boolean;
+  note?: string;
+  createdAt: string;
+}
+
+export interface DayPresence {
+  from: string;
+  to: string | null;
+  hours: number;
+  isHomeOffice: boolean;
+}
+
 export interface DayOverview {
   date: string;
   dayOfWeek: number;
   isWeekend: boolean;
   isToday: boolean;
   requiredHours: number;
+  presence?: DayPresence;
   absence?: PersonioMetadata;
+  manualAbsence?: ManualAbsence;
   entries: {
     moco: UnifiedTimeEntry[];
     jira: UnifiedTimeEntry[];
@@ -71,22 +97,5 @@ export interface DayOverview {
   };
   balance: number;
 }
-
-export interface WeekOverview {
-  weekNumber: number;
-  year: number;
-  startDate: string;
-  endDate: string;
-  days: DayOverview[];
-  totals: {
-    required: number;
-    actual: number;
-    balance: number;
-    jira: number;
-    outlook: number;
-  };
-}
-
-export type ViewMode = 'week' | 'day' | 'month';
 
 export type Theme = 'light' | 'dark' | 'system';
