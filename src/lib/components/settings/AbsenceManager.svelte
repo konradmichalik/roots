@@ -1,6 +1,7 @@
 <script lang="ts">
   import { absencesState, removeAbsence } from '../../stores/absences.svelte';
   import AbsenceForm from './AbsenceForm.svelte';
+  import { formatDateShort } from '../../utils/date-helpers';
   import type { AbsenceType } from '../../types';
 
   let showForm = $state(false);
@@ -26,10 +27,9 @@
   );
 
   function formatDateRange(start: string, end: string): string {
-    const startFmt = new Date(start + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const startFmt = formatDateShort(start);
     if (start === end) return startFmt;
-    const endFmt = new Date(end + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startFmt} - ${endFmt}`;
+    return `${startFmt} - ${formatDateShort(end)}`;
   }
 </script>
 
