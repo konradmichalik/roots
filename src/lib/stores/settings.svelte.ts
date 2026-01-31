@@ -1,6 +1,6 @@
-import type { ViewMode } from '../types';
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
+import type { WeekdayHours } from '../types';
 
 export interface AppSettings {
   sourceColors: {
@@ -11,31 +11,35 @@ export interface AppSettings {
   };
   showWeekends: boolean;
   weekStartsOn: number;
-  defaultView: ViewMode;
   hoursFormat: 'decimal' | 'hhmm';
+  sidebarLeft: boolean;
+  sidebarRight: boolean;
   outlookFilter: {
     showDeclined: boolean;
     showFree: false;
     showCancelled: false;
   };
+  weekdayHours: WeekdayHours;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   sourceColors: {
-    moco: '#10B981',
-    jira: '#3B82F6',
-    outlook: '#8B5CF6',
-    personio: '#F59E0B'
+    moco: '#a3be8c',
+    jira: '#5e81ac',
+    outlook: '#b48ead',
+    personio: '#d08770'
   },
   showWeekends: false,
   weekStartsOn: 1,
-  defaultView: 'week',
   hoursFormat: 'decimal',
+  sidebarLeft: true,
+  sidebarRight: false,
   outlookFilter: {
     showDeclined: false,
     showFree: false,
     showCancelled: false
-  }
+  },
+  weekdayHours: [8, 8, 8, 8, 8, 0, 0]
 };
 
 export const settingsState = $state<AppSettings>({ ...DEFAULT_SETTINGS });
