@@ -126,31 +126,31 @@ export function getDayOfWeekIndex(dateStr: string): number {
 }
 
 /**
- * Get day of week name in German
+ * Get day of week name
  */
 export function getDayName(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('de-DE', { weekday: 'short' });
+  return parseDate(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
 }
 
 /**
- * Get short day name (Mo, Di, Mi, Do, Fr, Sa, So)
+ * Get short day name (Mon, Tue, Wed, Thu, Fri, Sat, Sun)
  */
 export function getShortDayName(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('de-DE', { weekday: 'short' });
+  return parseDate(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
 }
 
 /**
- * Format date for display (e.g., "15. Jan")
+ * Format date for display (e.g., "Jan 15")
  */
 export function formatDateShort(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' });
+  return parseDate(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 }
 
 /**
- * Format date for display (e.g., "15. Januar 2025")
+ * Format date for display (e.g., "January 15, 2025")
  */
 export function formatDateLong(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('de-DE', {
+  return parseDate(dateStr).toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
@@ -158,24 +158,24 @@ export function formatDateLong(dateStr: string): string {
 }
 
 /**
- * Format a date range (e.g., "13. - 17. Jan 2025")
+ * Format a date range (e.g., "Jan 13 - Jan 17, 2025")
  */
 export function formatDateRange(startStr: string, endStr: string): string {
   const start = parseDate(startStr);
   const end = parseDate(endStr);
 
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-    const startDay = start.getDate();
-    const endFormatted = end.toLocaleDateString('de-DE', {
+    const startFormatted = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endFormatted = end.toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
     });
-    return `${startDay}. - ${endFormatted}`;
+    return `${startFormatted} - ${endFormatted}`;
   }
 
-  const startFormatted = start.toLocaleDateString('de-DE', { day: 'numeric', month: 'short' });
-  const endFormatted = end.toLocaleDateString('de-DE', {
+  const startFormatted = start.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  const endFormatted = end.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric'

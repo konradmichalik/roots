@@ -14,18 +14,18 @@ const LOG_LEVELS: Record<LogLevel, number> = {
 };
 
 const LOG_STYLES = {
-  prefix: 'color: #6B7280; font-weight: bold;',
-  connection: 'color: #3B82F6;',
-  api: 'color: #8B5CF6;',
-  store: 'color: #F59E0B;',
-  warn: 'color: #F59E0B;',
-  error: 'color: #EF4444;',
-  success: 'color: #10B981;',
-  timing: 'color: #6B7280; font-style: italic;',
-  moco: 'color: #10B981;',
-  jira: 'color: #3B82F6;',
-  outlook: 'color: #8B5CF6;',
-  personio: 'color: #F59E0B;'
+  prefix: 'color: #4c566a; font-weight: bold;',
+  connection: 'color: #5e81ac;',
+  api: 'color: #b48ead;',
+  store: 'color: #ebcb8b;',
+  warn: 'color: #d08770;',
+  error: 'color: #bf616a;',
+  success: 'color: #a3be8c;',
+  timing: 'color: #4c566a; font-style: italic;',
+  moco: 'color: #a3be8c;',
+  jira: 'color: #5e81ac;',
+  outlook: 'color: #b48ead;',
+  personio: 'color: #d08770;'
 };
 
 const ICONS = {
@@ -61,7 +61,7 @@ class Logger {
   private getTimestamp(): string {
     if (!this.config.showTimestamp) return '';
     const now = new Date();
-    return `[${now.toLocaleTimeString('de-DE')}.${now.getMilliseconds().toString().padStart(3, '0')}]`;
+    return `[${now.toLocaleTimeString('en-US')}.${now.getMilliseconds().toString().padStart(3, '0')}]`;
   }
 
   private formatMessage(icon: string, _category: string, message: string): string {
@@ -94,7 +94,7 @@ class Logger {
     );
     if (details) {
       Object.entries(details).forEach(([key, value]) => {
-        console.log(`%c\u251C\u2500 ${key}:`, 'color: #6B7280;', value);
+        console.log(`%c\u251C\u2500 ${key}:`, 'color: #4c566a;', value);
       });
     }
     console.groupEnd();
@@ -117,7 +117,7 @@ class Logger {
     );
     if (details) {
       Object.entries(details).forEach(([key, value]) => {
-        console.log(`%c\u251C\u2500 ${key}:`, 'color: #6B7280;', value);
+        console.log(`%c\u251C\u2500 ${key}:`, 'color: #4c566a;', value);
       });
     }
     console.groupEnd();
@@ -163,7 +163,7 @@ class Logger {
     if (!this.shouldLog('info')) return;
     console.log(
       `%c${this.formatMessage('\u2139\uFE0F', 'info', message)}`,
-      'color: #3B82F6;',
+      'color: #5e81ac;',
       data ?? ''
     );
   }
@@ -172,7 +172,7 @@ class Logger {
     if (!this.shouldLog('debug')) return;
     console.log(
       `%c${this.formatMessage('\u{1F41B}', 'debug', message)}`,
-      'color: #6B7280;',
+      'color: #4c566a;',
       data ?? ''
     );
   }

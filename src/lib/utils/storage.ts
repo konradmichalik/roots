@@ -28,7 +28,9 @@ export const STORAGE_KEYS = {
   PERSONIO_CONFIG: 'personio-config',
   OUTLOOK_CONFIG: 'outlook-config',
   OUTLOOK_TOKENS: 'outlook-tokens',
-  PERSONIO_TOKENS: 'personio-tokens'
+  PERSONIO_TOKENS: 'personio-tokens',
+  ABSENCES: 'absences',
+  FAVORITES: 'favorites'
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

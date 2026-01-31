@@ -41,8 +41,8 @@ export function formatBalance(hours: number, format: 'decimal' | 'hhmm' = 'decim
  * Get CSS class for balance coloring
  */
 export function getBalanceClass(hours: number): string {
-  if (hours > 0.1) return 'text-emerald-600 dark:text-emerald-400';
-  if (hours < -0.1) return 'text-red-600 dark:text-red-400';
+  if (hours > 0.1) return 'text-success-text';
+  if (hours < -0.1) return 'text-danger-text';
   return 'text-muted-foreground';
 }
 
