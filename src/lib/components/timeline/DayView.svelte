@@ -1,250 +1,110 @@
 <script lang="ts">
-  import type { UnifiedTimeEntry, JiraMetadata } from '../../types';
+  import SourceColumn from './SourceColumn.svelte';
+  import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getEntriesForDate, isAnyLoading } from '../../stores/timeEntries.svelte';
+  import { getEntriesForDate, getDayOverview, timeEntriesState } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { extractIssueKeyFromMoco } from '../../utils/reconciliation';
+  import { formatDateLong } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { settingsState } from '../../stores/settings.svelte';
-  import { formatDateLong } from '../../utils/date-helpers';
-
-  const MATCH_COLORS = [
-    'border-l-blue-500',
-    'border-l-purple-500',
-    'border-l-teal-500',
-    'border-l-amber-500',
-    'border-l-rose-500',
-    'border-l-indigo-500',
-    'border-l-cyan-500',
-    'border-l-orange-500'
-  ];
-
-  interface DayRow {
-    mocoEntry: UnifiedTimeEntry | null;
-    jiraEntry: UnifiedTimeEntry | null;
-    issueKey: string | null;
-    matchColor: string;
-  }
+  import { buildMatchResult } from '../../stores/entryMatching.svelte';
 
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
-  let loading = $derived(isAnyLoading());
+  let matchResult = $derived(buildMatchResult(entries.moco, entries.jira));
+  let overview = $derived(getDayOverview(dateNavState.selectedDate));
   let fmt = $derived(settingsState.hoursFormat);
-
-  let mocoTotal = $derived(entries.moco.reduce((s, e) => s + e.hours, 0));
-  let jiraTotal = $derived(entries.jira.reduce((s, e) => s + e.hours, 0));
-  let diff = $derived(Math.round((mocoTotal - jiraTotal) * 100) / 100);
-  let diffClass = $derived(getBalanceClass(diff));
-
-  let bothConnected = $derived(connectionsState.moco.isConnected && connectionsState.jira.isConnected);
-
-  let rows = $derived(buildRows(entries.moco, entries.jira));
-
-  function buildRows(moco: UnifiedTimeEntry[], jira: UnifiedTimeEntry[]): DayRow[] {
-    // Index Jira entries by issue key
-    const jiraByKey = new Map<string, UnifiedTimeEntry[]>();
-    for (const j of jira) {
-      const key = (j.metadata as JiraMetadata).issueKey;
-      const list = jiraByKey.get(key) ?? [];
-      jiraByKey.set(key, [...list, j]);
-    }
-
-    // Track which Jira keys have been paired
-    const pairedJiraKeys = new Set<string>();
-    let colorIndex = 0;
-
-    // Group Moco entries by extracted issue key
-    const mocoGroups: { key: string | null; entries: UnifiedTimeEntry[] }[] = [];
-    const mocoKeyMap = new Map<string, UnifiedTimeEntry[]>();
-
-    for (const m of moco) {
-      const extracted = extractIssueKeyFromMoco(m);
-      const key = extracted?.key ?? null;
-      if (key) {
-        const list = mocoKeyMap.get(key) ?? [];
-        mocoKeyMap.set(key, [...list, m]);
-      } else {
-        mocoGroups.push({ key: null, entries: [m] });
-      }
-    }
-    for (const [key, entries] of mocoKeyMap) {
-      mocoGroups.push({ key, entries });
-    }
-
-    const result: DayRow[] = [];
-
-    // Build paired rows for each Moco group
-    for (const group of mocoGroups) {
-      const jiraEntries = group.key ? (jiraByKey.get(group.key) ?? []) : [];
-      const isMatched = group.key !== null && jiraEntries.length > 0;
-      const color = isMatched ? MATCH_COLORS[colorIndex++ % MATCH_COLORS.length] : '';
-
-      if (isMatched && group.key) {
-        pairedJiraKeys.add(group.key);
-      }
-
-      const maxLen = Math.max(group.entries.length, jiraEntries.length);
-      for (let i = 0; i < maxLen; i++) {
-        result.push({
-          mocoEntry: group.entries[i] ?? null,
-          jiraEntry: jiraEntries[i] ?? null,
-          issueKey: group.key,
-          matchColor: color
-        });
-      }
-    }
-
-    // Add unmatched Jira entries
-    for (const [key, jiraEntries] of jiraByKey) {
-      if (pairedJiraKeys.has(key)) continue;
-      for (const j of jiraEntries) {
-        result.push({
-          mocoEntry: null,
-          jiraEntry: j,
-          issueKey: key,
-          matchColor: ''
-        });
-      }
-    }
-
-    return result;
-  }
 </script>
 
-<div class="mx-auto max-w-4xl space-y-4">
+<div class="mx-auto max-w-6xl space-y-4">
   <!-- Day header -->
   <div class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
     <span class="text-sm font-medium text-foreground">
       {formatDateLong(dateNavState.selectedDate)}
     </span>
-    {#if bothConnected}
-      <div class="flex items-center gap-3 text-sm">
-        <span class="text-muted-foreground">
-          Moco <span class="font-mono font-medium text-foreground">{formatHours(mocoTotal, fmt)}</span>
+    <div class="flex items-center gap-3 text-sm">
+      <span class="text-muted-foreground">
+        Actual: <span class="font-mono font-medium text-foreground">{formatHours(overview.totals.actual, fmt)}</span>
+      </span>
+      <span class="text-muted-foreground">
+        Target: <span class="font-mono font-medium text-foreground">{formatHours(overview.requiredHours, fmt)}</span>
+      </span>
+      {#if overview.presence}
+        <span class="inline-flex items-center gap-1 rounded-full bg-success-subtle px-2 py-0.5 text-xs font-medium text-success-text">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+          </svg>
+          {overview.presence.from} – {overview.presence.to ?? 'now'}
+          {#if overview.presence.isHomeOffice}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+          {/if}
         </span>
-        <span class="text-muted-foreground">
-          Jira <span class="font-mono font-medium text-foreground">{formatHours(jiraTotal, fmt)}</span>
+      {/if}
+      <span class="font-mono font-medium {getBalanceClass(overview.balance)}">
+        {formatBalance(overview.balance, fmt)}
+      </span>
+      {#if overview.manualAbsence}
+        <span class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text">
+          {overview.manualAbsence.type === 'vacation' ? 'Vacation'
+            : overview.manualAbsence.type === 'sick' ? 'Sick'
+            : overview.manualAbsence.type === 'public_holiday' ? 'Holiday'
+            : overview.manualAbsence.type === 'personal' ? 'Personal'
+            : 'Absence'}{overview.manualAbsence.halfDay ? ' (half day)' : ''}
         </span>
-        {#if Math.abs(diff) > 0.01}
-          <span class="font-mono font-medium {diffClass}">
-            {formatBalance(diff, fmt)}
-          </span>
-        {/if}
+      {/if}
+    </div>
+  </div>
+
+  <!-- Three-column layout: Outlook | Moco (emphasized) | Jira -->
+  <div class="grid grid-cols-[1fr_1.4fr_1fr] gap-4 items-start" style="min-height: 60vh;">
+    <!-- Left: Outlook Calendar -->
+    {#if connectionsState.outlook.isConnected}
+      <SourceColumn source="outlook" entries={entries.outlook} loading={timeEntriesState.loading.outlook} />
+    {:else}
+      <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
+        </svg>
+        <p class="text-xs text-muted-foreground/50">Outlook not connected</p>
+      </div>
+    {/if}
+
+    <!-- Center: Moco (emphasized) -->
+    {#if connectionsState.moco.isConnected}
+      <SourceColumn source="moco" entries={matchResult.sortedMoco} loading={timeEntriesState.loading.moco} emphasized entryGroupMap={matchResult.entryGroupMap} dayTarget={{ requiredHours: overview.requiredHours }}>
+        {#snippet headerAction()}
+          <MocoEntryModal mode="create" prefill={{ date: dateNavState.selectedDate }}>
+            <button
+              class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
+              title="New Moco entry"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
+              </svg>
+            </button>
+          </MocoEntryModal>
+        {/snippet}
+      </SourceColumn>
+    {:else}
+      <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+        <p class="text-xs text-muted-foreground/50">Moco not connected</p>
+      </div>
+    {/if}
+
+    <!-- Right: Jira Worklogs -->
+    {#if connectionsState.jira.isConnected}
+      <SourceColumn source="jira" entries={matchResult.sortedJira} loading={timeEntriesState.loading.jira} entryGroupMap={matchResult.entryGroupMap} />
+    {:else}
+      <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" />
+        </svg>
+        <p class="text-xs text-muted-foreground/50">Jira not connected</p>
       </div>
     {/if}
   </div>
-
-  {#if loading}
-    <div class="text-center text-sm text-muted-foreground py-3 animate-pulse">
-      Lade Eintraege...
-    </div>
-  {/if}
-
-  <!-- Column headers -->
-  <div class="grid grid-cols-2 gap-4">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="h-2.5 w-2.5 rounded-full bg-emerald-500"></div>
-        <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Moco</span>
-      </div>
-      <span class="text-xs font-mono text-muted-foreground">{formatHours(mocoTotal, fmt)}</span>
-    </div>
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="h-2.5 w-2.5 rounded-full bg-blue-500"></div>
-        <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Jira</span>
-      </div>
-      <span class="text-xs font-mono text-muted-foreground">{formatHours(jiraTotal, fmt)}</span>
-    </div>
-  </div>
-
-  <!-- Paired rows -->
-  {#if rows.length > 0}
-    <div class="space-y-1.5">
-      {#each rows as row, i (row.mocoEntry?.id ?? row.jiraEntry?.id ?? i)}
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Moco cell -->
-          {#if row.mocoEntry}
-            <div class="rounded-xl border border-border bg-card p-2.5 shadow-sm {row.matchColor ? `border-l-4 ${row.matchColor}` : ''}">
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex-1 min-w-0">
-                  <span class="text-sm font-medium text-foreground truncate block">{row.mocoEntry.title}</span>
-                  {#if row.mocoEntry.description}
-                    <p class="text-xs text-muted-foreground truncate">{row.mocoEntry.description}</p>
-                  {/if}
-                  {#if row.issueKey}
-                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400">{row.issueKey}</span>
-                  {/if}
-                </div>
-                <span class="text-sm font-mono font-medium text-foreground flex-shrink-0">
-                  {formatHours(row.mocoEntry.hours, fmt)}
-                </span>
-              </div>
-            </div>
-          {:else}
-            <div class="rounded-xl border border-dashed border-border/50 p-2.5 flex items-center justify-center">
-              <span class="text-xs text-muted-foreground/50 italic">Nicht in Moco</span>
-            </div>
-          {/if}
-
-          <!-- Jira cell -->
-          {#if row.jiraEntry}
-            <div class="rounded-xl border border-border bg-card p-2.5 shadow-sm {row.matchColor ? `border-l-4 ${row.matchColor}` : ''}">
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex-1 min-w-0">
-                  <span class="text-sm font-medium text-foreground truncate block">{row.jiraEntry.title}</span>
-                  {#if row.jiraEntry.description}
-                    <p class="text-xs text-muted-foreground truncate">{row.jiraEntry.description}</p>
-                  {/if}
-                </div>
-                <span class="text-sm font-mono font-medium text-foreground flex-shrink-0">
-                  {formatHours(row.jiraEntry.hours, fmt)}
-                </span>
-              </div>
-            </div>
-          {:else}
-            <div class="rounded-xl border border-dashed border-border/50 p-2.5 flex items-center justify-center">
-              <span class="text-xs text-muted-foreground/50 italic">Kein Jira-Worklog</span>
-            </div>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  {:else}
-    <div class="flex flex-col items-center gap-2 py-12 text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
-      </svg>
-      <p class="text-sm text-muted-foreground/50">Keine Eintraege fuer diesen Tag.</p>
-    </div>
-  {/if}
-
-  <!-- Outlook events (if any) -->
-  {#if entries.outlook.length > 0}
-    <div>
-      <div class="flex items-center gap-2 mb-2">
-        <div class="h-2.5 w-2.5 rounded-full bg-purple-500"></div>
-        <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Outlook</span>
-        <span class="text-xs font-mono text-muted-foreground ml-auto">
-          {formatHours(entries.outlook.reduce((s, e) => s + e.hours, 0), fmt)}
-        </span>
-      </div>
-      <div class="grid grid-cols-2 gap-1.5">
-        {#each entries.outlook as entry (entry.id)}
-          <div class="rounded-xl border border-border bg-card p-2.5 shadow-sm">
-            <div class="flex items-start justify-between gap-2">
-              <div class="flex-1 min-w-0">
-                <span class="text-sm font-medium text-foreground truncate block">{entry.title}</span>
-                {#if entry.startTime && entry.endTime}
-                  <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
-                {/if}
-              </div>
-              <span class="text-sm font-mono font-medium text-foreground flex-shrink-0">
-                {formatHours(entry.hours, fmt)}
-              </span>
-            </div>
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
 </div>
