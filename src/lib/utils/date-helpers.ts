@@ -51,7 +51,6 @@ export function getWeekEnd(dateStr: string): string {
   return addDays(start, 4);
 }
 
-
 /**
  * Get all dates (Mon-Fri) in the week containing the given date
  */
@@ -59,7 +58,6 @@ export function getWeekDates(dateStr: string): string[] {
   const start = getWeekStart(dateStr);
   return Array.from({ length: 5 }, (_, i) => addDays(start, i));
 }
-
 
 /**
  * Get the first day of the month
@@ -92,7 +90,6 @@ export function isToday(dateStr: string): boolean {
   return dateStr === today();
 }
 
-
 /**
  * Get day of week index (0 = Monday, 6 = Sunday)
  */
@@ -120,29 +117,4 @@ export function formatDateLong(dateStr: string): string {
   });
 }
 
-/**
- * Format a date range (e.g., "Jan 13 - Jan 17, 2025")
- */
-export function formatDateRange(startStr: string, endStr: string): string {
-  const start = parseDate(startStr);
-  const end = parseDate(endStr);
-
-  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-    const startFormatted = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endFormatted = end.toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-    return `${startFormatted} - ${endFormatted}`;
-  }
-
-  const startFormatted = start.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-  const endFormatted = end.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  });
-  return `${startFormatted} - ${endFormatted}`;
-}
 

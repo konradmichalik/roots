@@ -21,7 +21,6 @@ export function secondsToHours(seconds: number): number {
   return Math.round((seconds / 3600) * 100) / 100;
 }
 
-
 /**
  * Format a balance value with sign and color hint
  * e.g., 1.5 -> "+1,5h", -0.5 -> "-0,5h"
