@@ -19,8 +19,8 @@
   </Dialog.Trigger>
   <Dialog.Content class="sm:max-w-lg max-h-[85vh] overflow-y-auto">
     <Dialog.Header>
-      <Dialog.Title>Verbindungen</Dialog.Title>
-      <Dialog.Description>Services verbinden und verwalten.</Dialog.Description>
+      <Dialog.Title>Connections</Dialog.Title>
+      <Dialog.Description>Connect and manage services.</Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-6 py-4">
@@ -28,17 +28,17 @@
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('moco')}"></div>
+            <img src="/moco.svg" alt="Moco" class="h-4 w-auto opacity-40 grayscale dark:invert dark:opacity-30" />
             <h3 class="font-semibold text-foreground">Moco</h3>
           </div>
           {#if connectionsState.moco.isConnected}
             <div class="flex items-center gap-2">
-              <span class="text-xs text-green-600 dark:text-green-400">Verbunden</span>
+              <span class="text-xs text-success-text">Connected</span>
               <button
                 onclick={() => disconnectMoco()}
-                class="text-xs text-muted-foreground hover:text-red-500 transition-colors"
+                class="text-xs text-muted-foreground hover:text-danger-text transition-colors"
               >
-                Trennen
+                Disconnect
               </button>
             </div>
           {/if}
@@ -52,17 +52,17 @@
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('jira')}"></div>
+            <img src="/jira.svg" alt="Jira" class="h-4 w-4 opacity-40 grayscale dark:invert dark:opacity-30" />
             <h3 class="font-semibold text-foreground">Jira</h3>
           </div>
           {#if connectionsState.jira.isConnected}
             <div class="flex items-center gap-2">
-              <span class="text-xs text-green-600 dark:text-green-400">Verbunden</span>
+              <span class="text-xs text-success-text">Connected</span>
               <button
                 onclick={() => disconnectJira()}
-                class="text-xs text-muted-foreground hover:text-red-500 transition-colors"
+                class="text-xs text-muted-foreground hover:text-danger-text transition-colors"
               >
-                Trennen
+                Disconnect
               </button>
             </div>
           {/if}
@@ -76,17 +76,17 @@
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('outlook')}"></div>
+            <img src="/icons8-outlook.svg" alt="Outlook" class="h-4 w-4 opacity-40 grayscale dark:invert dark:opacity-30" />
             <h3 class="font-semibold text-foreground">Outlook</h3>
           </div>
           {#if connectionsState.outlook.isConnected}
             <div class="flex items-center gap-2">
-              <span class="text-xs text-green-600 dark:text-green-400">Verbunden</span>
+              <span class="text-xs text-success-text">Connected</span>
               <button
                 onclick={() => disconnectOutlook()}
-                class="text-xs text-muted-foreground hover:text-red-500 transition-colors"
+                class="text-xs text-muted-foreground hover:text-danger-text transition-colors"
               >
-                Trennen
+                Disconnect
               </button>
             </div>
           {/if}
@@ -101,7 +101,7 @@
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full bg-muted-foreground/30"></div>
           <span class="font-semibold text-muted-foreground">Personio</span>
-          <span class="ml-auto text-xs text-muted-foreground">Bald verfuegbar</span>
+          <span class="ml-auto text-xs text-muted-foreground">Coming soon</span>
         </div>
       </div>
     </div>

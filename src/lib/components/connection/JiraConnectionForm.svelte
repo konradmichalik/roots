@@ -99,7 +99,7 @@
       type="text"
       bind:value={baseUrl}
       oninput={handleUrlInput}
-      placeholder={instanceType === 'cloud' ? 'firma.atlassian.net' : 'https://jira.firma.de'}
+      placeholder={instanceType === 'cloud' ? 'company.atlassian.net' : 'https://jira.company.com'}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
@@ -114,7 +114,7 @@
         id="jira-email"
         type="email"
         bind:value={email}
-        placeholder="name@firma.de"
+        placeholder="name@company.com"
         class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
     </div>
@@ -137,7 +137,7 @@
           rel="noopener"
           class="underline hover:text-foreground"
         >
-          API Token erstellen
+          Create API Token
         </a>
       </p>
     </div>
@@ -164,32 +164,32 @@
           id="jira-pat"
           type="password"
           bind:value={personalAccessToken}
-          placeholder="PAT aus Jira-Profil"
+          placeholder="PAT from Jira profile"
           class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
     {:else}
       <div>
         <label for="jira-user" class="block text-sm font-medium text-foreground mb-1">
-          Benutzername
+          Username
         </label>
         <input
           id="jira-user"
           type="text"
           bind:value={username}
-          placeholder="Benutzername"
+          placeholder="Username"
           class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
       <div>
         <label for="jira-pass" class="block text-sm font-medium text-foreground mb-1">
-          Passwort
+          Password
         </label>
         <input
           id="jira-pass"
           type="password"
           bind:value={password}
-          placeholder="Passwort"
+          placeholder="Password"
           class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
@@ -205,6 +205,6 @@
     disabled={connectionsState.jira.isConnecting || !isValid()}
     class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
   >
-    {connectionsState.jira.isConnecting ? 'Verbinde...' : 'Verbinden'}
+    {connectionsState.jira.isConnecting ? 'Connecting...' : 'Connect'}
   </button>
 </form>

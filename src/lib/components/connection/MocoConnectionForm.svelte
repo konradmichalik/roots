@@ -26,7 +26,7 @@
         id="moco-domain"
         type="text"
         bind:value={domain}
-        placeholder="firma"
+        placeholder="company"
         class="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
       <span class="text-sm text-muted-foreground">.mocoapp.com</span>
@@ -35,17 +35,17 @@
 
   <div>
     <label for="moco-api-key" class="block text-sm font-medium text-foreground mb-1">
-      API-Schluessel
+      API Key
     </label>
     <input
       id="moco-api-key"
       type="password"
       bind:value={apiKey}
-      placeholder="API Key aus deinem Moco-Profil"
+      placeholder="API key from your Moco profile"
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
     <p class="mt-1 text-xs text-muted-foreground">
-      Zu finden unter Profil &rarr; Integrationen
+      Found under Profile &rarr; Integrations
     </p>
   </div>
 
@@ -58,6 +58,6 @@
     disabled={connectionsState.moco.isConnecting || !domain.trim() || !apiKey.trim()}
     class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
   >
-    {connectionsState.moco.isConnecting ? 'Verbinde...' : 'Verbinden'}
+    {connectionsState.moco.isConnecting ? 'Connecting...' : 'Connect'}
   </button>
 </form>
