@@ -40,11 +40,3 @@ export function getBalanceClass(hours: number): string {
   return 'text-muted-foreground';
 }
 
-/**
- * Calculate duration in hours between two ISO datetime strings
- */
-export function calculateDurationHours(start: string, end: string): number {
-  const startMs = new Date(start).getTime();
-  const endMs = new Date(end).getTime();
-  return secondsToHours((endMs - startMs) / 1000);
-}
