@@ -60,13 +60,6 @@ export function getWeekDates(dateStr: string): string[] {
   return Array.from({ length: 5 }, (_, i) => addDays(start, i));
 }
 
-/**
- * Get all dates (Mon-Sun) in the week containing the given date
- */
-export function getFullWeekDates(dateStr: string): string[] {
-  const start = getWeekStart(dateStr);
-  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
-}
 
 /**
  * Get the first day of the month
