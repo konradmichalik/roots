@@ -106,16 +106,6 @@ export function isToday(dateStr: string): boolean {
   return dateStr === today();
 }
 
-/**
- * Get the ISO week number
- */
-export function getWeekNumber(dateStr: string): number {
-  const date = parseDate(dateStr);
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-}
 
 /**
  * Get day of week index (0 = Monday, 6 = Sunday)
