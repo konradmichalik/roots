@@ -146,30 +146,3 @@ export function formatDateRange(startStr: string, endStr: string): string {
   return `${startFormatted} - ${endFormatted}`;
 }
 
-/**
- * Check if two date strings are the same date
- */
-export function isSameDate(a: string, b: string): boolean {
-  return a === b;
-}
-
-/**
- * Check if date a is before date b
- */
-export function isBefore(a: string, b: string): boolean {
-  return a < b;
-}
-
-/**
- * Check if date a is after date b
- */
-export function isAfter(a: string, b: string): boolean {
-  return a > b;
-}
-
-/**
- * Check if a date falls within a range (inclusive)
- */
-export function isInRange(dateStr: string, startStr: string, endStr: string): boolean {
-  return dateStr >= startStr && dateStr <= endStr;
-}
