@@ -23,10 +23,6 @@ export const presencesState = $state<{
   error: null
 });
 
-export function initializePresences(): void {
-  logger.store('presences', 'Initialized');
-}
-
 /**
  * Fetch presences for a date range with TTL-based caching.
  */
