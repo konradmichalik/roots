@@ -7,8 +7,6 @@ import { OutlookClient } from './outlook-client';
 
 export { MocoClient } from './moco-client';
 export { JiraWorklogClient, type WorklogWithIssue } from './jira-worklog-client';
-export { JiraCloudWorklogClient } from './jira-cloud-worklog';
-export { JiraServerWorklogClient } from './jira-server-worklog';
 export { OutlookClient } from './outlook-client';
 
 const PROXY_BASE = 'http://localhost:3002';
