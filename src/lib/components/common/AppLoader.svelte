@@ -13,7 +13,7 @@
     <div class="text-center">
       <h1 class="text-2xl font-bold text-foreground tracking-tight">Roots</h1>
       <p class="mt-2 text-sm text-muted-foreground animate-pulse">
-        Laden...
+        Loading...
       </p>
     </div>
   </div>
