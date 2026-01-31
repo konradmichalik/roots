@@ -1,5 +1,5 @@
 import { ApiClient, type ApiClientConfig } from './base-client';
-import type { MocoActivity, MocoUser } from '../types';
+import type { MocoActivity, MocoUser, MocoTask, MocoProjectAssigned, MocoCreateActivity, MocoUpdateActivity, MocoPresence } from '../types';
 import { logger } from '../utils/logger';
 
 export interface MocoClientConfig extends ApiClientConfig {
@@ -59,6 +59,64 @@ export class MocoClient extends ApiClient {
     );
     logger.info(`Fetched ${activities.length} Moco activities`);
     return activities;
+  }
+
+  /**
+   * Fetch projects assigned to the current user (includes tasks)
+   */
+  async getAssignedProjects(): Promise<MocoProjectAssigned[]> {
+    logger.info('Fetching assigned Moco projects');
+    const projects = await this.request<MocoProjectAssigned[]>('GET', '/projects/assigned');
+    logger.info(`Fetched ${projects.length} assigned projects`);
+    return projects;
+  }
+
+  /**
+   * Fetch tasks for a specific project
+   */
+  async getProjectTasks(projectId: number): Promise<MocoTask[]> {
+    logger.info(`Fetching tasks for project ${projectId}`);
+    const tasks = await this.request<MocoTask[]>('GET', `/projects/${projectId}/tasks`);
+    logger.info(`Fetched ${tasks.length} tasks for project ${projectId}`);
+    return tasks;
+  }
+
+  /**
+   * Create a new time entry
+   */
+  async createActivity(data: MocoCreateActivity): Promise<MocoActivity> {
+    logger.info('Creating Moco activity', { date: data.date, projectId: data.project_id });
+    return this.request<MocoActivity>('POST', '/activities', data);
+  }
+
+  /**
+   * Update an existing time entry
+   */
+  async updateActivity(id: number, data: MocoUpdateActivity): Promise<MocoActivity> {
+    logger.info(`Updating Moco activity ${id}`);
+    return this.request<MocoActivity>('PUT', `/activities/${id}`, data);
+  }
+
+  /**
+   * Delete a time entry
+   */
+  async deleteActivity(id: number): Promise<void> {
+    logger.info(`Deleting Moco activity ${id}`);
+    await this.request<void>('DELETE', `/activities/${id}`);
+  }
+
+  /**
+   * Fetch user presences (attendance) for a date range
+   */
+  async getPresences(from: string, to: string): Promise<MocoPresence[]> {
+    const userFilter = this.currentUserId ? `&user_id=${this.currentUserId}` : '';
+    logger.info(`Fetching Moco presences: ${from} to ${to}`);
+    const presences = await this.request<MocoPresence[]>(
+      'GET',
+      `/users/presences?from=${from}&to=${to}${userFilter}`
+    );
+    logger.info(`Fetched ${presences.length} Moco presences`);
+    return presences;
   }
 
   /**
