@@ -3,74 +3,96 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Roots Design Tokens - Light */
+/* Roots Design Tokens - Light (Nord) */
 html[data-color-mode='light'] {
   color-scheme: light;
-  --ds-text: #0f172a;
-  --ds-text-subtle: #475569;
-  --ds-text-subtlest: #94a3b8;
-  --ds-text-inverse: #ffffff;
-  --ds-text-brand: #2563eb;
-  --ds-text-danger: #dc2626;
-  --ds-text-success: #16a34a;
-  --ds-text-warning: #d97706;
-  --ds-border: #e2e8f0;
-  --ds-border-bold: #94a3b8;
-  --ds-border-focused: #3b82f6;
-  --ds-border-input: #cbd5e1;
-  --ds-surface: #ffffff;
-  --ds-surface-hovered: #f8fafc;
+  --ds-text: #2e3440;
+  --ds-text-subtle: #434c5e;
+  --ds-text-subtlest: #4c566a;
+  --ds-text-inverse: #eceff4;
+  --ds-text-brand: #5e81ac;
+  --ds-text-danger: #bf616a;
+  --ds-text-success: #7b9e64;
+  --ds-text-warning: #d08770;
+  --ds-text-discovery: #b48ead;
+  --ds-border: #2e344020;
+  --ds-border-bold: #4c566a;
+  --ds-border-focused: #88c0d0;
+  --ds-border-input: #d8dee9;
+  --ds-border-danger: #bf616a;
+  --ds-border-warning: #d08770;
+  --ds-border-success: #a3be8c;
+  --ds-surface: #f5f7fa;
+  --ds-surface-hovered: #eceff4;
   --ds-surface-raised: #ffffff;
-  --ds-surface-sunken: #f1f5f9;
+  --ds-surface-sunken: #eceff4;
   --ds-surface-overlay: #ffffff;
-  --ds-background-brand-bold: #2563eb;
-  --ds-background-brand-bold-hovered: #1d4ed8;
-  --ds-background-neutral: #f1f5f9;
-  --ds-background-neutral-hovered: #e2e8f0;
-  --ds-background-selected: #eff6ff;
-  --ds-background-danger: #fef2f2;
-  --ds-background-danger-bold: #dc2626;
-  --ds-background-success: #f0fdf4;
-  --ds-background-success-bold: #16a34a;
-  --ds-background-warning: #fffbeb;
-  --ds-background-warning-bold: #d97706;
+  --ds-background-brand-bold: #5e81ac;
+  --ds-background-brand-bold-hovered: #507396;
+  --ds-background-neutral: #2e344010;
+  --ds-background-neutral-hovered: #2e344018;
+  --ds-background-neutral-pressed: #2e344030;
+  --ds-background-selected: #e7ecf3;
+  --ds-background-danger: #f9eff0;
+  --ds-background-danger-bold: #bf616a;
+  --ds-background-danger-bold-hovered: #a9545c;
+  --ds-background-success: #f2f6ef;
+  --ds-background-success-bold: #a3be8c;
+  --ds-background-success-bold-hovered: #8faa78;
+  --ds-background-warning: #fdf9f1;
+  --ds-background-warning-bold: #ebcb8b;
+  --ds-background-discovery: #f5f0f4;
+  --ds-background-discovery-bold: #b48ead;
+  --ds-background-information: #e7ecf3;
+  --ds-background-information-bold: #5e81ac;
   --ds-background-input: #ffffff;
-  --ds-blanket: #0f172a75;
+  --ds-blanket: #2e344070;
 }
 
-/* Roots Design Tokens - Dark */
+/* Roots Design Tokens - Dark (Nord) */
 html[data-color-mode='dark'] {
   color-scheme: dark;
-  --ds-text: #e2e8f0;
-  --ds-text-subtle: #94a3b8;
-  --ds-text-subtlest: #64748b;
-  --ds-text-inverse: #0f172a;
-  --ds-text-brand: #60a5fa;
-  --ds-text-danger: #f87171;
-  --ds-text-success: #4ade80;
-  --ds-text-warning: #fbbf24;
-  --ds-border: #334155;
-  --ds-border-bold: #64748b;
-  --ds-border-focused: #3b82f6;
-  --ds-border-input: #475569;
-  --ds-surface: #0f172a;
-  --ds-surface-hovered: #1e293b;
-  --ds-surface-raised: #1e293b;
-  --ds-surface-sunken: #020617;
-  --ds-surface-overlay: #1e293b;
-  --ds-background-brand-bold: #3b82f6;
-  --ds-background-brand-bold-hovered: #60a5fa;
-  --ds-background-neutral: #1e293b;
-  --ds-background-neutral-hovered: #334155;
-  --ds-background-selected: #1e3a5f;
-  --ds-background-danger: #450a0a;
-  --ds-background-danger-bold: #f87171;
-  --ds-background-success: #052e16;
-  --ds-background-success-bold: #4ade80;
-  --ds-background-warning: #451a03;
-  --ds-background-warning-bold: #fbbf24;
-  --ds-background-input: #1e293b;
-  --ds-blanket: #00000080;
+  --ds-text: #d8dee9;
+  --ds-text-subtle: #8892a2;
+  --ds-text-subtlest: #6e7a8d;
+  --ds-text-inverse: #2e3440;
+  --ds-text-brand: #88c0d0;
+  --ds-text-danger: #bf616a;
+  --ds-text-success: #a3be8c;
+  --ds-text-warning: #ebcb8b;
+  --ds-text-discovery: #b48ead;
+  --ds-border: #d8dee920;
+  --ds-border-bold: #4c566a;
+  --ds-border-focused: #88c0d0;
+  --ds-border-input: #4c566a;
+  --ds-border-danger: #bf616a;
+  --ds-border-warning: #ebcb8b;
+  --ds-border-success: #a3be8c;
+  --ds-surface: #2e3440;
+  --ds-surface-hovered: #3b4252;
+  --ds-surface-raised: #3b4252;
+  --ds-surface-sunken: #272c36;
+  --ds-surface-overlay: #3b4252;
+  --ds-background-brand-bold: #81a1c1;
+  --ds-background-brand-bold-hovered: #88c0d0;
+  --ds-background-neutral: #d8dee914;
+  --ds-background-neutral-hovered: #d8dee920;
+  --ds-background-neutral-pressed: #d8dee930;
+  --ds-background-selected: #364455;
+  --ds-background-danger: #4a2f33;
+  --ds-background-danger-bold: #bf616a;
+  --ds-background-danger-bold-hovered: #c97b82;
+  --ds-background-success: #3a4438;
+  --ds-background-success-bold: #a3be8c;
+  --ds-background-success-bold-hovered: #b5cc9f;
+  --ds-background-warning: #443d2c;
+  --ds-background-warning-bold: #ebcb8b;
+  --ds-background-discovery: #443548;
+  --ds-background-discovery-bold: #b48ead;
+  --ds-background-information: #364455;
+  --ds-background-information-bold: #81a1c1;
+  --ds-background-input: #3b4252;
+  --ds-blanket: #2e344080;
 }
 
 /* shadcn-svelte variables mapped to Roots tokens */
@@ -94,11 +116,11 @@ html[data-color-mode='dark'] {
   --border: var(--ds-border);
   --input: var(--ds-border-input);
   --ring: var(--ds-border-focused);
-  --chart-1: #10B981;
-  --chart-2: #3B82F6;
-  --chart-3: #8B5CF6;
-  --chart-4: #F59E0B;
-  --chart-5: #EF4444;
+  --chart-1: var(--ds-background-success-bold);
+  --chart-2: var(--ds-background-brand-bold);
+  --chart-3: var(--ds-background-discovery-bold);
+  --chart-4: var(--ds-background-warning-bold);
+  --chart-5: var(--ds-background-danger-bold);
 }
 
 @theme inline {
@@ -130,11 +152,33 @@ html[data-color-mode='dark'] {
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Source-specific colors */
-  --color-source-moco: #10B981;
-  --color-source-jira: #3B82F6;
-  --color-source-outlook: #8B5CF6;
-  --color-source-personio: #F59E0B;
+  /* Source-specific colors (Nord Aurora) */
+  --color-source-moco: #a3be8c;
+  --color-source-jira: #5e81ac;
+  --color-source-outlook: #b48ead;
+  --color-source-personio: #d08770;
+
+  /* Semantic colors mapped to Tailwind classes */
+  --color-success: var(--ds-background-success-bold);
+  --color-success-subtle: var(--ds-background-success);
+  --color-success-text: var(--ds-text-success);
+  --color-danger: var(--ds-background-danger-bold);
+  --color-danger-subtle: var(--ds-background-danger);
+  --color-danger-text: var(--ds-text-danger);
+  --color-warning: var(--ds-background-warning-bold);
+  --color-warning-subtle: var(--ds-background-warning);
+  --color-warning-text: var(--ds-text-warning);
+  --color-discovery: var(--ds-background-discovery-bold);
+  --color-discovery-subtle: var(--ds-background-discovery);
+  --color-discovery-text: var(--ds-text-discovery);
+  --color-information: var(--ds-background-information-bold);
+  --color-information-subtle: var(--ds-background-information);
+  --color-brand: var(--ds-background-brand-bold);
+  --color-brand-text: var(--ds-text-brand);
+  --color-brand-subtle: var(--ds-background-selected);
+  --color-border-danger: var(--ds-border-danger);
+  --color-border-warning: var(--ds-border-warning);
+  --color-border-success: var(--ds-border-success);
 }
 
 @layer base {
@@ -237,4 +281,34 @@ html[data-color-mode='dark'] {
     transparent 1px
   );
   background-size: 16px 16px;
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.2s ease-out;
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out;
 }
