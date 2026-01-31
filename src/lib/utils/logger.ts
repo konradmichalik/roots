@@ -141,15 +141,6 @@ class Logger {
     );
   }
 
-  warn(message: string, data?: unknown): void {
-    if (!this.shouldLog('warn')) return;
-    console.warn(
-      `%c${this.formatMessage(ICONS.warn, 'warn', message)}`,
-      LOG_STYLES.warn,
-      data ?? ''
-    );
-  }
-
   error(message: string, error?: unknown): void {
     if (!this.shouldLog('error')) return;
     console.error(
