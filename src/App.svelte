@@ -8,6 +8,9 @@
   import { initializeDateNavigation } from './lib/stores/dateNavigation.svelte';
   import { initializeTimeEntries } from './lib/stores/timeEntries.svelte';
   import { initializeSettings } from './lib/stores/settings.svelte';
+  import { initializeAbsences } from './lib/stores/absences.svelte';
+  import { initializeFavorites } from './lib/stores/favorites.svelte';
+  import { initializeSidebar } from './lib/stores/sidebar.svelte';
   import { detectOAuthCallback, clearOAuthCallbackFromUrl } from './lib/api/oauth-manager';
   import { logger } from './lib/utils/logger';
   import { onMount } from 'svelte';
@@ -19,11 +22,11 @@
       try {
         await initializeTheme();
 
-        await Promise.all([
-          initializeDateNavigation(),
-          initializeSettings()
-        ]);
-
+        await initializeSettings();
+        await initializeAbsences();
+        await initializeFavorites();
+        initializeDateNavigation();
+        initializeSidebar();
         initializeTimeEntries();
 
         // Check for OAuth callback before restoring connections
