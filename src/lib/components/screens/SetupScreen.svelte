@@ -18,7 +18,7 @@
       <div class="text-center">
         <h1 class="text-3xl font-bold text-foreground tracking-tight">Roots</h1>
         <p class="mt-1.5 text-sm text-muted-foreground">
-          Verbinde deine Zeiterfassung, um loszulegen.
+          Connect your time tracking to get started.
         </p>
       </div>
     </div>
@@ -27,7 +27,7 @@
     <div class="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-full" style="background-color: #10B981"></div>
+          <img src="/moco.svg" alt="Moco" class="h-5 w-auto opacity-40 grayscale dark:invert dark:opacity-30" />
           <h2 class="text-lg font-semibold text-foreground">Moco</h2>
         </div>
         {#if connectionsState.moco.isConnected}
@@ -35,15 +35,15 @@
             onclick={() => disconnectMoco()}
             class="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Trennen
+            Disconnect
           </button>
         {:else}
-          <span class="text-xs text-muted-foreground">Empfohlen als erstes</span>
+          <span class="text-xs text-muted-foreground">Recommended first</span>
         {/if}
       </div>
 
       {#if connectionsState.moco.isConnected}
-        <p class="text-sm text-green-600 dark:text-green-400">Verbunden</p>
+        <p class="text-sm text-success-text">Connected</p>
       {:else}
         <MocoConnectionForm />
       {/if}
@@ -53,7 +53,7 @@
     <div class="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-full" style="background-color: #3B82F6"></div>
+          <img src="/jira.svg" alt="Jira" class="h-5 w-5 opacity-40 grayscale dark:invert dark:opacity-30" />
           <h2 class="text-lg font-semibold text-foreground">Jira</h2>
         </div>
         {#if connectionsState.jira.isConnected}
@@ -61,7 +61,7 @@
             onclick={() => disconnectJira()}
             class="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Trennen
+            Disconnect
           </button>
         {:else}
           <span class="text-xs text-muted-foreground">Worklogs</span>
@@ -69,7 +69,7 @@
       </div>
 
       {#if connectionsState.jira.isConnected}
-        <p class="text-sm text-green-600 dark:text-green-400">Verbunden</p>
+        <p class="text-sm text-success-text">Connected</p>
       {:else}
         <JiraConnectionForm />
       {/if}
@@ -79,7 +79,7 @@
     <div class="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-full" style="background-color: #8B5CF6"></div>
+          <img src="/icons8-outlook.svg" alt="Outlook" class="h-5 w-5 opacity-40 grayscale dark:invert dark:opacity-30" />
           <h2 class="text-lg font-semibold text-foreground">Outlook</h2>
         </div>
         {#if connectionsState.outlook.isConnected}
@@ -87,15 +87,15 @@
             onclick={() => disconnectOutlook()}
             class="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Trennen
+            Disconnect
           </button>
         {:else}
-          <span class="text-xs text-muted-foreground">Kalender</span>
+          <span class="text-xs text-muted-foreground">Calendar</span>
         {/if}
       </div>
 
       {#if connectionsState.outlook.isConnected}
-        <p class="text-sm text-green-600 dark:text-green-400">Verbunden</p>
+        <p class="text-sm text-success-text">Connected</p>
       {:else}
         <OutlookConnectionForm />
       {/if}
@@ -107,7 +107,7 @@
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full bg-muted-foreground/30"></div>
           <span class="text-sm font-medium text-muted-foreground">Personio</span>
-          <span class="ml-auto text-xs text-muted-foreground">Bald verfuegbar</span>
+          <span class="ml-auto text-xs text-muted-foreground">Coming soon</span>
         </div>
       </div>
     </div>
