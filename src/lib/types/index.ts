@@ -54,5 +54,6 @@ export type {
   DayOverview,
   Theme
 } from './unified';
+export { ABSENCE_LABELS, ABSENCE_COLORS } from './unified';
 
 export type { Favorite, FavoriteEventMatch } from './favorites';

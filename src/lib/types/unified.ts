@@ -50,6 +50,22 @@ export type WeekdayHours = [number, number, number, number, number, number, numb
 
 export type AbsenceType = 'vacation' | 'sick' | 'public_holiday' | 'personal' | 'other';
 
+export const ABSENCE_LABELS: Record<AbsenceType, string> = {
+  vacation: 'Vacation',
+  sick: 'Sick Leave',
+  public_holiday: 'Public Holiday',
+  personal: 'Personal',
+  other: 'Other'
+};
+
+export const ABSENCE_COLORS: Record<AbsenceType, string> = {
+  vacation: 'bg-information-subtle text-brand-text',
+  sick: 'bg-danger-subtle text-danger-text',
+  public_holiday: 'bg-warning-subtle text-warning-text',
+  personal: 'bg-discovery-subtle text-discovery-text',
+  other: 'bg-secondary text-muted-foreground'
+};
+
 export interface ManualAbsence {
   id: string;
   type: AbsenceType;
@@ -87,6 +103,7 @@ export interface DayOverview {
     actual: number;
   };
   balance: number;
+  presenceBalance?: number; // mocoTotal - presence hours (if presence exists)
 }
 
 export type Theme = 'light' | 'dark' | 'system';
