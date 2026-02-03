@@ -12,6 +12,7 @@
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira));
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
   let isLoading = $derived(isAnyLoading());
+  let displayBalance = $derived(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance);
 
   function handleRefresh(): void {
     refreshDayEntries(dateNavState.selectedDate);
@@ -81,10 +82,11 @@
         {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(overview.requiredHours)}</span>
       </span>
       <span
-        class="font-mono font-medium {getBalanceClass(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance)}"
+        class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium
+          {displayBalance > 0.1 ? 'bg-success-subtle text-success-text' : displayBalance < -0.1 ? 'bg-danger-subtle text-danger-text' : 'bg-secondary text-muted-foreground'}"
         title={overview.presence ? 'vs. Presence' : 'vs. Target'}
       >
-        {formatBalance(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance)}
+        {formatBalance(displayBalance)}
       </span>
     </div>
   </div>
