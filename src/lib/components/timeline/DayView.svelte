@@ -6,7 +6,7 @@
   import { getEntriesForDate, getDayOverview, timeEntriesState, refreshDayEntries, isAnyLoading } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { formatDateLong } from '../../utils/date-helpers';
+  import { formatDateLong, formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
 
@@ -17,6 +17,14 @@
   let isLoading = $derived(isAnyLoading());
   let displayBalance = $derived(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance);
   let displayTarget = $derived(overview.presence?.hours ?? overview.requiredHours);
+  let lastFetched = $derived(timeEntriesState.lastFetched ? new Date(timeEntriesState.lastFetched) : null);
+
+  // Tick counter for relative time updates
+  let timeTick = $state(0);
+  $effect(() => {
+    const interval = setInterval(() => timeTick++, 30000);
+    return () => clearInterval(interval);
+  });
 
   function formatBreakMinutes(minutes: number): string {
     if (minutes < 60) return `${minutes}min`;
@@ -37,29 +45,47 @@
       <span class="text-sm font-medium text-foreground">
         {formatDateLong(dateNavState.selectedDate)}
       </span>
-      <button
-        onclick={handleRefresh}
-        disabled={isLoading}
-        class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent
-          disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-        title="Refresh"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 {isLoading ? 'animate-spin' : ''}"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+      <div class="flex items-center gap-1.5">
+        {#if lastFetched}
+          {#key `${lastFetched.getTime()}-${timeTick}`}
+            <Tooltip.Provider delayDuration={200}>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <span class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-muted text-muted-foreground whitespace-nowrap cursor-default">
+                    {formatRelativeTime(lastFetched)}
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom" sideOffset={4}>
+                  {formatDateTime(timeEntriesState.lastFetched!)}
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          {/key}
+        {/if}
+        <button
+          onclick={handleRefresh}
+          disabled={isLoading}
+          class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent
+            disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+          title="Refresh"
         >
-          <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-          <path d="M3 3v5h5" />
-          <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-          <path d="M16 16h5v5" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 {isLoading ? 'animate-spin' : ''}"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+            <path d="M16 16h5v5" />
+          </svg>
+        </button>
+      </div>
       {#if overview.manualAbsence}
         <span class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text">
           {overview.manualAbsence.type === 'vacation' ? 'Vacation'
