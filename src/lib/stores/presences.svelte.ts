@@ -68,8 +68,9 @@ export async function fetchPresences(from: string, to: string): Promise<void> {
 /**
  * Calculate decimal hours from "HH:MM" time strings.
  * If `to` is null (open presence), uses current time.
+ * Subtracts break time if provided.
  */
-function calculatePresenceHours(from: string, to: string | null): number {
+function calculatePresenceHours(from: string, to: string | null, breakMinutes?: number): number {
   const [fromH, fromM] = from.split(':').map(Number);
   const fromMinutes = fromH * 60 + fromM;
 
@@ -82,7 +83,8 @@ function calculatePresenceHours(from: string, to: string | null): number {
     toMinutes = now.getHours() * 60 + now.getMinutes();
   }
 
-  return Math.max(0, (toMinutes - fromMinutes) / 60);
+  const breakHours = (breakMinutes ?? 0) / 60;
+  return Math.max(0, (toMinutes - fromMinutes) / 60 - breakHours);
 }
 
 /**
@@ -93,9 +95,9 @@ export function getPresenceForDate(date: string): DayPresence | null {
   const presences = presencesState.cache?.byDate.get(date);
   if (!presences || presences.length === 0) return null;
 
-  // Sum hours across all presences for the day
+  // Sum hours across all presences for the day (including break deductions)
   const totalHours = presences.reduce(
-    (sum, p) => sum + calculatePresenceHours(p.from, p.to),
+    (sum, p) => sum + calculatePresenceHours(p.from, p.to, p.break),
     0
   );
 

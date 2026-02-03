@@ -6,7 +6,7 @@
   import { buttonVariants } from '$lib/components/ui/button/index.js';
   import { cn } from '$lib/utils.js';
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
-  import { getCachedDayOverview } from '../../stores/timeEntries.svelte';
+  import { getCachedDayOverview, getDayOverview } from '../../stores/timeEntries.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { today, parseDate, getMonthStart } from '../../utils/date-helpers';
 
@@ -41,8 +41,10 @@
 
     if (dateStr > todayStr) return 'none';
 
-    const monthStart = getMonthStart(dateStr);
-    const overview = getCachedDayOverview(dateStr, monthStart);
+    // Use live data for the selected date, cached data otherwise
+    const overview = dateStr === dateNavState.selectedDate
+      ? getDayOverview(dateStr)
+      : getCachedDayOverview(dateStr, getMonthStart(dateStr));
 
     if (overview.isWeekend) return 'none';
     if (overview.requiredHours === 0) return 'none';

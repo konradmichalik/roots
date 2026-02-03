@@ -2,7 +2,7 @@
   import SourceColumn from './SourceColumn.svelte';
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getEntriesForDate, getDayOverview, timeEntriesState } from '../../stores/timeEntries.svelte';
+  import { getEntriesForDate, getDayOverview, timeEntriesState, refreshDayEntries, isAnyLoading } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { formatDateLong } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
@@ -11,14 +11,44 @@
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira));
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
+  let isLoading = $derived(isAnyLoading());
+
+  function handleRefresh(): void {
+    refreshDayEntries(dateNavState.selectedDate);
+  }
 </script>
 
 <div class="mx-auto max-w-6xl space-y-4">
   <!-- Day header -->
   <div class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-    <span class="text-sm font-medium text-foreground">
-      {formatDateLong(dateNavState.selectedDate)}
-    </span>
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-medium text-foreground">
+        {formatDateLong(dateNavState.selectedDate)}
+      </span>
+      <button
+        onclick={handleRefresh}
+        disabled={isLoading}
+        class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent
+          disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+        title="Refresh data"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 {isLoading ? 'animate-spin' : ''}"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+          <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+          <path d="M16 16h5v5" />
+        </svg>
+      </button>
+    </div>
     <div class="flex items-center gap-3 text-sm">
       <span class="text-muted-foreground">
         Actual: <span class="font-mono font-medium text-foreground">{formatHours(overview.totals.actual)}</span>
@@ -27,21 +57,27 @@
         Target: <span class="font-mono font-medium text-foreground">{formatHours(overview.requiredHours)}</span>
       </span>
       {#if overview.presence}
-        <span class="inline-flex items-center gap-1 rounded-full bg-success-subtle px-2 py-0.5 text-xs font-medium text-success-text">
+        <span class="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
           </svg>
           {overview.presence.from} – {overview.presence.to ?? 'now'}
+          <span class="text-muted-foreground">({formatHours(overview.presence.hours)})</span>
           {#if overview.presence.isHomeOffice}
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           {/if}
         </span>
+        <!-- Show presence balance when presence exists -->
+        <span class="font-mono font-medium {getBalanceClass(overview.presenceBalance ?? 0)}" title="Difference: Booked vs. Presence">
+          {formatBalance(overview.presenceBalance ?? 0)}
+        </span>
+      {:else}
+        <span class="font-mono font-medium {getBalanceClass(overview.balance)}" title="Difference: Booked vs. Target">
+          {formatBalance(overview.balance)}
+        </span>
       {/if}
-      <span class="font-mono font-medium {getBalanceClass(overview.balance)}">
-        {formatBalance(overview.balance)}
-      </span>
       {#if overview.manualAbsence}
         <span class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text">
           {overview.manualAbsence.type === 'vacation' ? 'Vacation'

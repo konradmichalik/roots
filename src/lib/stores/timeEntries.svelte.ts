@@ -9,6 +9,7 @@ import { fetchPresences, getPresenceForDate } from './presences.svelte';
 import { isWeekend, isToday as checkIsToday, getDayOfWeekIndex, getMonthStart, getMonthEnd } from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';
 import { logger } from '../utils/logger';
+import { toast } from './toast.svelte';
 
 const MONTH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -255,9 +256,11 @@ export async function createMocoActivity(data: MocoCreateActivity): Promise<bool
       refreshDayEntries(data.date),
       refreshMonthCacheForDate(data.date)
     ]);
+    toast.success('Entry created');
     return true;
   } catch (error) {
     logger.error('Failed to create Moco activity', error);
+    toast.error('Failed to create entry');
     return false;
   }
 }
@@ -274,9 +277,11 @@ export async function updateMocoActivity(id: number, data: MocoUpdateActivity, d
       refreshDayEntries(date),
       refreshMonthCacheForDate(date)
     ]);
+    toast.success('Entry updated');
     return true;
   } catch (error) {
     logger.error(`Failed to update Moco activity ${id}`, error);
+    toast.error('Failed to update entry');
     return false;
   }
 }
@@ -293,9 +298,11 @@ export async function deleteMocoActivity(id: number, date: string): Promise<bool
       refreshDayEntries(date),
       refreshMonthCacheForDate(date)
     ]);
+    toast.success('Entry deleted');
     return true;
   } catch (error) {
     logger.error(`Failed to delete Moco activity ${id}`, error);
+    toast.error('Failed to delete entry');
     return false;
   }
 }
@@ -417,7 +424,7 @@ export function getDayOverview(date: string): DayOverview {
 }
 
 // ---------------------------------------------------------------------------
-// Selectors: Cached month data (used by MiniCalendar + StatsSidebar)
+// Selectors: Cached month data (used by MiniCalendar + StatsModal)
 // ---------------------------------------------------------------------------
 export function getCachedEntriesForDate(date: string, monthStart: string): {
   moco: UnifiedTimeEntry[];
@@ -464,6 +471,9 @@ function buildDayOverview(
     : 0;
   const requiredHours = Math.max(0, baseTargetHours - absenceReduction);
 
+  // Calculate presence balance (how much of presence time is booked)
+  const presenceBalance = presence ? mocoTotal - presence.hours : undefined;
+
   return {
     date,
     dayOfWeek: dayIndex,
@@ -479,7 +489,8 @@ function buildDayOverview(
       outlook: outlookTotal,
       actual: mocoTotal
     },
-    balance: mocoTotal - requiredHours
+    balance: mocoTotal - requiredHours,
+    presenceBalance
   };
 }
 
