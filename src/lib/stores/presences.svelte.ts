@@ -118,6 +118,18 @@ export function getPresenceForDate(date: string): DayPresence | null {
 }
 
 /**
+ * Get raw presences (individual time slots) for a specific date.
+ * Useful for showing detailed breakdown including gaps/breaks.
+ */
+export function getRawPresencesForDate(date: string): MocoPresence[] {
+  const presences = presencesState.cache?.byDate.get(date);
+  if (!presences || presences.length === 0) return [];
+
+  // Sort by start time
+  return [...presences].sort((a, b) => a.from.localeCompare(b.from));
+}
+
+/**
  * Invalidate the presence cache (e.g. after date range change).
  */
 export function invalidatePresenceCache(): void {

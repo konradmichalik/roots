@@ -167,6 +167,29 @@ export function invalidateMonthCache(monthStart: string): void {
 }
 
 /**
+ * Update month cache with fresh entries for a specific day.
+ * Replaces all entries for that day while keeping other days intact.
+ */
+function updateMonthCacheForDay(date: string, entries: UnifiedTimeEntry[]): void {
+  const monthKey = getMonthStart(date);
+  const cached = monthCacheState.cache[monthKey];
+  if (!cached) return;
+
+  // Remove old entries for this day and add new ones
+  const otherDaysEntries = cached.mocoEntries.filter((e) => e.date !== date);
+  const updatedEntries = [...otherDaysEntries, ...entries];
+
+  monthCacheState.cache = {
+    ...monthCacheState.cache,
+    [monthKey]: {
+      ...cached,
+      mocoEntries: updatedEntries
+    }
+  };
+  logger.store('timeEntries', `Updated month cache for ${date}`);
+}
+
+/**
  * Invalidate and re-fetch the month cache for a given date.
  * Use after mutations to keep the calendar in sync.
  */
@@ -189,8 +212,14 @@ async function fetchMocoEntries(from: string, to: string): Promise<void> {
 
   try {
     const activities = await client.getActivities(from, to);
-    timeEntriesState.mocoActivities = activities.map(mapMocoActivity);
+    const mappedEntries = activities.map(mapMocoActivity);
+    timeEntriesState.mocoActivities = mappedEntries;
     logger.store('timeEntries', `Loaded ${activities.length} Moco activities`);
+
+    // Update month cache with fresh data for this day
+    if (from === to) {
+      updateMonthCacheForDay(from, mappedEntries);
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch Moco activities';
     timeEntriesState.errors.moco = message;
