@@ -48,9 +48,10 @@
     }}
   >
     <button
-      class="w-full text-left group rounded-xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150 cursor-pointer
+      class="w-full text-left group rounded-xl border border-border bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150 cursor-pointer
         {isDimmed ? 'opacity-40' : ''}
         {isInHoveredGroup ? 'shadow-md' : ''}"
+      style="border-left: 3px solid {sourceColor}"
       onmouseenter={handleMouseEnter}
       onmouseleave={handleMouseLeave}
     >
@@ -59,9 +60,10 @@
   </MocoEntryModal>
 {:else}
   <div
-    class="group rounded-xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
+    class="group rounded-xl border border-border bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
       {isDimmed ? 'opacity-40' : ''}
       {isInHoveredGroup ? 'shadow-md' : ''}"
+    style="border-left: 3px solid {sourceColor}"
     onmouseenter={handleMouseEnter}
     onmouseleave={handleMouseLeave}
   >
@@ -72,27 +74,21 @@
 {#snippet cardContent()}
   <div class="flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-1.5 mb-0.5">
-        <div
-          class="h-2 w-2 rounded-full flex-shrink-0"
-          style="background-color: {sourceColor}"
-        ></div>
-        <span class="text-sm font-medium text-foreground truncate">
-          {entry.title}
-        </span>
-      </div>
+      <span class="text-sm font-medium text-foreground truncate block">
+        {entry.title}
+      </span>
       {#if entry.description}
-        <p class="text-xs text-muted-foreground truncate pl-3.5">
+        <p class="text-xs text-muted-foreground truncate">
           {entry.description}
         </p>
       {/if}
       {#if mocoMeta?.remoteTicketKey}
-        <span class="text-xs text-muted-foreground pl-3.5 font-mono">
+        <span class="text-xs text-muted-foreground font-mono">
           {mocoMeta.remoteTicketKey}
         </span>
       {/if}
       {#if jiraMeta}
-        <div class="flex items-center gap-1.5 pl-3.5">
+        <div class="flex items-center gap-1.5">
           <span class="text-xs font-mono font-medium text-brand-text">
             {jiraMeta.issueKey}
           </span>
@@ -102,7 +98,7 @@
         </div>
       {/if}
       {#if outlookMeta}
-        <div class="flex items-center gap-1.5 pl-3.5">
+        <div class="flex items-center gap-1.5">
           {#if entry.startTime && entry.endTime}
             <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
           {/if}

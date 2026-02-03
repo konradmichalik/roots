@@ -67,14 +67,11 @@
   <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
     {#if loading && entries.length === 0}
       {#each { length: 3 } as _}
-        <div class="animate-pulse rounded-xl border border-border bg-card p-3">
+        <div class="animate-pulse rounded-xl border border-border bg-card p-3 pl-4" style="border-left: 3px solid {sourceColor}20">
           <div class="flex items-start justify-between gap-2">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-1.5 mb-1.5">
-                <div class="h-2 w-2 rounded-full bg-muted-foreground/20"></div>
-                <div class="h-3.5 rounded bg-muted-foreground/15 w-3/4"></div>
-              </div>
-              <div class="h-3 rounded bg-muted-foreground/10 w-1/2 ml-3.5"></div>
+              <div class="h-3.5 rounded bg-muted-foreground/15 w-3/4 mb-1.5"></div>
+              <div class="h-3 rounded bg-muted-foreground/10 w-1/2"></div>
             </div>
             <div class="h-4 w-10 rounded bg-muted-foreground/15"></div>
           </div>
