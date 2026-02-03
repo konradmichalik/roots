@@ -28,7 +28,8 @@ export const STORAGE_KEYS = {
   OUTLOOK_CONFIG: 'outlook-config',
   OUTLOOK_TOKENS: 'outlook-tokens',
   ABSENCES: 'absences',
-  FAVORITES: 'favorites'
+  FAVORITES: 'favorites',
+  AUTO_REFRESH: 'auto-refresh'
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
