@@ -27,7 +27,7 @@
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <img src="/moco.svg" alt="Moco" class="h-4 w-auto opacity-40 grayscale dark:invert dark:opacity-30" />
+            <div class="h-2 w-2 rounded-full bg-source-moco"></div>
             <h3 class="font-semibold text-foreground">Moco</h3>
           </div>
           {#if connectionsState.moco.isConnected}
@@ -51,7 +51,7 @@
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <img src="/jira.svg" alt="Jira" class="h-4 w-4 opacity-40 grayscale dark:invert dark:opacity-30" />
+            <div class="h-2 w-2 rounded-full bg-source-jira"></div>
             <h3 class="font-semibold text-foreground">Jira</h3>
           </div>
           {#if connectionsState.jira.isConnected}
@@ -75,7 +75,7 @@
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <img src="/icons8-outlook.svg" alt="Outlook" class="h-4 w-4 opacity-40 grayscale dark:invert dark:opacity-30" />
+            <div class="h-2 w-2 rounded-full bg-source-outlook"></div>
             <h3 class="font-semibold text-foreground">Outlook</h3>
           </div>
           {#if connectionsState.outlook.isConnected}
