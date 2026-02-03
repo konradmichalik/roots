@@ -36,6 +36,23 @@ export function addAbsence(data: {
   return absence;
 }
 
+export function updateAbsence(
+  id: string,
+  data: {
+    type: AbsenceType;
+    startDate: string;
+    endDate: string;
+    halfDay: boolean;
+    note?: string;
+  }
+): void {
+  absencesState.absences = absencesState.absences.map((a) =>
+    a.id === id ? { ...a, ...data } : a
+  );
+  persist();
+  logger.store('absences', 'Updated', { id, type: data.type });
+}
+
 export function removeAbsence(id: string): void {
   absencesState.absences = absencesState.absences.filter((a) => a.id !== id);
   persist();
