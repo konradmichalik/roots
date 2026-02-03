@@ -15,7 +15,11 @@
 </script>
 
 <div
-  class="h-2.5 w-2.5 rounded-none transition-all duration-200 {isConnected ? '' : 'opacity-40'}"
-  style="background-color: {isConnected ? getSourceColor(service) : 'var(--ds-border-bold)'}"
+  class="relative flex items-center justify-center"
   title="{labels[service]}: {isConnected ? 'Connected' : 'Not connected'}"
-></div>
+>
+  <div
+    class="h-2 w-2 rounded-full transition-all duration-200 {isConnected ? '' : 'opacity-30'}"
+    style="background-color: {isConnected ? getSourceColor(service) : 'var(--ds-border-bold)'}"
+  ></div>
+</div>
