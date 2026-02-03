@@ -14,6 +14,8 @@
 <header class="flex h-14 items-center border-b border-border bg-card px-5 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]">
   <!-- Left section -->
   <div class="flex flex-1 items-center gap-4">
+    <!-- Logo with text -->
+    <Logo variant="full" size="md" />
     <!-- Left sidebar toggle -->
     <button
       onclick={toggleLeftSidebar}
@@ -32,7 +34,7 @@
     </div>
   </div>
 
-  <!-- Center: Logo -->
+  <!-- Center: Logo (animated on load) -->
   <div class="flex items-center justify-center">
     <Logo animate={isLoading} size="md" />
   </div>
