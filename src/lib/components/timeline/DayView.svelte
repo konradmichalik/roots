@@ -16,6 +16,7 @@
   let rawPresences = $derived(getRawPresencesForDate(dateNavState.selectedDate));
   let isLoading = $derived(isAnyLoading());
   let displayBalance = $derived(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance);
+  let displayTarget = $derived(overview.presence?.hours ?? overview.requiredHours);
 
   function formatBreakMinutes(minutes: number): string {
     if (minutes < 60) return `${minutes}min`;
@@ -116,12 +117,12 @@
         </Tooltip.Root>
         <span class="text-border">|</span>
       {/if}
-      <span class="font-mono text-foreground" title="Booked / Target">
-        {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(overview.requiredHours)}</span>
+      <span class="font-mono text-foreground" title={overview.presence ? 'Booked / Presence' : 'Booked / Target'}>
+        {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(displayTarget)}</span>
       </span>
       <span
         class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium
-          {displayBalance > 0.1 ? 'bg-success-subtle text-success-text' : displayBalance < -0.1 ? 'bg-danger-subtle text-danger-text' : 'bg-secondary text-muted-foreground'}"
+          {displayBalance >= -0.01 ? 'bg-success-subtle text-success-text' : 'bg-danger-subtle text-danger-text'}"
         title={overview.presence ? 'vs. Presence' : 'vs. Target'}
       >
         {formatBalance(displayBalance)}
@@ -145,7 +146,7 @@
 
     <!-- Center: Moco (emphasized) -->
     {#if connectionsState.moco.isConnected}
-      <SourceColumn source="moco" entries={matchResult.sortedMoco} loading={timeEntriesState.loading.moco} emphasized entryGroupMap={matchResult.entryGroupMap} dayTarget={{ requiredHours: overview.requiredHours }}>
+      <SourceColumn source="moco" entries={matchResult.sortedMoco} loading={timeEntriesState.loading.moco} emphasized entryGroupMap={matchResult.entryGroupMap}>
         {#snippet headerAction()}
           <MocoEntryModal mode="create" prefill={{ date: dateNavState.selectedDate }}>
             <button
