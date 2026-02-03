@@ -15,7 +15,7 @@
 </script>
 
 <div
-  class="h-2.5 w-2.5 rounded-full transition-all duration-200 {isConnected ? 'shadow-[0_0_4px_1px]' : ''}"
-  style="background-color: {isConnected ? getSourceColor(service) : 'var(--ds-border-bold)'}; {isConnected ? `--tw-shadow-color: ${getSourceColor(service)}40` : ''}"
+  class="h-2.5 w-2.5 rounded-sm transition-all duration-200 {isConnected ? '' : 'opacity-40'}"
+  style="background-color: {isConnected ? getSourceColor(service) : 'var(--ds-border-bold)'}"
   title="{labels[service]}: {isConnected ? 'Connected' : 'Not connected'}"
 ></div>
