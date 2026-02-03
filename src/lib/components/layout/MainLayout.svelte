@@ -2,11 +2,13 @@
   import TopBar from './TopBar.svelte';
   import DayView from '../timeline/DayView.svelte';
   import CalendarSidebar from '../sidebar/CalendarSidebar.svelte';
-  import StatsSidebar from '../sidebar/StatsSidebar.svelte';
+  import FavoritesSidebar from '../sidebar/FavoritesSidebar.svelte';
+  import ToastContainer from '../common/ToastContainer.svelte';
   import { sidebarState } from '../../stores/sidebar.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getDateRange } from '../../stores/dateNavigation.svelte';
   import { fetchDayEntries, refreshDayEntries, fetchMonthCache, refreshMonthCacheIfStale } from '../../stores/timeEntries.svelte';
+  import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
   import { onMount } from 'svelte';
 
   let lastMonthKey = '';
@@ -27,6 +29,7 @@
   onMount(() => {
     fetchDay();
     fetchMonth();
+    initializeAutoRefresh();
 
     function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return;
@@ -36,7 +39,10 @@
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      cleanupAutoRefresh();
+    };
   });
 
   // Re-fetch day data on every date change; month cache only on month change
@@ -65,8 +71,10 @@
 
     {#if sidebarState.rightOpen}
       <aside class="w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right">
-        <StatsSidebar />
+        <FavoritesSidebar />
       </aside>
     {/if}
   </div>
+
+  <ToastContainer />
 </div>
