@@ -12,7 +12,7 @@
 <div class="space-y-3">
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-2">
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-warning" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 				<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 			</svg>
 			<h3 class="text-sm font-semibold text-foreground">Favorites</h3>
@@ -34,8 +34,8 @@
 	{/if}
 
 	{#each favorites as favorite (favorite.id)}
-		<div class="group/fav relative rounded-lg border border-border bg-card shadow-sm
-			hover:shadow-md hover:border-border-bold transition-all duration-150">
+		<div class="group/fav relative rounded-lg border border-border bg-card
+			hover:border-border-bold transition-all duration-150">
 			<MocoEntryModal
 				mode="create"
 				prefill={{
@@ -53,7 +53,7 @@
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-1.5">
 								{#if favorite.eventMatch}
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-warning flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-warning flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 									</svg>
 								{:else}
@@ -62,7 +62,17 @@
 									</svg>
 								{/if}
 								<span class="text-sm font-medium text-foreground truncate">{favorite.name}</span>
+								{#if favorite.defaultHours}
+									<span class="text-xs font-mono text-muted-foreground ml-auto flex-shrink-0 pr-5">
+										{formatHours(favorite.defaultHours)}
+									</span>
+								{/if}
 							</div>
+							{#if favorite.description}
+								<p class="text-xs text-foreground/80 truncate pl-[18px]">
+									{favorite.description}
+								</p>
+							{/if}
 							<p class="text-xs text-muted-foreground truncate pl-[18px]">
 								{favorite.customerName} — {favorite.projectName}
 							</p>
@@ -73,11 +83,6 @@
 								</p>
 							{/if}
 						</div>
-						{#if favorite.defaultHours}
-							<span class="text-xs font-mono text-muted-foreground flex-shrink-0">
-								{formatHours(favorite.defaultHours)}
-							</span>
-						{/if}
 					</div>
 				</button>
 			</MocoEntryModal>
