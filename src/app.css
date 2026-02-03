@@ -152,10 +152,10 @@ html[data-color-mode='dark'] {
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Source-specific colors (Pastel) */
-  --color-source-moco: #8fbf9f;
-  --color-source-jira: #7ba3c9;
-  --color-source-outlook: #c9a3c4;
+  /* Source-specific colors (Nord-aligned) */
+  --color-source-moco: #a3be8c;
+  --color-source-jira: #5e81ac;
+  --color-source-outlook: #b48ead;
 
   /* Semantic colors mapped to Tailwind classes */
   --color-success: var(--ds-background-success-bold);
