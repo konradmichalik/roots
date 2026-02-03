@@ -21,7 +21,7 @@
 <div class="mx-auto max-w-6xl space-y-4">
   <!-- Day header -->
   <div class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-3">
       <span class="text-sm font-medium text-foreground">
         {formatDateLong(dateNavState.selectedDate)}
       </span>
@@ -30,7 +30,7 @@
         disabled={isLoading}
         class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent
           disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-        title="Refresh data"
+        title="Refresh"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -48,45 +48,44 @@
           <path d="M16 16h5v5" />
         </svg>
       </button>
-    </div>
-    <div class="flex items-center gap-3 text-sm">
-      <span class="text-muted-foreground">
-        Actual: <span class="font-mono font-medium text-foreground">{formatHours(overview.totals.actual)}</span>
-      </span>
-      <span class="text-muted-foreground">
-        Target: <span class="font-mono font-medium text-foreground">{formatHours(overview.requiredHours)}</span>
-      </span>
-      {#if overview.presence}
-        <span class="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-          </svg>
-          {overview.presence.from} – {overview.presence.to ?? 'now'}
-          <span class="text-muted-foreground">({formatHours(overview.presence.hours)})</span>
-          {#if overview.presence.isHomeOffice}
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-          {/if}
-        </span>
-        <!-- Show presence balance when presence exists -->
-        <span class="font-mono font-medium {getBalanceClass(overview.presenceBalance ?? 0)}" title="Difference: Booked vs. Presence">
-          {formatBalance(overview.presenceBalance ?? 0)}
-        </span>
-      {:else}
-        <span class="font-mono font-medium {getBalanceClass(overview.balance)}" title="Difference: Booked vs. Target">
-          {formatBalance(overview.balance)}
-        </span>
-      {/if}
       {#if overview.manualAbsence}
         <span class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text">
           {overview.manualAbsence.type === 'vacation' ? 'Vacation'
             : overview.manualAbsence.type === 'sick' ? 'Sick'
             : overview.manualAbsence.type === 'public_holiday' ? 'Holiday'
             : overview.manualAbsence.type === 'personal' ? 'Personal'
-            : 'Absence'}{overview.manualAbsence.halfDay ? ' (half day)' : ''}
+            : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
         </span>
       {/if}
+    </div>
+    <div class="flex items-center gap-2 text-sm">
+      {#if overview.presence}
+        <span
+          class="inline-flex items-center gap-1.5 text-muted-foreground"
+          title="Presence: {formatHours(overview.presence.hours)}"
+        >
+          {#if overview.presence.isHomeOffice}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+          {:else}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+            </svg>
+          {/if}
+          <span class="font-mono text-xs">{overview.presence.from}–{overview.presence.to ?? '...'}</span>
+        </span>
+        <span class="text-border">|</span>
+      {/if}
+      <span class="font-mono text-foreground" title="Booked / Target">
+        {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(overview.requiredHours)}</span>
+      </span>
+      <span
+        class="font-mono font-medium {getBalanceClass(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance)}"
+        title={overview.presence ? 'vs. Presence' : 'vs. Target'}
+      >
+        {formatBalance(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance)}
+      </span>
     </div>
   </div>
 
