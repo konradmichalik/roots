@@ -4,11 +4,16 @@
   import ServiceStatusDot from '../common/ServiceStatusDot.svelte';
   import ConnectionManager from '../connection/ConnectionManager.svelte';
   import SettingsModal from '../settings/SettingsModal.svelte';
+  import Logo from '../common/Logo.svelte';
   import { sidebarState, toggleLeftSidebar, toggleRightSidebar } from '../../stores/sidebar.svelte';
+  import { isAnyLoading } from '../../stores/timeEntries.svelte';
+
+  let isLoading = $derived(isAnyLoading());
 </script>
 
-<header class="flex h-14 items-center justify-between border-b border-border bg-card px-5 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]">
-  <div class="flex items-center gap-4">
+<header class="flex h-14 items-center border-b border-border bg-card px-5 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]">
+  <!-- Left section -->
+  <div class="flex flex-1 items-center gap-4">
     <!-- Left sidebar toggle -->
     <button
       onclick={toggleLeftSidebar}
@@ -22,25 +27,30 @@
         <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
       </svg>
     </button>
-
-    <img src="/roots-logo.svg" alt="Roots" class="h-6" />
     <div class="hidden sm:block">
       <DateNavigator />
     </div>
   </div>
 
-  <div class="flex items-center gap-3">
-    <!-- Right sidebar toggle -->
+  <!-- Center: Logo -->
+  <div class="flex items-center justify-center">
+    <Logo animate={isLoading} size="md" />
+  </div>
+
+  <!-- Right section -->
+
+  <div class="flex flex-1 items-center justify-end gap-3">
+    <!-- Right sidebar toggle (Favorites) -->
     <button
       onclick={toggleRightSidebar}
       class="rounded-lg p-1.5 transition-all duration-150
         {sidebarState.rightOpen
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}"
-      title="Statistics"
+      title="Favorites"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="14" />
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
       </svg>
     </button>
 
