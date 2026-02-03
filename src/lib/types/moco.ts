@@ -28,6 +28,7 @@ export interface MocoTask {
   id: number;
   name: string;
   billable: boolean;
+  active?: boolean; // May not be present in /projects/assigned but is in /projects/:id/tasks
 }
 
 export interface MocoCustomer {
@@ -45,6 +46,7 @@ export interface MocoProjectAssigned {
   id: number;
   name: string;
   billable: boolean;
+  active?: boolean; // Projects can be deactivated in Moco
   customer: MocoCustomer;
   tasks: MocoTask[];
 }
@@ -73,6 +75,7 @@ export interface MocoPresence {
   from: string;
   to: string | null;
   is_home_office: boolean;
+  break?: number; // Break time in minutes (from Moco API)
   user: MocoUser;
   created_at: string;
   updated_at: string;

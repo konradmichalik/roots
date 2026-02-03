@@ -32,25 +32,36 @@ export async function fetchAssignedProjects(): Promise<void> {
   }
 }
 
+export function getActiveProjects(): MocoProjectAssigned[] {
+  // Filter out inactive projects (active defaults to true if not present)
+  return mocoProjectsState.projects.filter((p) => p.active !== false);
+}
+
 export function getProjectById(id: number): MocoProjectAssigned | undefined {
   return mocoProjectsState.projects.find((p) => p.id === id);
 }
 
 export function getTasksForProject(projectId: number): MocoTask[] {
   const project = getProjectById(projectId);
-  return project?.tasks ?? [];
+  const tasks = project?.tasks ?? [];
+  // Filter out inactive tasks (active defaults to true if not present)
+  return tasks.filter((t) => t.active !== false);
 }
 
 /**
- * Fetch tasks for a project from the API if not already cached.
- * Some Moco API responses don't include tasks in /projects/assigned.
+ * Fetch tasks for a project from the API.
+ * Always fetches from /projects/:id/tasks to get the `active` field,
+ * which is not included in /projects/assigned responses.
  */
 export async function fetchTasksForProject(projectId: number): Promise<void> {
   const project = getProjectById(projectId);
-  if (project && project.tasks && project.tasks.length > 0) return;
 
   const client = getMocoClient();
   if (!client || !project) return;
+
+  // Check if tasks already have the `active` field (were fetched from /tasks endpoint)
+  const hasActiveField = project.tasks?.some((t) => t.active !== undefined);
+  if (hasActiveField) return;
 
   try {
     const tasks = await client.getProjectTasks(projectId);

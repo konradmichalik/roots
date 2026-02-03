@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mocoProjectsState } from '../../stores/mocoProjects.svelte';
+  import { getActiveProjects } from '../../stores/mocoProjects.svelte';
 
   let { value = $bindable<string>(''), onSelect }: {
     value?: string;
@@ -10,7 +10,7 @@
   let open = $state(false);
 
   let items = $derived(
-    mocoProjectsState.projects.map((p) => ({
+    getActiveProjects().map((p) => ({
       value: String(p.id),
       label: `${p.customer.name} — ${p.name}`
     }))
