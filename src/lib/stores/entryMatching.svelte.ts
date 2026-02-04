@@ -1,4 +1,5 @@
 import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../types';
+import { hashOutlookEventId } from '../utils/time-format';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -123,15 +124,6 @@ export function buildMatchResult(
 // Helpers
 // ---------------------------------------------------------------------------
 
-// Simple hash function matching the one in FavoritesList for Outlook event IDs
-function hashEventId(eventId: string): string {
-  let hash = 5381;
-  for (let i = 0; i < eventId.length; i++) {
-    hash = (hash * 33) ^ eventId.charCodeAt(i);
-  }
-  return `ol-${(hash >>> 0).toString(36)}`;
-}
-
 function groupByTicketKey(
   entries: UnifiedTimeEntry[],
   source: 'moco' | 'jira'
@@ -181,7 +173,7 @@ function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeE
   for (const entry of entries) {
     const meta = entry.metadata as OutlookMetadata;
     // Hash eventId to match the hashed remoteId stored in Moco
-    const hashedId = hashEventId(meta.eventId);
+    const hashedId = hashOutlookEventId(meta.eventId);
     const group = map.get(hashedId);
     if (group) {
       group.push(entry);

@@ -86,3 +86,15 @@ export function normalizeTimeInput(value: string): string | null {
   return null;
 }
 
+/**
+ * Hash long Outlook event IDs to a shorter string for Moco remote_id.
+ * Uses djb2 hash algorithm for consistent, deterministic output.
+ */
+export function hashOutlookEventId(eventId: string): string {
+  let hash = 5381;
+  for (let i = 0; i < eventId.length; i++) {
+    hash = (hash * 33) ^ eventId.charCodeAt(i);
+  }
+  return `ol-${(hash >>> 0).toString(36)}`;
+}
+
