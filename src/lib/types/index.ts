@@ -20,7 +20,9 @@ export type {
   MocoProjectAssigned,
   MocoCreateActivity,
   MocoUpdateActivity,
-  MocoPresence
+  MocoPresence,
+  MocoCreatePresence,
+  MocoUpdatePresence
 } from './moco';
 
 export type {

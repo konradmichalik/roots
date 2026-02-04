@@ -1,8 +1,9 @@
-import type { MocoPresence } from '../types';
+import type { MocoPresence, MocoCreatePresence, MocoUpdatePresence } from '../types';
 import type { DayPresence } from '../types/unified';
 import { getMocoClient } from './connections.svelte';
 import { connectionsState } from './connections.svelte';
 import { logger } from '../utils/logger';
+import { toast } from './toast.svelte';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -135,4 +136,97 @@ export function getRawPresencesForDate(date: string): MocoPresence[] {
 export function invalidatePresenceCache(): void {
   presencesState.cache = null;
   logger.store('presences', 'Cache invalidated');
+}
+
+/**
+ * Create a new presence entry
+ */
+export async function createPresence(data: MocoCreatePresence): Promise<boolean> {
+  if (!connectionsState.moco.isConnected) return false;
+
+  const client = getMocoClient();
+  if (!client) return false;
+
+  try {
+    const newPresence = await client.createPresence(data);
+    logger.store('presences', `Created presence for ${data.date}`);
+
+    // Update cache with new presence
+    if (presencesState.cache) {
+      const existing = presencesState.cache.byDate.get(data.date) ?? [];
+      presencesState.cache.byDate.set(data.date, [...existing, newPresence]);
+    }
+
+    toast.success('Presence created');
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to create presence';
+    logger.error('Failed to create presence', error);
+    toast.error(message);
+    return false;
+  }
+}
+
+/**
+ * Update an existing presence entry
+ */
+export async function updatePresence(id: number, date: string, data: MocoUpdatePresence): Promise<boolean> {
+  if (!connectionsState.moco.isConnected) return false;
+
+  const client = getMocoClient();
+  if (!client) return false;
+
+  try {
+    const updatedPresence = await client.updatePresence(id, data);
+    logger.store('presences', `Updated presence ${id}`);
+
+    // Update cache
+    if (presencesState.cache) {
+      const existing = presencesState.cache.byDate.get(date) ?? [];
+      const updated = existing.map((p) => (p.id === id ? updatedPresence : p));
+      presencesState.cache.byDate.set(date, updated);
+    }
+
+    toast.success('Presence updated');
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update presence';
+    logger.error('Failed to update presence', error);
+    toast.error(message);
+    return false;
+  }
+}
+
+/**
+ * Delete a presence entry
+ */
+export async function deletePresence(id: number, date: string): Promise<boolean> {
+  if (!connectionsState.moco.isConnected) return false;
+
+  const client = getMocoClient();
+  if (!client) return false;
+
+  try {
+    await client.deletePresence(id);
+    logger.store('presences', `Deleted presence ${id}`);
+
+    // Update cache
+    if (presencesState.cache) {
+      const existing = presencesState.cache.byDate.get(date) ?? [];
+      const filtered = existing.filter((p) => p.id !== id);
+      if (filtered.length === 0) {
+        presencesState.cache.byDate.delete(date);
+      } else {
+        presencesState.cache.byDate.set(date, filtered);
+      }
+    }
+
+    toast.success('Presence deleted');
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to delete presence';
+    logger.error('Failed to delete presence', error);
+    toast.error(message);
+    return false;
+  }
 }

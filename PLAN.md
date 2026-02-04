@@ -52,11 +52,11 @@ Basierend auf REQUIREMENTS.md. Status: ⬜ Offen | 🔄 In Arbeit | ✅ Erledigt
 
 ---
 
-## Phase 5: Offene Fragen
+## Phase 5: Anwesenheits-Management ✅
 
-| # | Status | Frage |
-|---|--------|-------|
-| 21 | ⬜ | Anwesenheit: Sollen Anwesenheiten in roots gepflegt werden können (wie in Moco)? |
+| # | Status | Aufgabe | Aufwand |
+|---|--------|---------|---------|
+| 21 | ✅ | Anwesenheiten in roots pflegen können (wie in Moco) | ⭐⭐⭐ |
 
 ---
 

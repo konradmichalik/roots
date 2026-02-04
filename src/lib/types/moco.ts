@@ -82,3 +82,16 @@ export interface MocoPresence {
   created_at: string;
   updated_at: string;
 }
+
+export interface MocoCreatePresence {
+  date: string;
+  from: string;
+  to?: string;
+  is_home_office?: boolean;
+}
+
+export interface MocoUpdatePresence {
+  from?: string;
+  to?: string;
+  is_home_office?: boolean;
+}

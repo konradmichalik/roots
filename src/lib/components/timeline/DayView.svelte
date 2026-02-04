@@ -1,6 +1,7 @@
 <script lang="ts">
   import SourceColumn from './SourceColumn.svelte';
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
+  import PresenceModal from '../presence/PresenceModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getEntriesForDate, getDayOverview, timeEntriesState, refreshDayEntries, isAnyLoading } from '../../stores/timeEntries.svelte';
@@ -97,53 +98,78 @@
       {/if}
     </div>
     <div class="flex items-center gap-2 text-sm">
-      {#if overview.presence}
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root>
-            <Tooltip.Trigger class="inline-flex items-center">
-              <span class="inline-flex items-center gap-1.5 text-muted-foreground cursor-help leading-none">
-                {#if overview.presence.isHomeOffice}
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
-                {:else}
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                  </svg>
-                {/if}
-                <span class="font-mono text-xs">{overview.presence.from}–{overview.presence.to ?? '...'}</span>
-              </span>
-            </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" class="max-w-xs">
-            <div class="space-y-2">
-              <div class="text-xs font-medium">Presence: {formatHours(overview.presence.hours)}</div>
-              <div class="space-y-1">
-                {#each rawPresences as presence, i}
-                  <div class="flex items-center gap-2 text-xs">
-                    <span class="font-mono">{presence.from}–{presence.to ?? '...'}</span>
-                    {#if presence.is_home_office}
-                      <span class="text-muted-foreground">(Home)</span>
+      {#if connectionsState.moco.isConnected}
+        {#if overview.presence}
+          <PresenceModal date={dateNavState.selectedDate}>
+            <Tooltip.Provider delayDuration={200}>
+              <Tooltip.Root>
+                <Tooltip.Trigger class="inline-flex items-center">
+                  <button class="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer leading-none transition-colors">
+                    {#if overview.presence.isHomeOffice}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                    {:else}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                      </svg>
                     {/if}
-                    {#if presence.break && presence.break > 0}
-                      <span class="text-warning-text">-{formatBreakMinutes(presence.break)} break</span>
-                    {/if}
-                  </div>
-                  {#if i < rawPresences.length - 1}
-                    {@const nextStart = rawPresences[i + 1].from}
-                    {@const currentEnd = presence.to}
-                    {#if currentEnd && nextStart > currentEnd}
-                      <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
-                        <span class="italic">Gap: {currentEnd}–{nextStart}</span>
+                    <span class="font-mono text-xs">{overview.presence.from}–{overview.presence.to ?? '...'}</span>
+                  </button>
+                </Tooltip.Trigger>
+              <Tooltip.Content side="bottom" class="max-w-xs">
+                <div class="space-y-2">
+                  <div class="text-xs font-medium">Presence: {formatHours(overview.presence.hours)} <span class="text-muted-foreground">(click to edit)</span></div>
+                  <div class="space-y-1">
+                    {#each rawPresences as presence, i}
+                      <div class="flex items-center gap-2 text-xs">
+                        <span class="font-mono">{presence.from}–{presence.to ?? '...'}</span>
+                        {#if presence.is_home_office}
+                          <span class="text-muted-foreground">(Home)</span>
+                        {/if}
+                        {#if presence.break && presence.break > 0}
+                          <span class="text-warning-text">-{formatBreakMinutes(presence.break)} break</span>
+                        {/if}
                       </div>
-                    {/if}
-                  {/if}
-                {/each}
-              </div>
-            </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-        <span class="text-border">|</span>
+                      {#if i < rawPresences.length - 1}
+                        {@const nextStart = rawPresences[i + 1].from}
+                        {@const currentEnd = presence.to}
+                        {#if currentEnd && nextStart > currentEnd}
+                          <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
+                            <span class="italic">Gap: {currentEnd}–{nextStart}</span>
+                          </div>
+                        {/if}
+                      {/if}
+                    {/each}
+                  </div>
+                </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          </PresenceModal>
+          <span class="text-border">|</span>
+        {:else}
+          <PresenceModal date={dateNavState.selectedDate}>
+            <Tooltip.Provider delayDuration={200}>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <button class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
+                    </svg>
+                  </button>
+                </Tooltip.Trigger>
+                <Tooltip.Content side="bottom" sideOffset={4}>
+                  Add working time
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          </PresenceModal>
+          <span class="text-border">|</span>
+        {/if}
       {/if}
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>

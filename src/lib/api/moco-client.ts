@@ -1,5 +1,5 @@
 import { ApiClient, type ApiClientConfig } from './base-client';
-import type { MocoActivity, MocoUser, MocoTask, MocoProjectAssigned, MocoCreateActivity, MocoUpdateActivity, MocoPresence } from '../types';
+import type { MocoActivity, MocoUser, MocoTask, MocoProjectAssigned, MocoCreateActivity, MocoUpdateActivity, MocoPresence, MocoCreatePresence, MocoUpdatePresence } from '../types';
 import { logger } from '../utils/logger';
 
 export interface MocoClientConfig extends ApiClientConfig {
@@ -117,6 +117,30 @@ export class MocoClient extends ApiClient {
     );
     logger.info(`Fetched ${presences.length} Moco presences`);
     return presences;
+  }
+
+  /**
+   * Create a new presence entry
+   */
+  async createPresence(data: MocoCreatePresence): Promise<MocoPresence> {
+    logger.info('Creating Moco presence', { date: data.date, from: data.from });
+    return this.request<MocoPresence>('POST', '/users/presences', data);
+  }
+
+  /**
+   * Update an existing presence entry
+   */
+  async updatePresence(id: number, data: MocoUpdatePresence): Promise<MocoPresence> {
+    logger.info(`Updating Moco presence ${id}`);
+    return this.request<MocoPresence>('PUT', `/users/presences/${id}`, data);
+  }
+
+  /**
+   * Delete a presence entry
+   */
+  async deletePresence(id: number): Promise<void> {
+    logger.info(`Deleting Moco presence ${id}`);
+    await this.request<void>('DELETE', `/users/presences/${id}`);
   }
 
   /**
