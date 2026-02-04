@@ -10,6 +10,15 @@
 	import { toast } from '../../stores/toast.svelte';
 	import type { Favorite, OutlookMetadata } from '../../types';
 
+	// Simple hash function to shorten long event IDs for Moco
+	function hashEventId(eventId: string): string {
+		let hash = 5381;
+		for (let i = 0; i < eventId.length; i++) {
+			hash = (hash * 33) ^ eventId.charCodeAt(i);
+		}
+		return `ol-${(hash >>> 0).toString(36)}`;
+	}
+
 	let favorites = $derived(getSortedFavorites());
 	let outlookEntries = $derived(getEntriesForDate(dateNavState.selectedDate).outlook);
 	let isAdding = $state(false);
@@ -49,14 +58,15 @@
 
 		try {
 			for (const match of matches) {
+				const hours = match.hours || match.favorite.defaultHours || 0.25;
 				const success = await createMocoActivity({
 					date: dateNavState.selectedDate,
 					project_id: match.favorite.projectId,
 					task_id: match.favorite.taskId,
-					hours: match.hours || match.favorite.defaultHours || 0,
+					hours,
 					description: match.favorite.description || match.eventTitle,
 					remote_service: 'outlook',
-					remote_id: match.eventId
+					remote_id: hashEventId(match.eventId)
 				});
 				if (success) successCount++;
 			}

@@ -123,6 +123,15 @@ export function buildMatchResult(
 // Helpers
 // ---------------------------------------------------------------------------
 
+// Simple hash function matching the one in FavoritesList for Outlook event IDs
+function hashEventId(eventId: string): string {
+  let hash = 5381;
+  for (let i = 0; i < eventId.length; i++) {
+    hash = (hash * 33) ^ eventId.charCodeAt(i);
+  }
+  return `ol-${(hash >>> 0).toString(36)}`;
+}
+
 function groupByTicketKey(
   entries: UnifiedTimeEntry[],
   source: 'moco' | 'jira'
@@ -171,11 +180,13 @@ function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeE
   const map = new Map<string, UnifiedTimeEntry[]>();
   for (const entry of entries) {
     const meta = entry.metadata as OutlookMetadata;
-    const group = map.get(meta.eventId);
+    // Hash eventId to match the hashed remoteId stored in Moco
+    const hashedId = hashEventId(meta.eventId);
+    const group = map.get(hashedId);
     if (group) {
       group.push(entry);
     } else {
-      map.set(meta.eventId, [entry]);
+      map.set(hashedId, [entry]);
     }
   }
   return map;
