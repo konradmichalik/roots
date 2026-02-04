@@ -7,7 +7,8 @@
     getMonthStart,
     getMonthEnd,
     addDays,
-    isWeekend
+    isWeekend,
+    today
   } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { getSourceColor } from '../../stores/settings.svelte';
@@ -16,6 +17,7 @@
   let { children }: { children: Snippet } = $props();
 
   let open = $state(false);
+  let todayStr = $derived(today());
 
   // Current day stats
   let dayOverview = $derived(getDayOverview(dateNavState.selectedDate));
@@ -29,6 +31,16 @@
     balance: weekOverviews.reduce((sum, d) => sum + d.balance, 0)
   });
 
+  // Week stats "until now" (only days up to and including today)
+  let weekDatesUntilNow = $derived(weekDates.filter((d) => d <= todayStr));
+  let weekOverviewsUntilNow = $derived(weekDatesUntilNow.map((d) => getCachedDayOverview(d, getMonthStart(d))));
+  let weekTotalsUntilNow = $derived({
+    actual: weekOverviewsUntilNow.reduce((sum, d) => sum + d.totals.actual, 0),
+    required: weekOverviewsUntilNow.reduce((sum, d) => sum + d.requiredHours, 0),
+    balance: weekOverviewsUntilNow.reduce((sum, d) => sum + d.balance, 0),
+    daysCount: weekDatesUntilNow.length
+  });
+
   // Month stats
   let monthWorkingDays = $derived(getMonthWorkingDays(dateNavState.selectedDate));
   let monthStart = $derived(getMonthStart(dateNavState.selectedDate));
@@ -37,6 +49,16 @@
     actual: monthOverviews.reduce((sum, d) => sum + d.totals.actual, 0),
     required: monthOverviews.reduce((sum, d) => sum + d.requiredHours, 0),
     balance: monthOverviews.reduce((sum, d) => sum + d.balance, 0)
+  });
+
+  // Month stats "until now" (only working days up to and including today)
+  let monthWorkingDaysUntilNow = $derived(monthWorkingDays.filter((d) => d <= todayStr));
+  let monthOverviewsUntilNow = $derived(monthWorkingDaysUntilNow.map((d) => getCachedDayOverview(d, monthStart)));
+  let monthTotalsUntilNow = $derived({
+    actual: monthOverviewsUntilNow.reduce((sum, d) => sum + d.totals.actual, 0),
+    required: monthOverviewsUntilNow.reduce((sum, d) => sum + d.requiredHours, 0),
+    balance: monthOverviewsUntilNow.reduce((sum, d) => sum + d.balance, 0),
+    daysCount: monthWorkingDaysUntilNow.length
   });
 
   function getMonthWorkingDays(dateStr: string): string[] {
@@ -120,6 +142,21 @@
         <p class="text-xs text-muted-foreground">
           {getProgressPercent(weekTotals.actual, weekTotals.required)}% of weekly target (Mon-Fri)
         </p>
+        <!-- Until now indicator -->
+        {#if weekTotalsUntilNow.daysCount < 5}
+          <div class="pt-2 border-t border-border/50">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-muted-foreground">Until now ({weekTotalsUntilNow.daysCount} days):</span>
+              <span class="font-mono font-medium {getBalanceClass(weekTotalsUntilNow.balance)}">
+                {formatBalance(weekTotalsUntilNow.balance)}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-muted-foreground mt-1">
+              <span>{formatHours(weekTotalsUntilNow.actual)} / {formatHours(weekTotalsUntilNow.required)}</span>
+              <span>{weekTotalsUntilNow.balance >= 0 ? 'ahead' : 'behind'}</span>
+            </div>
+          </div>
+        {/if}
       </div>
 
       <!-- Month Balance -->
@@ -143,6 +180,21 @@
         <p class="text-xs text-muted-foreground">
           {getProgressPercent(monthTotals.actual, monthTotals.required)}% of monthly target ({monthWorkingDays.length} working days)
         </p>
+        <!-- Until now indicator -->
+        {#if monthTotalsUntilNow.daysCount < monthWorkingDays.length}
+          <div class="pt-2 border-t border-border/50">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-muted-foreground">Until now ({monthTotalsUntilNow.daysCount} days):</span>
+              <span class="font-mono font-medium {getBalanceClass(monthTotalsUntilNow.balance)}">
+                {formatBalance(monthTotalsUntilNow.balance)}
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-muted-foreground mt-1">
+              <span>{formatHours(monthTotalsUntilNow.actual)} / {formatHours(monthTotalsUntilNow.required)}</span>
+              <span>{monthTotalsUntilNow.balance >= 0 ? 'ahead' : 'behind'}</span>
+            </div>
+          </div>
+        {/if}
       </div>
 
       <!-- Day source breakdown -->
