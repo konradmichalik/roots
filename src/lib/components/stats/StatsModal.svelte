@@ -1,13 +1,11 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getDayOverview, getCachedDayOverview, monthCacheState } from '../../stores/timeEntries.svelte';
+  import { getCachedDayOverview, monthCacheState } from '../../stores/timeEntries.svelte';
   import {
     getWeekDates,
     getMonthStart,
-    getMonthEnd,
-    addDays,
-    isWeekend,
+    getMonthWorkingDays,
     today
   } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
@@ -19,9 +17,6 @@
 
   let open = $state(false);
   let todayStr = $derived(today());
-
-  // Current day stats
-  let dayOverview = $derived(getDayOverview(dateNavState.selectedDate));
 
   // Week stats (Mon-Fri of the selected date's week)
   let weekDates = $derived(getWeekDates(dateNavState.selectedDate));
@@ -62,18 +57,6 @@
     daysCount: monthWorkingDaysUntilNow.length
   });
 
-  function getMonthWorkingDays(dateStr: string): string[] {
-    const start = getMonthStart(dateStr);
-    const end = getMonthEnd(dateStr);
-    const days: string[] = [];
-    let current = start;
-    while (current <= end) {
-      if (!isWeekend(current)) days.push(current);
-      current = addDays(current, 1);
-    }
-    return days;
-  }
-
   function getProgressPercent(actual: number, required: number): number {
     if (required === 0) return 0;
     return Math.min(100, Math.round((actual / required) * 100));
@@ -84,8 +67,6 @@
     name: string;
     customerName: string;
     hours: number;
-    billableHours: number;
-    nonBillableHours: number;
   }
 
   let monthProjectStats = $derived(() => {
@@ -104,9 +85,7 @@
         projectMap.set(projectId, {
           name: meta.projectName,
           customerName: meta.customerName,
-          hours: 0,
-          billableHours: 0,
-          nonBillableHours: 0
+          hours: 0
         });
       }
 
@@ -114,10 +93,8 @@
       stats.hours += entry.hours;
 
       if (meta.billable) {
-        stats.billableHours += entry.hours;
         billable += entry.hours;
       } else {
-        stats.nonBillableHours += entry.hours;
         nonBillable += entry.hours;
       }
     }
@@ -151,34 +128,11 @@
     <Dialog.Header>
       <Dialog.Title>Statistics</Dialog.Title>
       <Dialog.Description>
-        Overview of your time bookings for day, week, and month.
+        Overview of your time bookings for week and month.
       </Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-5 py-4">
-      <!-- Day Balance -->
-      <div class="rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold text-foreground">Today</span>
-          <span class="font-mono text-lg font-medium {getBalanceClass(dayOverview.balance)}">
-            {formatBalance(dayOverview.balance)}
-          </span>
-        </div>
-        <div class="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Booked: <span class="font-mono font-medium text-foreground">{formatHours(dayOverview.totals.actual)}</span></span>
-          <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(dayOverview.requiredHours)}</span></span>
-        </div>
-        <div class="h-2 rounded-full bg-muted overflow-hidden">
-          <div
-            class="h-full rounded-full transition-all duration-300"
-            style="width: {getProgressPercent(dayOverview.totals.actual, dayOverview.requiredHours)}%; background-color: {getSourceColor('moco')}"
-          ></div>
-        </div>
-        <p class="text-xs text-muted-foreground">
-          {getProgressPercent(dayOverview.totals.actual, dayOverview.requiredHours)}% of daily target
-        </p>
-      </div>
-
       <!-- Week Balance -->
       <div class="rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm">
         <div class="flex items-center justify-between">
@@ -253,64 +207,6 @@
             </div>
           </div>
         {/if}
-      </div>
-
-      <!-- Day source breakdown -->
-      <div class="border-t border-border pt-4 space-y-3">
-        <h4 class="text-sm font-semibold text-foreground">
-          Today by Source
-        </h4>
-
-        <!-- Moco -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('moco')}"></div>
-              <span class="text-sm text-muted-foreground">Moco (booked)</span>
-            </div>
-            <span class="text-sm font-mono font-medium text-foreground">{formatHours(dayOverview.totals.moco)}</span>
-          </div>
-          <div class="h-1.5 rounded-full bg-muted overflow-hidden">
-            <div
-              class="h-full rounded-full transition-all duration-300"
-              style="width: {getProgressPercent(dayOverview.totals.moco, dayOverview.requiredHours)}%; background-color: {getSourceColor('moco')}"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Jira -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('jira')}"></div>
-              <span class="text-sm text-muted-foreground">Jira (worklogs)</span>
-            </div>
-            <span class="text-sm font-mono font-medium text-foreground">{formatHours(dayOverview.totals.jira)}</span>
-          </div>
-          <div class="h-1.5 rounded-full bg-muted overflow-hidden">
-            <div
-              class="h-full rounded-full transition-all duration-300"
-              style="width: {getProgressPercent(dayOverview.totals.jira, dayOverview.requiredHours)}%; background-color: {getSourceColor('jira')}"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Outlook -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="h-3 w-3 rounded-full" style="background-color: {getSourceColor('outlook')}"></div>
-              <span class="text-sm text-muted-foreground">Outlook (meetings)</span>
-            </div>
-            <span class="text-sm font-mono font-medium text-foreground">{formatHours(dayOverview.totals.outlook)}</span>
-          </div>
-          <div class="h-1.5 rounded-full bg-muted overflow-hidden">
-            <div
-              class="h-full rounded-full transition-all duration-300"
-              style="width: {getProgressPercent(dayOverview.totals.outlook, dayOverview.requiredHours)}%; background-color: {getSourceColor('outlook')}"
-            ></div>
-          </div>
-        </div>
       </div>
 
       <!-- Monthly Billable/Non-billable -->

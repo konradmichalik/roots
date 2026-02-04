@@ -76,6 +76,22 @@ export function getMonthEnd(dateStr: string): string {
 }
 
 /**
+ * Get all working days (Mon-Fri) in the month containing the given date
+ */
+export function getMonthWorkingDays(dateStr: string): string[] {
+  const start = getMonthStart(dateStr);
+  const end = getMonthEnd(dateStr);
+  const days: string[] = [];
+  let current = start;
+  while (current <= end) {
+    const day = parseDate(current).getDay();
+    if (day !== 0 && day !== 6) days.push(current);
+    current = addDays(current, 1);
+  }
+  return days;
+}
+
+/**
  * Check if a date is a weekend (Saturday or Sunday)
  */
 export function isWeekend(dateStr: string): boolean {

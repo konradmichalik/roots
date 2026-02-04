@@ -5,7 +5,7 @@
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { getCachedDayOverview } from '../../stores/timeEntries.svelte';
-  import { formatDateShort, getWeekDates, getMonthStart, getMonthEnd, addDays, isWeekend, today } from '../../utils/date-helpers';
+  import { formatDateShort, getWeekDates, getMonthStart, getMonthWorkingDays, today } from '../../utils/date-helpers';
   import { formatBalance, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS, ABSENCE_COLORS, type AbsenceType } from '../../types';
 
@@ -25,18 +25,6 @@
   let monthWorkingDaysUntilNow = $derived(getMonthWorkingDays(dateNavState.selectedDate).filter((d) => d <= todayStr));
   let monthOverviews = $derived(monthWorkingDaysUntilNow.map((d) => getCachedDayOverview(d, monthStart)));
   let monthBalance = $derived(monthOverviews.reduce((sum, d) => sum + d.balance, 0));
-
-  function getMonthWorkingDays(dateStr: string): string[] {
-    const start = getMonthStart(dateStr);
-    const end = getMonthEnd(dateStr);
-    const days: string[] = [];
-    let current = start;
-    while (current <= end) {
-      if (!isWeekend(current)) days.push(current);
-      current = addDays(current, 1);
-    }
-    return days;
-  }
 
   function formatRange(start: string, end: string): string {
     const startFmt = formatDateShort(start);
