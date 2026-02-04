@@ -1,5 +1,4 @@
 import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../types';
-import { hashOutlookEventId } from '../utils/time-format';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -172,13 +171,11 @@ function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeE
   const map = new Map<string, UnifiedTimeEntry[]>();
   for (const entry of entries) {
     const meta = entry.metadata as OutlookMetadata;
-    // Hash eventId to match the hashed remoteId stored in Moco
-    const hashedId = hashOutlookEventId(meta.eventId);
-    const group = map.get(hashedId);
+    const group = map.get(meta.eventId);
     if (group) {
       group.push(entry);
     } else {
-      map.set(hashedId, [entry]);
+      map.set(meta.eventId, [entry]);
     }
   }
   return map;
