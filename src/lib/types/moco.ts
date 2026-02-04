@@ -29,6 +29,8 @@ export interface MocoTask {
   name: string;
   billable: boolean;
   active?: boolean; // May not be present in /projects/assigned but is in /projects/:id/tasks
+  budget?: number | null; // Task budget in currency (from /projects/:id/tasks)
+  hourly_rate?: number | null; // Task hourly rate (from /projects/:id/tasks)
 }
 
 export interface MocoCustomer {

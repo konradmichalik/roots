@@ -526,6 +526,27 @@ function buildDayOverview(
 }
 
 // ---------------------------------------------------------------------------
+// Task budget helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Get total logged hours for a specific task across all cached months.
+ * Returns the sum of hours from Moco entries matching the given taskId.
+ */
+export function getLoggedHoursForTask(taskId: number): number {
+  let total = 0;
+  for (const month of Object.values(monthCacheState.cache)) {
+    for (const entry of month.mocoEntries) {
+      const meta = entry.metadata as MocoMetadata;
+      if (meta.taskId === taskId) {
+        total += entry.hours;
+      }
+    }
+  }
+  return total;
+}
+
+// ---------------------------------------------------------------------------
 // Status helpers
 // ---------------------------------------------------------------------------
 export function isAnyLoading(): boolean {

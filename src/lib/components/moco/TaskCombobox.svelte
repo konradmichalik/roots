@@ -1,5 +1,7 @@
 <script lang="ts">
   import { getTasksForProject } from '../../stores/mocoProjects.svelte';
+  import { getLoggedHoursForTask } from '../../stores/timeEntries.svelte';
+  import { formatHours } from '../../utils/time-format';
 
   let { projectId, value = $bindable<string>('') }: {
     projectId: number | null;
@@ -11,11 +13,29 @@
 
   let tasks = $derived(projectId ? getTasksForProject(projectId) : []);
 
+  interface TaskItem {
+    value: string;
+    label: string;
+    budgetHours: number | null;
+    loggedHours: number;
+    availableHours: number | null;
+  }
+
   let items = $derived(
-    tasks.map((t) => ({
-      value: String(t.id),
-      label: t.name
-    }))
+    tasks.map((t): TaskItem => {
+      const loggedHours = getLoggedHoursForTask(t.id);
+      const budgetHours = (t.budget && t.hourly_rate && t.hourly_rate > 0)
+        ? t.budget / t.hourly_rate
+        : null;
+      const availableHours = budgetHours !== null ? budgetHours - loggedHours : null;
+      return {
+        value: String(t.id),
+        label: t.name,
+        budgetHours,
+        loggedHours,
+        availableHours
+      };
+    })
   );
 
   let filtered = $derived(
@@ -41,7 +61,7 @@
     }
   });
 
-  function handleSelect(item: { value: string; label: string }): void {
+  function handleSelect(item: TaskItem): void {
     value = item.value;
     displayValue = item.label;
     searchValue = '';
@@ -89,11 +109,17 @@
         <button
           type="button"
           class="w-full cursor-pointer select-none px-3 py-2 text-left text-sm text-foreground
-            hover:bg-accent hover:text-accent-foreground
+            hover:bg-accent hover:text-accent-foreground flex items-center justify-between gap-2
             {item.value === value ? 'font-medium bg-accent/50' : ''}"
           onmousedown={(e) => { e.preventDefault(); handleSelect(item); }}
         >
-          {item.label}
+          <span class="truncate">{item.label}</span>
+          {#if item.availableHours !== null}
+            <span class="flex-shrink-0 text-xs font-mono px-1.5 py-0.5 rounded
+              {item.availableHours > 0 ? 'bg-success-subtle text-success-text' : 'bg-danger-subtle text-danger-text'}">
+              {item.availableHours > 0 ? '+' : ''}{formatHours(item.availableHours)}h
+            </span>
+          {/if}
         </button>
       {/each}
     </div>
