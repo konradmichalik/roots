@@ -2,11 +2,12 @@
   import MiniCalendar from './MiniCalendar.svelte';
   import StatsModal from '../stats/StatsModal.svelte';
   import AbsenceModal from '../absences/AbsenceModal.svelte';
+  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { getCachedDayOverview } from '../../stores/timeEntries.svelte';
   import { formatDateShort, getWeekDates, getMonthStart, getMonthWorkingDays, today } from '../../utils/date-helpers';
-  import { formatBalance, getBalanceClass } from '../../utils/time-format';
+  import { formatBalance, formatHours, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS, ABSENCE_COLORS, type AbsenceType } from '../../types';
 
   let showLegend = $state(false);
@@ -19,12 +20,16 @@
   let weekDatesUntilNow = $derived(weekDates.filter((d) => d <= todayStr));
   let weekOverviews = $derived(weekDatesUntilNow.map((d) => getCachedDayOverview(d, getMonthStart(d))));
   let weekBalance = $derived(weekOverviews.reduce((sum, d) => sum + d.balance, 0));
+  let weekActual = $derived(weekOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
+  let weekTarget = $derived(weekOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
 
   // Month balance (for selected date's month, up to today)
   let monthStart = $derived(getMonthStart(dateNavState.selectedDate));
   let monthWorkingDaysUntilNow = $derived(getMonthWorkingDays(dateNavState.selectedDate).filter((d) => d <= todayStr));
   let monthOverviews = $derived(monthWorkingDaysUntilNow.map((d) => getCachedDayOverview(d, monthStart)));
   let monthBalance = $derived(monthOverviews.reduce((sum, d) => sum + d.balance, 0));
+  let monthActual = $derived(monthOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
+  let monthTarget = $derived(monthOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
 
   function formatRange(start: string, end: string): string {
     const startFmt = formatDateShort(start);
@@ -45,14 +50,56 @@
 
   <!-- Week/Month Balance Summary -->
   <div class="flex items-center gap-3 text-xs">
-    <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
-      <span class="text-muted-foreground">Week</span>
-      <span class="font-mono font-medium {getBalanceClass(weekBalance)}">{formatBalance(weekBalance)}</span>
-    </div>
-    <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
-      <span class="text-muted-foreground">Month</span>
-      <span class="font-mono font-medium {getBalanceClass(monthBalance)}">{formatBalance(monthBalance)}</span>
-    </div>
+    <Tooltip.Provider delayDuration={200}>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default">
+            <span class="text-muted-foreground">Week</span>
+            <span class="font-mono font-medium {getBalanceClass(weekBalance)}">{formatBalance(weekBalance)}</span>
+          </div>
+        </Tooltip.Trigger>
+        <Tooltip.Content side="bottom" sideOffset={4}>
+          <div class="text-xs space-y-1">
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Booked:</span>
+              <span class="font-mono font-medium">{formatHours(weekActual)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Target:</span>
+              <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
+            </div>
+            <div class="text-muted-foreground pt-1 border-t border-border/50">
+              {weekDatesUntilNow.length} working day{weekDatesUntilNow.length !== 1 ? 's' : ''} until today
+            </div>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+    <Tooltip.Provider delayDuration={200}>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default">
+            <span class="text-muted-foreground">Month</span>
+            <span class="font-mono font-medium {getBalanceClass(monthBalance)}">{formatBalance(monthBalance)}</span>
+          </div>
+        </Tooltip.Trigger>
+        <Tooltip.Content side="bottom" sideOffset={4}>
+          <div class="text-xs space-y-1">
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Booked:</span>
+              <span class="font-mono font-medium">{formatHours(monthActual)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Target:</span>
+              <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
+            </div>
+            <div class="text-muted-foreground pt-1 border-t border-border/50">
+              {monthWorkingDaysUntilNow.length} working day{monthWorkingDaysUntilNow.length !== 1 ? 's' : ''} until today
+            </div>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   </div>
 
   <!-- Actions -->

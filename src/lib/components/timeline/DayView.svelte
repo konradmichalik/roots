@@ -145,16 +145,48 @@
         </Tooltip.Provider>
         <span class="text-border">|</span>
       {/if}
-      <span class="font-mono text-foreground" title={overview.presence ? 'Booked / Presence' : 'Booked / Target'}>
-        {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(displayTarget)}</span>
-      </span>
-      <span
-        class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium
-          {displayBalance >= -0.01 ? 'bg-success-subtle text-success-text' : 'bg-danger-subtle text-danger-text'}"
-        title={overview.presence ? 'vs. Presence' : 'vs. Target'}
-      >
-        {formatBalance(displayBalance)}
-      </span>
+      <Tooltip.Provider delayDuration={200}>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <span class="font-mono text-foreground cursor-default">
+              {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(displayTarget)}</span>
+            </span>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom" sideOffset={4}>
+            <div class="text-xs space-y-1">
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Booked:</span>
+                <span class="font-mono font-medium">{formatHours(overview.totals.actual)}</span>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">{overview.presence ? 'Presence:' : 'Target:'}</span>
+                <span class="font-mono font-medium">{formatHours(displayTarget)}</span>
+              </div>
+              {#if overview.requiredHours !== displayTarget}
+                <div class="flex items-center justify-between gap-4 opacity-60">
+                  <span class="text-muted-foreground">Daily target:</span>
+                  <span class="font-mono">{formatHours(overview.requiredHours)}</span>
+                </div>
+              {/if}
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
+      <Tooltip.Provider delayDuration={200}>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <span
+              class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium cursor-default
+                {displayBalance >= -0.01 ? 'bg-success-subtle text-success-text' : 'bg-danger-subtle text-danger-text'}"
+            >
+              {formatBalance(displayBalance)}
+            </span>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom" sideOffset={4}>
+            Balance vs. {overview.presence ? 'presence time' : 'daily target'}
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
     </div>
   </div>
 
