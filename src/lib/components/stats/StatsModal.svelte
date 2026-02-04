@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getDayOverview, getCachedDayOverview } from '../../stores/timeEntries.svelte';
+  import { getDayOverview, getCachedDayOverview, monthCacheState } from '../../stores/timeEntries.svelte';
   import {
     getWeekDates,
     getMonthStart,
@@ -13,6 +13,7 @@
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { getSourceColor } from '../../stores/settings.svelte';
   import type { Snippet } from 'svelte';
+  import type { MocoMetadata } from '../../types';
 
   let { children }: { children: Snippet } = $props();
 
@@ -76,6 +77,63 @@
   function getProgressPercent(actual: number, required: number): number {
     if (required === 0) return 0;
     return Math.min(100, Math.round((actual / required) * 100));
+  }
+
+  // Month project distribution from cache
+  interface ProjectStats {
+    name: string;
+    customerName: string;
+    hours: number;
+    billableHours: number;
+    nonBillableHours: number;
+  }
+
+  let monthProjectStats = $derived(() => {
+    const cached = monthCacheState.cache[monthStart];
+    if (!cached) return { projects: [] as ProjectStats[], billable: 0, nonBillable: 0, total: 0 };
+
+    const projectMap = new Map<number, ProjectStats>();
+    let billable = 0;
+    let nonBillable = 0;
+
+    for (const entry of cached.mocoEntries) {
+      const meta = entry.metadata as MocoMetadata;
+      const projectId = meta.projectId;
+
+      if (!projectMap.has(projectId)) {
+        projectMap.set(projectId, {
+          name: meta.projectName,
+          customerName: meta.customerName,
+          hours: 0,
+          billableHours: 0,
+          nonBillableHours: 0
+        });
+      }
+
+      const stats = projectMap.get(projectId)!;
+      stats.hours += entry.hours;
+
+      if (meta.billable) {
+        stats.billableHours += entry.hours;
+        billable += entry.hours;
+      } else {
+        stats.nonBillableHours += entry.hours;
+        nonBillable += entry.hours;
+      }
+    }
+
+    const projects = [...projectMap.values()].sort((a, b) => b.hours - a.hours);
+    return { projects, billable, nonBillable, total: billable + nonBillable };
+  });
+
+  // Colors for project bars (cycling through a palette)
+  const PROJECT_COLORS = [
+    '#8fbcbb', '#88c0d0', '#81a1c1', '#5e81ac',
+    '#bf616a', '#d08770', '#ebcb8b', '#a3be8c', '#b48ead'
+  ];
+
+  function getProjectColor(index: number): string {
+    return PROJECT_COLORS[index % PROJECT_COLORS.length];
   }
 </script>
 
@@ -254,6 +312,78 @@
           </div>
         </div>
       </div>
+
+      <!-- Monthly Billable/Non-billable -->
+      {#if monthProjectStats().total > 0}
+        <div class="border-t border-border pt-4 space-y-3">
+          <h4 class="text-sm font-semibold text-foreground">
+            Monthly Breakdown
+          </h4>
+
+          <!-- Billable vs Non-billable -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-muted-foreground">Billable</span>
+              <span class="font-mono font-medium text-success-text">{formatHours(monthProjectStats().billable)}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-muted-foreground">Non-billable</span>
+              <span class="font-mono font-medium text-muted-foreground">{formatHours(monthProjectStats().nonBillable)}</span>
+            </div>
+            <div class="h-2 rounded-full bg-muted overflow-hidden flex">
+              {#if monthProjectStats().total > 0}
+                <div
+                  class="h-full bg-success transition-all duration-300"
+                  style="width: {(monthProjectStats().billable / monthProjectStats().total) * 100}%"
+                ></div>
+                <div
+                  class="h-full bg-muted-foreground/30 transition-all duration-300"
+                  style="width: {(monthProjectStats().nonBillable / monthProjectStats().total) * 100}%"
+                ></div>
+              {/if}
+            </div>
+            <p class="text-xs text-muted-foreground">
+              {Math.round((monthProjectStats().billable / monthProjectStats().total) * 100)}% billable
+            </p>
+          </div>
+        </div>
+
+        <!-- Project Distribution -->
+        <div class="border-t border-border pt-4 space-y-3">
+          <h4 class="text-sm font-semibold text-foreground">
+            Projects This Month
+          </h4>
+
+          <div class="space-y-2.5">
+            {#each monthProjectStats().projects.slice(0, 8) as project, i (project.name)}
+              <div class="space-y-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <div class="h-2.5 w-2.5 rounded-full flex-shrink-0" style="background-color: {getProjectColor(i)}"></div>
+                    <span class="text-xs text-muted-foreground truncate" title="{project.customerName} — {project.name}">
+                      {project.name}
+                    </span>
+                  </div>
+                  <span class="text-xs font-mono font-medium text-foreground ml-2 flex-shrink-0">
+                    {formatHours(project.hours)}
+                  </span>
+                </div>
+                <div class="h-1 rounded-full bg-muted overflow-hidden">
+                  <div
+                    class="h-full rounded-full transition-all duration-300"
+                    style="width: {(project.hours / monthProjectStats().total) * 100}%; background-color: {getProjectColor(i)}"
+                  ></div>
+                </div>
+              </div>
+            {/each}
+            {#if monthProjectStats().projects.length > 8}
+              <p class="text-xs text-muted-foreground">
+                +{monthProjectStats().projects.length - 8} more projects
+              </p>
+            {/if}
+          </div>
+        </div>
+      {/if}
     </div>
   </Dialog.Content>
 </Dialog.Root>
