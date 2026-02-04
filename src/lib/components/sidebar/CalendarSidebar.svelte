@@ -4,12 +4,39 @@
   import AbsenceModal from '../absences/AbsenceModal.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
-  import { formatDateShort } from '../../utils/date-helpers';
+  import { getCachedDayOverview } from '../../stores/timeEntries.svelte';
+  import { formatDateShort, getWeekDates, getMonthStart, getMonthEnd, addDays, isWeekend, today } from '../../utils/date-helpers';
+  import { formatBalance, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS, ABSENCE_COLORS, type AbsenceType } from '../../types';
 
   let showLegend = $state(false);
+  let todayStr = $derived(today());
 
   let selectedAbsence = $derived(getAbsenceForDate(dateNavState.selectedDate));
+
+  // Week balance (for selected date's week, up to today)
+  let weekDates = $derived(getWeekDates(dateNavState.selectedDate));
+  let weekDatesUntilNow = $derived(weekDates.filter((d) => d <= todayStr));
+  let weekOverviews = $derived(weekDatesUntilNow.map((d) => getCachedDayOverview(d, getMonthStart(d))));
+  let weekBalance = $derived(weekOverviews.reduce((sum, d) => sum + d.balance, 0));
+
+  // Month balance (for selected date's month, up to today)
+  let monthStart = $derived(getMonthStart(dateNavState.selectedDate));
+  let monthWorkingDaysUntilNow = $derived(getMonthWorkingDays(dateNavState.selectedDate).filter((d) => d <= todayStr));
+  let monthOverviews = $derived(monthWorkingDaysUntilNow.map((d) => getCachedDayOverview(d, monthStart)));
+  let monthBalance = $derived(monthOverviews.reduce((sum, d) => sum + d.balance, 0));
+
+  function getMonthWorkingDays(dateStr: string): string[] {
+    const start = getMonthStart(dateStr);
+    const end = getMonthEnd(dateStr);
+    const days: string[] = [];
+    let current = start;
+    while (current <= end) {
+      if (!isWeekend(current)) days.push(current);
+      current = addDays(current, 1);
+    }
+    return days;
+  }
 
   function formatRange(start: string, end: string): string {
     const startFmt = formatDateShort(start);
@@ -27,6 +54,18 @@
   </div>
 
   <MiniCalendar />
+
+  <!-- Week/Month Balance Summary -->
+  <div class="flex items-center gap-3 text-xs">
+    <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
+      <span class="text-muted-foreground">Week</span>
+      <span class="font-mono font-medium {getBalanceClass(weekBalance)}">{formatBalance(weekBalance)}</span>
+    </div>
+    <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
+      <span class="text-muted-foreground">Month</span>
+      <span class="font-mono font-medium {getBalanceClass(monthBalance)}">{formatBalance(monthBalance)}</span>
+    </div>
+  </div>
 
   <!-- Actions -->
   <div class="flex items-center gap-2 border-t border-border pt-3">
