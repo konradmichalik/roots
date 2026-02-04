@@ -85,10 +85,10 @@ export class OutlookClient {
     let url: string | null = `/me/calendarView?startDateTime=${startDateTime}&endDateTime=${endDateTime}&$select=id,subject,start,end,isAllDay,showAs,responseStatus,organizer,attendees,isOnlineMeeting,webLink&$top=100`;
 
     while (url) {
-      const response = await this.request<MSGraphCalendarResponse>(url);
+      const response: MSGraphCalendarResponse = await this.request<MSGraphCalendarResponse>(url);
       allEvents.push(...response.value);
 
-      const nextLink = response['@odata.nextLink'];
+      const nextLink: string | undefined = response['@odata.nextLink'];
       url = nextLink ? nextLink.replace(GRAPH_BASE, '') : null;
     }
 

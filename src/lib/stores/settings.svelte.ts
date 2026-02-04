@@ -22,9 +22,9 @@ export interface AppSettings {
 
 const DEFAULT_SETTINGS: AppSettings = {
   sourceColors: {
-    moco: '#8fbf9f',
-    jira: '#7ba3c9',
-    outlook: '#c9a3c4'
+    moco: '#b8d4be',
+    jira: '#a8c5db',
+    outlook: '#d4b8d0'
   },
   showWeekends: false,
   weekStartsOn: 1,

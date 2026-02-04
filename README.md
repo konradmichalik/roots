@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="roots-logo.svg" alt="Roots Logo" width="200" />
+  <img src="docs/images/roots-logo.svg" alt="Roots Logo" width="200" />
 </p>
 
 <h1 align="center">roots</h1>

@@ -5,6 +5,7 @@
   import ConnectionManager from '../connection/ConnectionManager.svelte';
   import SettingsModal from '../settings/SettingsModal.svelte';
   import Logo from '../common/Logo.svelte';
+  import MiniTimer from '../timer/MiniTimer.svelte';
   import { sidebarState, toggleLeftSidebar, toggleRightSidebar } from '../../stores/sidebar.svelte';
   import { isAnyLoading } from '../../stores/timeEntries.svelte';
 
@@ -42,6 +43,9 @@
   <!-- Right section -->
 
   <div class="flex flex-1 items-center justify-end gap-3">
+    <!-- Timer -->
+    <MiniTimer />
+
     <!-- Right sidebar toggle (Favorites) -->
     <button
       onclick={toggleRightSidebar}

@@ -11,7 +11,7 @@
   <div class="w-full max-w-md">
     <div class="mb-8 flex flex-col items-center gap-4">
       <img
-        src="/roots-logo-sm.svg"
+        src="/docs/images/roots-logo-sm.svg"
         alt="Roots Logo"
         class="h-14 w-14"
       />

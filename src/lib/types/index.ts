@@ -22,7 +22,9 @@ export type {
   MocoUpdateActivity,
   MocoPresence,
   MocoCreatePresence,
-  MocoUpdatePresence
+  MocoUpdatePresence,
+  MocoTaskCost,
+  MocoProjectReport
 } from './moco';
 
 export type {
@@ -59,3 +61,5 @@ export type {
 export { ABSENCE_LABELS, ABSENCE_COLORS } from './unified';
 
 export type { Favorite, FavoriteEventMatch } from './favorites';
+
+export type { TimerStatus, TimerMocoBooking, TimerState, DraftEntry } from './timer';

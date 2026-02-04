@@ -65,6 +65,28 @@ export function getSortedFavorites(): Favorite[] {
 	return [...favoritesState.favorites].sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
+export function getRegularFavorites(): Favorite[] {
+	return getSortedFavorites().filter((f) => !f.eventMatch);
+}
+
+export function getEventFavorites(): Favorite[] {
+	return getSortedFavorites().filter((f) => f.eventMatch);
+}
+
+export function reorderFavorites(orderedIds: string[]): void {
+	const maxNewOrder = orderedIds.length;
+	favoritesState.favorites = favoritesState.favorites.map((f) => {
+		const newOrder = orderedIds.indexOf(f.id);
+		if (newOrder !== -1) {
+			return { ...f, sortOrder: newOrder };
+		}
+		// Offset non-included items to avoid sortOrder conflicts
+		return { ...f, sortOrder: f.sortOrder + maxNewOrder };
+	});
+	persist();
+	logger.store('favorites', 'Reordered', { count: orderedIds.length });
+}
+
 export function findMatchingFavorite(eventTitle: string): Favorite | undefined {
 	const title = eventTitle.toLowerCase();
 

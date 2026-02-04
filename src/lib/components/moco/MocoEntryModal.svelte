@@ -3,13 +3,13 @@
   import ProjectCombobox from './ProjectCombobox.svelte';
   import TaskCombobox from './TaskCombobox.svelte';
   import TimeInput from '../common/TimeInput.svelte';
-  import { fetchAssignedProjects, fetchTasksForProject, getProjectById, getTasksForProject, getActiveProjects } from '../../stores/mocoProjects.svelte';
+  import { fetchAssignedProjects, fetchTasksForProject, fetchProjectReport, getProjectById, getTasksForProject, getActiveProjects } from '../../stores/mocoProjects.svelte';
   import { createMocoActivity, updateMocoActivity, deleteMocoActivity } from '../../stores/timeEntries.svelte';
   import { addFavorite } from '../../stores/favorites.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import type { Snippet } from 'svelte';
 
-  let { children, mode = 'create', prefill, activityId }: {
+  let { children, mode = 'create', prefill, activityId, onSuccess }: {
     children: Snippet;
     mode?: 'create' | 'edit';
     prefill?: {
@@ -22,6 +22,7 @@
       remoteId?: string;
     };
     activityId?: number;
+    onSuccess?: () => void;
   } = $props();
 
   let open = $state(false);
@@ -73,6 +74,7 @@
 
         if (selectedProjectId) {
           await fetchTasksForProject(selectedProjectId);
+          await fetchProjectReport(selectedProjectId);
           // Check if prefilled task is still available (active)
           if (prefill?.taskId) {
             const tasks = getTasksForProject(selectedProjectId);
@@ -96,6 +98,7 @@
       taskInactiveWarning = false;
     }
     fetchTasksForProject(projectId);
+    fetchProjectReport(projectId);
   }
 
   // Clear warnings when user selects valid values
@@ -147,6 +150,7 @@
       }
 
       open = false;
+      onSuccess?.();
     } finally {
       saving = false;
     }
@@ -266,6 +270,7 @@
       <form onsubmit={handleSubmit} class="space-y-4 py-4">
         <!-- Project -->
         <div>
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="block text-sm font-medium text-foreground mb-1">Project</label>
           <ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
           {#if projectInactiveWarning}
@@ -277,6 +282,7 @@
 
         <!-- Task -->
         <div>
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="block text-sm font-medium text-foreground mb-1">Task</label>
           <TaskCombobox projectId={selectedProjectId} bind:value={taskValue} />
           {#if taskInactiveWarning}

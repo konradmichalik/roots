@@ -12,15 +12,31 @@
 		editFavorite?: Favorite;
 	} = $props();
 
-	let name = $state(editFavorite?.name ?? '');
-	let projectValue = $state(editFavorite ? String(editFavorite.projectId) : '');
-	let taskValue = $state(editFavorite ? String(editFavorite.taskId) : '');
-	let selectedProjectId = $state<number | null>(editFavorite?.projectId ?? null);
-	let defaultHours = $state(editFavorite?.defaultHours ?? 0);
-	let description = $state(editFavorite?.description ?? '');
-	let enableEventMatch = $state(!!editFavorite?.eventMatch);
-	let matchPattern = $state(editFavorite?.eventMatch?.pattern ?? '');
-	let matchType = $state<FavoriteEventMatch['matchType']>(editFavorite?.eventMatch?.matchType ?? 'contains');
+	// Initialize form state - using function to avoid svelte reactivity tracking
+	function getInitialValues(fav: Favorite | undefined) {
+		return {
+			name: fav?.name ?? '',
+			projectValue: fav ? String(fav.projectId) : '',
+			taskValue: fav ? String(fav.taskId) : '',
+			selectedProjectId: fav?.projectId ?? null,
+			defaultHours: fav?.defaultHours ?? 0,
+			description: fav?.description ?? '',
+			enableEventMatch: !!fav?.eventMatch,
+			matchPattern: fav?.eventMatch?.pattern ?? '',
+			matchType: (fav?.eventMatch?.matchType ?? 'contains') as FavoriteEventMatch['matchType']
+		};
+	}
+	const initial = getInitialValues(editFavorite);
+
+	let name = $state(initial.name);
+	let projectValue = $state(initial.projectValue);
+	let taskValue = $state(initial.taskValue);
+	let selectedProjectId = $state<number | null>(initial.selectedProjectId);
+	let defaultHours = $state(initial.defaultHours);
+	let description = $state(initial.description);
+	let enableEventMatch = $state(initial.enableEventMatch);
+	let matchPattern = $state(initial.matchPattern);
+	let matchType = $state<FavoriteEventMatch['matchType']>(initial.matchType);
 
 	let isMocoConnected = $derived(connectionsState.moco.isConnected);
 
@@ -106,11 +122,13 @@
 		</div>
 
 		<div>
+			<!-- svelte-ignore a11y_label_has_associated_control -->
 			<label class="block text-xs font-medium text-foreground mb-1">Project</label>
 			<ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
 		</div>
 
 		<div>
+			<!-- svelte-ignore a11y_label_has_associated_control -->
 			<label class="block text-xs font-medium text-foreground mb-1">Task</label>
 			<TaskCombobox projectId={selectedProjectId} bind:value={taskValue} />
 		</div>

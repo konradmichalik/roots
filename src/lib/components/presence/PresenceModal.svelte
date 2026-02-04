@@ -164,7 +164,7 @@
   </Dialog.Trigger>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title>Arbeitszeit {formatDateLong(effectiveDate)}</Dialog.Title>
+      <Dialog.Title>Working Time {formatDateLong(effectiveDate)}</Dialog.Title>
       <Dialog.Description>
         Manage your working time for this day.
       </Dialog.Description>
@@ -188,8 +188,9 @@
                 <div class="space-y-3">
                   <div class="grid grid-cols-2 gap-2">
                     <div>
-                      <label class="text-xs text-muted-foreground">From</label>
+                      <label for="edit-from-time" class="text-xs text-muted-foreground">From</label>
                       <input
+                        id="edit-from-time"
                         type="text"
                         bind:value={editFromTime}
                         placeholder="08:00"
@@ -198,8 +199,9 @@
                       />
                     </div>
                     <div>
-                      <label class="text-xs text-muted-foreground">To</label>
+                      <label for="edit-to-time" class="text-xs text-muted-foreground">To</label>
                       <input
+                        id="edit-to-time"
                         type="text"
                         bind:value={editToTime}
                         placeholder="17:00"
@@ -320,8 +322,9 @@
         <div class="space-y-3">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-muted-foreground">From</label>
+              <label for="new-from-time" class="text-xs text-muted-foreground">From</label>
               <input
+                id="new-from-time"
                 type="text"
                 bind:value={newFromTime}
                 placeholder="08:00"
@@ -330,8 +333,9 @@
               />
             </div>
             <div>
-              <label class="text-xs text-muted-foreground">To (optional)</label>
+              <label for="new-to-time" class="text-xs text-muted-foreground">To (optional)</label>
               <input
+                id="new-to-time"
                 type="text"
                 bind:value={newToTime}
                 placeholder="17:00"

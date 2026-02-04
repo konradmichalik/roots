@@ -1,5 +1,5 @@
 import { ApiClient, type ApiClientConfig } from './base-client';
-import type { MocoActivity, MocoUser, MocoTask, MocoProjectAssigned, MocoCreateActivity, MocoUpdateActivity, MocoPresence, MocoCreatePresence, MocoUpdatePresence } from '../types';
+import type { MocoActivity, MocoUser, MocoTask, MocoProjectAssigned, MocoCreateActivity, MocoUpdateActivity, MocoPresence, MocoCreatePresence, MocoUpdatePresence, MocoProjectReport } from '../types';
 import { logger } from '../utils/logger';
 
 export interface MocoClientConfig extends ApiClientConfig {
@@ -79,6 +79,16 @@ export class MocoClient extends ApiClient {
     const tasks = await this.request<MocoTask[]>('GET', `/projects/${projectId}/tasks`);
     logger.info(`Fetched ${tasks.length} tasks for project ${projectId}`);
     return tasks;
+  }
+
+  /**
+   * Fetch project report with budget and hours data per task
+   */
+  async getProjectReport(projectId: number): Promise<MocoProjectReport> {
+    logger.info(`Fetching report for project ${projectId}`);
+    const report = await this.request<MocoProjectReport>('GET', `/projects/${projectId}/report`);
+    logger.info(`Fetched report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`);
+    return report;
   }
 
   /**

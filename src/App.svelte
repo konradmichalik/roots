@@ -12,6 +12,7 @@
   import { initializeAbsences } from './lib/stores/absences.svelte';
   import { initializeFavorites } from './lib/stores/favorites.svelte';
   import { initializeSidebar } from './lib/stores/sidebar.svelte';
+  import { initializeTimer } from './lib/stores/timer.svelte';
   import { detectOAuthCallback, clearOAuthCallbackFromUrl } from './lib/api/oauth-manager';
   import { logger } from './lib/utils/logger';
   import { onMount } from 'svelte';
@@ -26,6 +27,7 @@
         await initializeSettings();
         await initializeAbsences();
         await initializeFavorites();
+        await initializeTimer();
         initializeDateNavigation();
         initializeSidebar();
         initializeTimeEntries();

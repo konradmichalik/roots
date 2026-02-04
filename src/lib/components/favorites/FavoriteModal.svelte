@@ -212,11 +212,13 @@
         </div>
 
         <div>
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="block text-sm font-medium text-foreground mb-1">Project</label>
           <ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
         </div>
 
         <div>
+          <!-- svelte-ignore a11y_label_has_associated_control -->
           <label class="block text-sm font-medium text-foreground mb-1">Task</label>
           <TaskCombobox projectId={selectedProjectId} bind:value={taskValue} />
         </div>

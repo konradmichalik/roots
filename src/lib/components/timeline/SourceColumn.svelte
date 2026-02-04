@@ -21,9 +21,9 @@
   };
 
   const LOGOS: Record<string, string> = {
-    moco: '/moco.svg',
-    jira: '/jira.svg',
-    outlook: '/icons8-outlook.svg'
+    moco: '/logos/moco.svg',
+    jira: '/logos/jira.svg',
+    outlook: '/logos/outlook.svg'
   };
 
   let sourceColor = $derived(getSourceColor(source));

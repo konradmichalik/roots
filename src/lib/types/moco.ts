@@ -95,3 +95,18 @@ export interface MocoUpdatePresence {
   to?: string;
   is_home_office?: boolean;
 }
+
+export interface MocoTaskCost {
+  id: number;
+  name: string;
+  hours_total: number;
+  total_costs: number;
+}
+
+export interface MocoProjectReport {
+  budget_total: number;
+  budget_remaining: number;
+  hours_total: number;
+  hours_remaining: number;
+  costs_by_task: MocoTaskCost[];
+}

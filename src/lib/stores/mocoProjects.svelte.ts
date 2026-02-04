@@ -1,4 +1,4 @@
-import type { MocoProjectAssigned, MocoTask } from '../types';
+import type { MocoProjectAssigned, MocoTask, MocoProjectReport } from '../types';
 import { getMocoClient } from './connections.svelte';
 import { logger } from '../utils/logger';
 
@@ -7,7 +7,11 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 export const mocoProjectsState = $state({
   projects: [] as MocoProjectAssigned[],
   loading: false,
-  lastFetched: null as number | null
+  lastFetched: null as number | null,
+  // Task hours from project reports: taskId -> hours_total
+  taskHoursCache: new Map<number, number>(),
+  // Track which projects have been loaded
+  loadedReports: new Set<number>()
 });
 
 export async function fetchAssignedProjects(): Promise<void> {
@@ -74,4 +78,40 @@ export async function fetchTasksForProject(projectId: number): Promise<void> {
   } catch (error) {
     logger.error(`Failed to fetch tasks for project ${projectId}`, error);
   }
+}
+
+/**
+ * Fetch project report to get hours logged per task.
+ * Results are cached in taskHoursCache.
+ */
+export async function fetchProjectReport(projectId: number): Promise<void> {
+  // Skip if already loaded
+  if (mocoProjectsState.loadedReports.has(projectId)) return;
+
+  const client = getMocoClient();
+  if (!client) return;
+
+  try {
+    const report = await client.getProjectReport(projectId);
+
+    // Cache hours for each task
+    if (report.costs_by_task) {
+      for (const taskCost of report.costs_by_task) {
+        mocoProjectsState.taskHoursCache.set(taskCost.id, taskCost.hours_total);
+      }
+    }
+
+    mocoProjectsState.loadedReports.add(projectId);
+    logger.store('mocoProjects', `Loaded report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`);
+  } catch (error) {
+    logger.error(`Failed to fetch report for project ${projectId}`, error);
+  }
+}
+
+/**
+ * Get logged hours for a task from the cached project report.
+ * Returns 0 if not cached yet.
+ */
+export function getTaskLoggedHours(taskId: number): number {
+  return mocoProjectsState.taskHoursCache.get(taskId) ?? 0;
 }

@@ -20,13 +20,13 @@
 
 {#if variant === 'full'}
   <img
-    src="/roots-logo.svg"
+    src="/docs/images/roots-logo.svg"
     alt="Roots"
     class="{fullSizeClasses[size]} w-auto"
   />
 {:else}
   <img
-    src="/roots-logo-sm.svg"
+    src="/docs/images/roots-logo-sm.svg"
     alt="Roots"
     class="{iconSizeClasses[size]} {animate ? 'logo-spin' : ''}"
   />

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { getTasksForProject } from '../../stores/mocoProjects.svelte';
-  import { getLoggedHoursForTask } from '../../stores/timeEntries.svelte';
+  import { getTasksForProject, getTaskLoggedHours } from '../../stores/mocoProjects.svelte';
   import { formatHours } from '../../utils/time-format';
 
   let { projectId, value = $bindable<string>('') }: {
@@ -23,7 +22,7 @@
 
   let items = $derived(
     tasks.map((t): TaskItem => {
-      const loggedHours = getLoggedHoursForTask(t.id);
+      const loggedHours = getTaskLoggedHours(t.id);
       const budgetHours = (t.budget && t.hourly_rate && t.hourly_rate > 0)
         ? t.budget / t.hourly_rate
         : null;
