@@ -8,7 +8,7 @@
 	import { connectionsState } from '../../stores/connections.svelte';
 	import { formatHours } from '../../utils/time-format';
 	import { toast } from '../../stores/toast.svelte';
-	import type { Favorite } from '../../types';
+	import type { Favorite, OutlookMetadata } from '../../types';
 
 	let favorites = $derived(getSortedFavorites());
 	let outlookEntries = $derived(getEntriesForDate(dateNavState.selectedDate).outlook);
@@ -16,12 +16,14 @@
 
 	// Find matching events that have favorites with eventMatch
 	let matchingEvents = $derived(() => {
-		const matches: Array<{ eventTitle: string; favorite: Favorite; hours: number }> = [];
+		const matches: Array<{ eventTitle: string; eventId: string; favorite: Favorite; hours: number }> = [];
 		for (const event of outlookEntries) {
-			const favorite = findMatchingFavorite(event.description);
+			const favorite = findMatchingFavorite(event.title);
 			if (favorite) {
+				const meta = event.metadata as OutlookMetadata;
 				matches.push({
-					eventTitle: event.description,
+					eventTitle: event.title,
+					eventId: meta.eventId,
 					favorite,
 					hours: event.hours
 				});
@@ -52,7 +54,9 @@
 					project_id: match.favorite.projectId,
 					task_id: match.favorite.taskId,
 					hours: match.hours || match.favorite.defaultHours || 0,
-					description: match.favorite.description || match.eventTitle
+					description: match.favorite.description || match.eventTitle,
+					remote_service: 'outlook',
+					remote_id: match.eventId
 				});
 				if (success) successCount++;
 			}

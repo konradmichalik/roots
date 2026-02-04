@@ -1,4 +1,4 @@
-import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata } from '../types';
+import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../types';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -7,7 +7,8 @@ import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata } from '../types';
 export interface MatchResult {
   sortedMoco: UnifiedTimeEntry[];
   sortedJira: UnifiedTimeEntry[];
-  entryGroupMap: Map<string, string>; // entryId -> groupId (ticket key)
+  sortedOutlook: UnifiedTimeEntry[];
+  entryGroupMap: Map<string, string>; // entryId -> groupId (ticket key or outlook event id)
 }
 
 // ---------------------------------------------------------------------------
@@ -32,38 +33,69 @@ export function clearHoveredGroup(): void {
 
 export function buildMatchResult(
   mocoEntries: UnifiedTimeEntry[],
-  jiraEntries: UnifiedTimeEntry[]
+  jiraEntries: UnifiedTimeEntry[],
+  outlookEntries: UnifiedTimeEntry[] = []
 ): MatchResult {
-  const mocoByKey = groupByTicketKey(mocoEntries, 'moco');
-  const jiraByKey = groupByTicketKey(jiraEntries, 'jira');
-
-  // Find keys present in both
-  const matchedKeys = [...mocoByKey.keys()].filter((k) => jiraByKey.has(k));
-  matchedKeys.sort();
-
   const entryGroupMap = new Map<string, string>();
   const sortedMoco: UnifiedTimeEntry[] = [];
   const sortedJira: UnifiedTimeEntry[] = [];
+  const sortedOutlook: UnifiedTimeEntry[] = [];
   const usedMocoIds = new Set<string>();
   const usedJiraIds = new Set<string>();
+  const usedOutlookIds = new Set<string>();
 
-  for (const key of matchedKeys) {
-    const mocoGroup = mocoByKey.get(key)!;
+  // --- Jira <-> Moco matching (by ticket key) ---
+  const mocoByTicketKey = groupByTicketKey(mocoEntries, 'moco');
+  const jiraByKey = groupByTicketKey(jiraEntries, 'jira');
+
+  const matchedJiraKeys = [...mocoByTicketKey.keys()].filter((k) => jiraByKey.has(k));
+  matchedJiraKeys.sort();
+
+  for (const key of matchedJiraKeys) {
+    const mocoGroup = mocoByTicketKey.get(key)!;
     const jiraGroup = jiraByKey.get(key)!;
 
-    // Sort within each group by hours descending for stable pairing
     mocoGroup.sort((a, b) => b.hours - a.hours);
     jiraGroup.sort((a, b) => b.hours - a.hours);
 
     for (const entry of mocoGroup) {
       sortedMoco.push(entry);
-      entryGroupMap.set(entry.id, key);
+      entryGroupMap.set(entry.id, `jira:${key}`);
       usedMocoIds.add(entry.id);
     }
     for (const entry of jiraGroup) {
       sortedJira.push(entry);
-      entryGroupMap.set(entry.id, key);
+      entryGroupMap.set(entry.id, `jira:${key}`);
       usedJiraIds.add(entry.id);
+    }
+  }
+
+  // --- Outlook <-> Moco matching (by remote_service='outlook' and remote_id=eventId) ---
+  const mocoByOutlookId = groupMocoByOutlookId(mocoEntries);
+  const outlookById = groupOutlookById(outlookEntries);
+
+  const matchedOutlookIds = [...mocoByOutlookId.keys()].filter((id) => outlookById.has(id));
+  matchedOutlookIds.sort();
+
+  for (const eventId of matchedOutlookIds) {
+    const mocoGroup = mocoByOutlookId.get(eventId)!;
+    const outlookGroup = outlookById.get(eventId)!;
+    const groupKey = `outlook:${eventId}`;
+
+    mocoGroup.sort((a, b) => b.hours - a.hours);
+    outlookGroup.sort((a, b) => b.hours - a.hours);
+
+    for (const entry of mocoGroup) {
+      if (!usedMocoIds.has(entry.id)) {
+        sortedMoco.push(entry);
+        usedMocoIds.add(entry.id);
+      }
+      entryGroupMap.set(entry.id, groupKey);
+    }
+    for (const entry of outlookGroup) {
+      sortedOutlook.push(entry);
+      entryGroupMap.set(entry.id, groupKey);
+      usedOutlookIds.add(entry.id);
     }
   }
 
@@ -78,8 +110,13 @@ export function buildMatchResult(
       sortedJira.push(entry);
     }
   }
+  for (const entry of outlookEntries) {
+    if (!usedOutlookIds.has(entry.id)) {
+      sortedOutlook.push(entry);
+    }
+  }
 
-  return { sortedMoco, sortedJira, entryGroupMap };
+  return { sortedMoco, sortedJira, sortedOutlook, entryGroupMap };
 }
 
 // ---------------------------------------------------------------------------
@@ -112,4 +149,34 @@ function getTicketKey(entry: UnifiedTimeEntry, source: 'moco' | 'jira'): string 
     return (entry.metadata as JiraMetadata).issueKey ?? null;
   }
   return null;
+}
+
+function groupMocoByOutlookId(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    const meta = entry.metadata as MocoMetadata;
+    if (meta.remoteService === 'outlook' && meta.remoteId) {
+      const group = map.get(meta.remoteId);
+      if (group) {
+        group.push(entry);
+      } else {
+        map.set(meta.remoteId, [entry]);
+      }
+    }
+  }
+  return map;
+}
+
+function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    const meta = entry.metadata as OutlookMetadata;
+    const group = map.get(meta.eventId);
+    if (group) {
+      group.push(entry);
+    } else {
+      map.set(meta.eventId, [entry]);
+    }
+  }
+  return map;
 }

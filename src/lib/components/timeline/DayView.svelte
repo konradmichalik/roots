@@ -11,7 +11,7 @@
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
 
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
-  let matchResult = $derived(buildMatchResult(entries.moco, entries.jira));
+  let matchResult = $derived(buildMatchResult(entries.moco, entries.jira, entries.outlook));
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
   let rawPresences = $derived(getRawPresencesForDate(dateNavState.selectedDate));
   let isLoading = $derived(isAnyLoading());
@@ -162,7 +162,7 @@
   <div class="grid grid-cols-[1fr_1.4fr_1fr] gap-4 items-start" style="min-height: 60vh;">
     <!-- Left: Outlook Calendar -->
     {#if connectionsState.outlook.isConnected}
-      <SourceColumn source="outlook" entries={entries.outlook} loading={timeEntriesState.loading.outlook} />
+      <SourceColumn source="outlook" entries={matchResult.sortedOutlook} loading={timeEntriesState.loading.outlook} entryGroupMap={matchResult.entryGroupMap} />
     {:else}
       <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

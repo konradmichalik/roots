@@ -349,7 +349,9 @@ function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
     taskName: activity.task.name,
     customerName: activity.customer.name,
     billable: activity.billable,
-    remoteTicketKey: activity.remote_id ?? undefined
+    remoteTicketKey: activity.remote_id ?? undefined,
+    remoteService: activity.remote_service,
+    remoteId: activity.remote_id
   };
 
   return {

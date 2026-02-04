@@ -23,6 +23,8 @@ export interface MocoMetadata {
   customerName: string;
   billable: boolean;
   remoteTicketKey?: string;
+  remoteService?: string | null;
+  remoteId?: string | null;
 }
 
 export interface JiraMetadata {
