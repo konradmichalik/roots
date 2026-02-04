@@ -300,7 +300,7 @@
           </div>
           <div>
             <label for="moco-hours" class="block text-sm font-medium text-foreground mb-1">Duration</label>
-            <TimeInput id="moco-hours" bind:value={hours} />
+            <TimeInput id="moco-hours" bind:value={hours} showStepButtons />
           </div>
         </div>
 
