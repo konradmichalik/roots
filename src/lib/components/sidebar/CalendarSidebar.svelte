@@ -144,9 +144,14 @@
             {ABSENCE_LABELS[selectedAbsence.type]}
           </span>
           <span class="flex-1 text-xs text-foreground truncate">
-            {formatRange(selectedAbsence.startDate, selectedAbsence.endDate)}{#if selectedAbsence.halfDay}<span class="text-muted-foreground ml-1">(½)</span>{/if}
+            {formatRange(
+              selectedAbsence.startDate,
+              selectedAbsence.endDate
+            )}{#if selectedAbsence.halfDay}<span class="text-muted-foreground ml-1">(½)</span>{/if}
           </span>
-          <Pencil class="size-3 text-muted-foreground shrink-0 transition-colors group-hover:text-foreground" />
+          <Pencil
+            class="size-3 text-muted-foreground shrink-0 transition-colors group-hover:text-foreground"
+          />
         </div>
         {#if selectedAbsence.note}
           <p class="text-[10px] text-muted-foreground truncate mt-1">{selectedAbsence.note}</p>
@@ -224,8 +229,9 @@
                 <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
               </div>
               <div class="text-muted-foreground pt-1 border-t border-border/50">
-                {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1 ? 's' : ''} (excl.
-                today)
+                {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1
+                  ? 's'
+                  : ''} (excl. today)
               </div>
             </div>
           </Tooltip.Content>
@@ -254,7 +260,8 @@
                 <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
               </div>
               <div class="text-muted-foreground pt-1 border-t border-border/50">
-                {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !== 1
+                {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !==
+                1
                   ? 's'
                   : ''} (excl. today)
               </div>
@@ -298,7 +305,9 @@
                   {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
               >
                 <span class="text-muted-foreground">{formatDateShort(date)}</span>
-                <span class="font-mono text-danger-text">{formatBalance(overview.presenceBalance ?? 0)}</span>
+                <span class="font-mono text-danger-text"
+                  >{formatBalance(overview.presenceBalance ?? 0)}</span
+                >
               </button>
             {/each}
           </div>
@@ -340,7 +349,9 @@
                   {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
               >
                 <span class="text-muted-foreground">{formatDateShort(date)}</span>
-                <span class="font-mono {getBalanceClass(overview.balance)}">{formatBalance(overview.balance)}</span>
+                <span class="font-mono {getBalanceClass(overview.balance)}"
+                  >{formatBalance(overview.balance)}</span
+                >
               </button>
             {/each}
           </div>

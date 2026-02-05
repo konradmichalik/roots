@@ -200,7 +200,8 @@
       <Tabs.Content value="data" class="mt-0 px-6 py-4 min-h-[240px]">
         <h3 class="text-sm font-semibold text-foreground mb-1">Cache</h3>
         <p class="text-xs text-muted-foreground mb-3">
-          {cachedMonths} {cachedMonths === 1 ? 'month' : 'months'} cached.
+          {cachedMonths}
+          {cachedMonths === 1 ? 'month' : 'months'} cached.
         </p>
         <button
           onclick={handleClearCache}

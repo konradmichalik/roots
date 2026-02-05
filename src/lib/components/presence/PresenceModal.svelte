@@ -28,7 +28,9 @@
 
   let effectiveDate = $derived(date ?? dateNavState.selectedDate);
   let existingPresences = $derived(getRawPresencesForDate(effectiveDate));
-  let isHomeOfficeDay = $derived(existingPresences.length > 0 && existingPresences[0].is_home_office);
+  let isHomeOfficeDay = $derived(
+    existingPresences.length > 0 && existingPresences[0].is_home_office
+  );
 
   let open = $state(false);
   let saving = $state(false);

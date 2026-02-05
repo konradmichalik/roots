@@ -32,7 +32,11 @@ export const pendingMocoModal = $state<{
   prefill: null
 });
 
-export function openPendingMocoModal(prefill: { date: string; hours: number; description?: string }): void {
+export function openPendingMocoModal(prefill: {
+  date: string;
+  hours: number;
+  description?: string;
+}): void {
   pendingMocoModal.prefill = prefill;
   pendingMocoModal.show = true;
 }

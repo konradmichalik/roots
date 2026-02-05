@@ -21,11 +21,7 @@ import {
   getMonthStart,
   getMonthEnd
 } from '../utils/date-helpers';
-import {
-  getStorageItemAsync,
-  setStorageItemAsync,
-  STORAGE_KEYS
-} from '../utils/storage';
+import { getStorageItemAsync, setStorageItemAsync, STORAGE_KEYS } from '../utils/storage';
 import { secondsToHours } from '../utils/time-format';
 import { logger } from '../utils/logger';
 import { toast } from './toast.svelte';
