@@ -59,6 +59,14 @@ export function trackPairUsage(data: {
   });
 }
 
+export function removePair(projectId: number, taskId: number): void {
+  recentPairsState.pairs = recentPairsState.pairs.filter(
+    (p) => !(p.projectId === projectId && p.taskId === taskId)
+  );
+  persist();
+  logger.store('recentPairs', 'Removed pair', { projectId, taskId });
+}
+
 export function getTopPairs(limit: number = 5): RecentMocoPair[] {
   const activeProjects = getActiveProjects();
   const activeProjectIds = new Set(activeProjects.map((p) => p.id));
