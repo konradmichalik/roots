@@ -6,6 +6,7 @@
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { getCachedDayOverview, hasCachedDataForDate } from '../../stores/timeEntries.svelte';
+  import { getPresenceForDate } from '../../stores/presences.svelte';
   import {
     formatDateShort,
     getWeekDates,
@@ -20,9 +21,11 @@
   import Plus from '@lucide/svelte/icons/plus';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import AlertCircle from '@lucide/svelte/icons/alert-circle';
+  import Scale from '@lucide/svelte/icons/scale';
 
   let showLegend = $state(false);
   let showOpenDays = $state(true);
+  let showBalancedDays = $state(true);
   let todayStr = $derived(today());
 
   let selectedAbsence = $derived(getAbsenceForDate(dateNavState.selectedDate));
@@ -49,18 +52,49 @@
   let monthActual = $derived(monthOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
   let monthTarget = $derived(monthOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
 
-  // Days with open hours (negative balance, in the past, with actual cached data)
+  // Days with open hours (negative presenceBalance = not all presence time booked)
+  // Only shows days where presence is finished (to !== null)
   let openDays = $derived(
     monthWorkingDaysUntilYesterday
       .map((date, i) => ({
         date,
         overview: monthOverviews[i]
       }))
-      .filter(
-        ({ date, overview }) =>
-          overview.balance < 0 && hasCachedDataForDate(date, monthStart)
-      )
-      .sort((a, b) => b.date.localeCompare(a.date)) // Most recent first
+      .filter(({ date, overview }) => {
+        // Must have cached data
+        if (!hasCachedDataForDate(date, monthStart)) return false;
+        // Must have presence and it must be finished (to !== null)
+        if (!overview.presence || overview.presence.to === null) return false;
+        // presenceBalance < 0 means booked hours < presence hours
+        return overview.presenceBalance !== undefined && overview.presenceBalance < -0.01;
+      })
+      .sort((a, b) => (a.overview.presenceBalance ?? 0) - (b.overview.presenceBalance ?? 0)) // Largest deficit first
+  );
+
+  // Days with non-zero balance where presence is finished (to !== null)
+  let balancedDays = $derived(
+    monthWorkingDaysUntilYesterday
+      .map((date, i) => {
+        const presence = getPresenceForDate(date);
+        return {
+          date,
+          overview: monthOverviews[i],
+          presence
+        };
+      })
+      .filter(({ date, overview, presence }) => {
+        // Only include if:
+        // 1. Has cached data
+        // 2. Balance is not zero (over or under target)
+        // 3. Presence exists and is finished (to !== null)
+        return (
+          hasCachedDataForDate(date, monthStart) &&
+          Math.abs(overview.balance) >= 0.01 && // Allow small rounding tolerance
+          presence !== null &&
+          presence.to !== null
+        );
+      })
+      .sort((a, b) => a.overview.balance - b.overview.balance) // Ascending: largest minus first
   );
 
   function formatRange(start: string, end: string): string {
@@ -206,7 +240,49 @@
                 {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
             >
               <span class="text-muted-foreground">{formatDateShort(date)}</span>
-              <span class="font-mono text-danger-text">{formatBalance(overview.balance)}</span>
+              <span class="font-mono text-danger-text">{formatBalance(overview.presenceBalance ?? 0)}</span>
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {/if}
+
+  <!-- Hour Balances (finished days with non-zero balance) -->
+  {#if balancedDays.length > 0}
+    <div class="border-t border-border pt-3">
+      <button
+        onclick={() => {
+          showBalancedDays = !showBalancedDays;
+        }}
+        class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
+      >
+        <div class="flex items-center gap-1.5">
+          <Scale class="size-3.5 text-muted-foreground" />
+          <span class="text-xs font-medium text-foreground">Hour Balances</span>
+          <span
+            class="inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground text-[10px] font-medium px-1.5 min-w-[18px]"
+          >
+            {balancedDays.length}
+          </span>
+        </div>
+        <ChevronDown
+          class="size-3.5 text-muted-foreground transition-transform duration-200 {showBalancedDays
+            ? 'rotate-180'
+            : ''}"
+        />
+      </button>
+      {#if showBalancedDays}
+        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
+          {#each balancedDays as { date, overview } (date)}
+            <button
+              onclick={() => setDate(date)}
+              class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
+                hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+                {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
+            >
+              <span class="text-muted-foreground">{formatDateShort(date)}</span>
+              <span class="font-mono {getBalanceClass(overview.balance)}">{formatBalance(overview.balance)}</span>
             </button>
           {/each}
         </div>
