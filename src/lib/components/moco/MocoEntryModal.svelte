@@ -19,6 +19,7 @@
   } from '../../stores/timeEntries.svelte';
   import { addFavorite } from '../../stores/favorites.svelte';
   import { trackPairUsage } from '../../stores/recentMocoPairs.svelte';
+  import { settingsState } from '../../stores/settings.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import type { Snippet } from 'svelte';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
@@ -331,7 +332,7 @@
         </div>
       </div>
     {:else}
-      {#if mode === 'create'}
+      {#if mode === 'create' && settingsState.showQuickSelection}
         <RecentPairChips onSelect={handleChipSelect} />
       {/if}
       <form onsubmit={handleSubmit} class="space-y-4 py-4">
