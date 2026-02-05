@@ -157,6 +157,11 @@ html[data-color-mode='dark'] {
   --color-source-jira: #a8c5db;
   --color-source-outlook: #d4b8d0;
 
+  /* Source-specific text colors for indicators */
+  --color-source-moco-text: var(--ds-text-success);
+  --color-source-jira-text: var(--ds-text-brand);
+  --color-source-outlook-text: #ebcb8b;
+
   /* Semantic colors mapped to Tailwind classes */
   --color-success: var(--ds-background-success-bold);
   --color-success-subtle: var(--ds-background-success);

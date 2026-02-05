@@ -7,7 +7,7 @@
   import {
     connectionsState,
     initializeConnections,
-    isAnyServiceConnected,
+    hasAnyServiceConfigured,
     handleOutlookCallback
   } from './lib/stores/connections.svelte';
   import { initializeTheme, cleanupTheme } from './lib/stores/theme.svelte';
@@ -64,7 +64,7 @@
 <Tooltip.Provider>
   {#if isInitializing}
     <AppLoader />
-  {:else if isAnyServiceConnected()}
+  {:else if hasAnyServiceConfigured()}
     <div class="animate-fade-in">
       <MainLayout />
     </div>

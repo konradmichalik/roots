@@ -3,7 +3,6 @@
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { formatHours } from '../../utils/time-format';
-  import { getSourceColor } from '../../stores/settings.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
   import Star from '@lucide/svelte/icons/star';
@@ -37,7 +36,14 @@
     if (matchGroupId) clearHoveredGroup();
   }
 
-  let sourceColor = $derived(getSourceColor(entry.source));
+  // Map sources to styleguide border color classes
+  const SOURCE_BORDER_COLORS: Record<string, string> = {
+    moco: 'border-l-success',
+    jira: 'border-l-brand',
+    outlook: 'border-l-warning'
+  };
+
+  let borderColorClass = $derived(SOURCE_BORDER_COLORS[entry.source]);
   let mocoMeta = $derived(
     entry.metadata.source === 'moco' ? (entry.metadata as MocoMetadata) : null
   );
@@ -64,10 +70,9 @@
     }}
   >
     <button
-      class="w-full text-left group rounded-xl border border-border bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150 cursor-pointer
+      class="w-full text-left group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150 cursor-pointer
         {isDimmed ? 'opacity-40' : ''}
         {isInHoveredGroup ? 'shadow-md' : ''}"
-      style="border-left: 3px solid {sourceColor}"
       onmouseenter={handleMouseEnter}
       onmouseleave={handleMouseLeave}
     >
@@ -77,10 +82,9 @@
 {:else}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="group rounded-xl border border-border bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
+    class="group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
       {isDimmed ? 'opacity-40' : ''}
       {isInHoveredGroup ? 'shadow-md' : ''}"
-    style="border-left: 3px solid {sourceColor}"
     onmouseenter={handleMouseEnter}
     onmouseleave={handleMouseLeave}
   >

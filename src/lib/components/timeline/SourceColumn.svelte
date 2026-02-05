@@ -3,7 +3,6 @@
   import type { Snippet } from 'svelte';
   import TimeEntryCard from '../entries/TimeEntryCard.svelte';
   import { formatHours } from '../../utils/time-format';
-  import { getSourceColor } from '../../stores/settings.svelte';
   import Calendar from '@lucide/svelte/icons/calendar';
 
   let {
@@ -34,7 +33,26 @@
     outlook: '/logos/outlook.svg'
   };
 
-  let sourceColor = $derived(getSourceColor(source));
+  // Map sources to styleguide color classes
+  const SOURCE_COLORS: Record<string, { bg: string; border: string; text: string }> = {
+    moco: {
+      bg: 'bg-success/10',
+      border: 'border-l-success',
+      text: 'text-success-text'
+    },
+    jira: {
+      bg: 'bg-brand/10',
+      border: 'border-l-brand',
+      text: 'text-brand-text'
+    },
+    outlook: {
+      bg: 'bg-warning/10',
+      border: 'border-l-warning',
+      text: 'text-warning-text'
+    }
+  };
+
+  let colorClasses = $derived(SOURCE_COLORS[source]);
   let total = $derived(entries.reduce((sum, e) => sum + e.hours, 0));
   let label = $derived(LABELS[source]);
 </script>
@@ -44,16 +62,13 @@
     {emphasized ? 'shadow-lg ring-1 ring-border z-10' : 'shadow-sm opacity-95'}"
 >
   <!-- Source header -->
-  <div
-    class="px-4 py-3 border-b border-border"
-    style="background: linear-gradient(to right, {sourceColor}10, transparent)"
-  >
+  <div class="px-4 py-3 border-b border-border {colorClasses.bg}">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <img
           src={LOGOS[source]}
           alt={label}
-          class="h-4 w-auto opacity-30 grayscale dark:invert dark:opacity-25"
+          class="size-4 opacity-50 grayscale dark:invert dark:opacity-40"
         />
         <span class="text-sm font-semibold text-foreground uppercase tracking-wide">{label}</span>
       </div>
@@ -73,8 +88,7 @@
     {#if loading && entries.length === 0}
       {#each { length: 3 } as _, i (i)}
         <div
-          class="animate-pulse rounded-xl border border-border bg-card p-3 pl-4"
-          style="border-left: 3px solid {sourceColor}20"
+          class="animate-pulse rounded-xl border border-border {colorClasses.border} border-l-[3px] bg-card p-3 pl-4"
         >
           <div class="flex items-start justify-between gap-2">
             <div class="flex-1 min-w-0">
@@ -99,8 +113,8 @@
   </div>
 
   <!-- Footer -->
-  <div class="border-t border-border bg-muted/20 px-4 py-2">
-    <span class="text-xs text-muted-foreground">
+  <div class="border-t border-border bg-muted/20 px-3 py-1 flex items-center">
+    <span class="text-[10px] text-muted-foreground leading-none">
       {entries.length}
       {entries.length === 1 ? 'entry' : 'entries'}
     </span>

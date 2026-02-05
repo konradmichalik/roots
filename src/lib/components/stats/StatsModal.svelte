@@ -11,7 +11,6 @@
     toDateString
   } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
-  import { getSourceColor } from '../../stores/settings.svelte';
   import type { Snippet } from 'svelte';
   import type { MocoMetadata } from '../../types';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -264,11 +263,8 @@
               </div>
               <div class="h-2 rounded-full bg-muted overflow-hidden">
                 <div
-                  class="h-full rounded-full transition-all duration-300"
-                  style="width: {getProgressPercent(
-                    weekTotals.actual,
-                    weekTotals.required
-                  )}%; background-color: {getSourceColor('moco')}"
+                  class="h-full rounded-full bg-success transition-all duration-300"
+                  style="width: {getProgressPercent(weekTotals.actual, weekTotals.required)}%"
                 ></div>
               </div>
               <p class="text-xs text-muted-foreground">
@@ -323,11 +319,8 @@
               </div>
               <div class="h-2 rounded-full bg-muted overflow-hidden">
                 <div
-                  class="h-full rounded-full transition-all duration-300"
-                  style="width: {getProgressPercent(
-                    monthTotals.actual,
-                    monthTotals.required
-                  )}%; background-color: {getSourceColor('moco')}"
+                  class="h-full rounded-full bg-success transition-all duration-300"
+                  style="width: {getProgressPercent(monthTotals.actual, monthTotals.required)}%"
                 ></div>
               </div>
               <p class="text-xs text-muted-foreground">

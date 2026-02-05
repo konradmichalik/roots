@@ -11,11 +11,11 @@
     outlook: 'Outlook'
   };
 
-  // Map services to styleguide semantic colors
+  // Map services to dedicated source text colors
   const serviceColors: Record<ServiceType, string> = {
-    moco: 'text-success-text',
-    jira: 'text-brand-text',
-    outlook: 'text-warning-text'
+    moco: 'text-source-moco-text',
+    jira: 'text-source-jira-text',
+    outlook: 'text-source-outlook-text'
   };
 
   let isConnected = $derived(connectionsState[service].isConnected);

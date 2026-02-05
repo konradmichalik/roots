@@ -29,6 +29,9 @@ export const connectionsState = $state<AllConnectionsState>({
   outlook: createInitialServiceState('outlook')
 });
 
+// Track if user has ever configured any service (persisted configs exist)
+let hasConfiguredServices = $state(false);
+
 let mocoClient: MocoClient | null = null;
 let jiraClient: JiraWorklogClient | null = null;
 let outlookClient: OutlookClient | null = null;
@@ -38,12 +41,14 @@ export async function initializeConnections(): Promise<void> {
 
   const mocoConfig = await getStorageItemAsync<MocoConnectionConfig>(STORAGE_KEYS.MOCO_CONFIG);
   if (mocoConfig) {
+    hasConfiguredServices = true;
     logger.connection('Restoring Moco connection from storage');
     restores.push(connectMoco(mocoConfig).then(() => {}));
   }
 
   const jiraConfig = await getStorageItemAsync<JiraConnectionConfig>(STORAGE_KEYS.JIRA_CONFIG);
   if (jiraConfig) {
+    hasConfiguredServices = true;
     logger.connection('Restoring Jira connection from storage');
     restores.push(connectJira(jiraConfig).then(() => {}));
   }
@@ -53,9 +58,12 @@ export async function initializeConnections(): Promise<void> {
   );
   const outlookTokens = await getStorageItemAsync<OAuthTokens>(STORAGE_KEYS.OUTLOOK_TOKENS);
   if (outlookConfig && outlookTokens) {
+    hasConfiguredServices = true;
     logger.connection('Restoring Outlook connection from storage');
     restores.push(restoreOutlook(outlookConfig, outlookTokens).then(() => {}));
   }
+
+  // Note: hasConfiguredServices is also set in connect functions for new connections
 
   await Promise.allSettled(restores);
   logger.store('connections', 'Initialized');
@@ -79,6 +87,7 @@ export async function connectMoco(config: MocoConnectionConfig): Promise<boolean
     connectionsState.moco.lastConnected = new Date().toISOString();
 
     await setStorageItemAsync(STORAGE_KEYS.MOCO_CONFIG, config);
+    hasConfiguredServices = true;
     logger.connectionSuccess(`Moco connected to ${config.domain}.mocoapp.com`);
     return true;
   } catch (error) {
@@ -118,6 +127,7 @@ export async function connectJira(config: JiraConnectionConfig): Promise<boolean
     connectionsState.jira.lastConnected = new Date().toISOString();
 
     await setStorageItemAsync(STORAGE_KEYS.JIRA_CONFIG, config);
+    hasConfiguredServices = true;
     logger.connectionSuccess(`Jira connected as ${result.user?.displayName ?? 'unknown'}`);
     return true;
   } catch (error) {
@@ -188,6 +198,7 @@ export async function handleOutlookCallback(code: string): Promise<boolean> {
 
     await setStorageItemAsync(STORAGE_KEYS.OUTLOOK_CONFIG, config);
     await setStorageItemAsync(STORAGE_KEYS.OUTLOOK_TOKENS, tokens);
+    hasConfiguredServices = true;
     logger.connectionSuccess(`Outlook connected as ${result.user?.displayName ?? 'unknown'}`);
     return true;
   } catch (error) {
@@ -227,4 +238,8 @@ export function isAnyServiceConnected(): boolean {
     connectionsState.jira.isConnected ||
     connectionsState.outlook.isConnected
   );
+}
+
+export function hasAnyServiceConfigured(): boolean {
+  return hasConfiguredServices;
 }
