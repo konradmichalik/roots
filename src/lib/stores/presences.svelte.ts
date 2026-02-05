@@ -8,7 +8,7 @@ import { toast } from './toast.svelte';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 interface PresenceCache {
-  byDate: Map<string, MocoPresence[]>;
+  byDate: Record<string, MocoPresence[]>;
   lastFetched: number;
   from: string;
   to: string;
@@ -49,10 +49,10 @@ export async function fetchPresences(from: string, to: string): Promise<void> {
   try {
     const presences = await client.getPresences(from, to);
 
-    const byDate = new Map<string, MocoPresence[]>();
+    const byDate: Record<string, MocoPresence[]> = {};
     for (const presence of presences) {
-      const existing = byDate.get(presence.date) ?? [];
-      byDate.set(presence.date, [...existing, presence]);
+      const existing = byDate[presence.date] ?? [];
+      byDate[presence.date] = [...existing, presence];
     }
 
     presencesState.cache = { byDate, lastFetched: Date.now(), from, to };
@@ -93,7 +93,7 @@ function calculatePresenceHours(from: string, to: string | null, breakMinutes?: 
  * Returns null if no presence exists for that date.
  */
 export function getPresenceForDate(date: string): DayPresence | null {
-  const presences = presencesState.cache?.byDate.get(date);
+  const presences = presencesState.cache?.byDate[date];
   if (!presences || presences.length === 0) return null;
 
   // Sum hours across all presences for the day (including break deductions)
@@ -123,7 +123,7 @@ export function getPresenceForDate(date: string): DayPresence | null {
  * Useful for showing detailed breakdown including gaps/breaks.
  */
 export function getRawPresencesForDate(date: string): MocoPresence[] {
-  const presences = presencesState.cache?.byDate.get(date);
+  const presences = presencesState.cache?.byDate[date];
   if (!presences || presences.length === 0) return [];
 
   // Sort by start time
@@ -153,10 +153,14 @@ export async function createPresence(data: MocoCreatePresence): Promise<boolean>
 
     // Update cache with new presence (create new reference for reactivity)
     if (presencesState.cache) {
-      const existing = presencesState.cache.byDate.get(data.date) ?? [];
-      const newByDate = new Map(presencesState.cache.byDate);
-      newByDate.set(data.date, [...existing, newPresence]);
-      presencesState.cache = { ...presencesState.cache, byDate: newByDate };
+      const existing = presencesState.cache.byDate[data.date] ?? [];
+      presencesState.cache = {
+        ...presencesState.cache,
+        byDate: {
+          ...presencesState.cache.byDate,
+          [data.date]: [...existing, newPresence]
+        }
+      };
     }
 
     toast.success('Presence created');
@@ -188,11 +192,15 @@ export async function updatePresence(
 
     // Update cache (create new reference for reactivity)
     if (presencesState.cache) {
-      const existing = presencesState.cache.byDate.get(date) ?? [];
+      const existing = presencesState.cache.byDate[date] ?? [];
       const updated = existing.map((p) => (p.id === id ? updatedPresence : p));
-      const newByDate = new Map(presencesState.cache.byDate);
-      newByDate.set(date, updated);
-      presencesState.cache = { ...presencesState.cache, byDate: newByDate };
+      presencesState.cache = {
+        ...presencesState.cache,
+        byDate: {
+          ...presencesState.cache.byDate,
+          [date]: updated
+        }
+      };
     }
 
     toast.success('Presence updated');
@@ -220,15 +228,13 @@ export async function deletePresence(id: number, date: string): Promise<boolean>
 
     // Update cache (create new reference for reactivity)
     if (presencesState.cache) {
-      const existing = presencesState.cache.byDate.get(date) ?? [];
+      const existing = presencesState.cache.byDate[date] ?? [];
       const filtered = existing.filter((p) => p.id !== id);
-      const newByDate = new Map(presencesState.cache.byDate);
-      if (filtered.length === 0) {
-        newByDate.delete(date);
-      } else {
-        newByDate.set(date, filtered);
-      }
-      presencesState.cache = { ...presencesState.cache, byDate: newByDate };
+      const { [date]: _, ...restByDate } = presencesState.cache.byDate;
+      presencesState.cache = {
+        ...presencesState.cache,
+        byDate: filtered.length === 0 ? restByDate : { ...restByDate, [date]: filtered }
+      };
     }
 
     toast.success('Presence deleted');
