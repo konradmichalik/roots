@@ -22,6 +22,7 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import AlertCircle from '@lucide/svelte/icons/alert-circle';
   import Scale from '@lucide/svelte/icons/scale';
+  import Pencil from '@lucide/svelte/icons/pencil';
 
   let showLegend = $state(true);
   let showOpenDays = $state(true);
@@ -127,6 +128,32 @@
   </div>
 
   <MiniCalendar />
+
+  <!-- Absence detail for selected date -->
+  {#if selectedAbsence}
+    <AbsenceModal mode="edit" editAbsence={selectedAbsence}>
+      <button
+        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+      >
+        <div class="flex items-center gap-2">
+          <span
+            class="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium {ABSENCE_COLORS[
+              selectedAbsence.type
+            ]}"
+          >
+            {ABSENCE_LABELS[selectedAbsence.type]}
+          </span>
+          <span class="flex-1 text-xs text-foreground truncate">
+            {formatRange(selectedAbsence.startDate, selectedAbsence.endDate)}{#if selectedAbsence.halfDay}<span class="text-muted-foreground ml-1">(½)</span>{/if}
+          </span>
+          <Pencil class="size-3 text-muted-foreground shrink-0" />
+        </div>
+        {#if selectedAbsence.note}
+          <p class="text-[10px] text-muted-foreground truncate mt-1">{selectedAbsence.note}</p>
+        {/if}
+      </button>
+    </AbsenceModal>
+  {/if}
 
   <!-- Legend (collapsible, under calendar) -->
   <div class="border-t border-border pt-3">
@@ -332,33 +359,4 @@
       </button>
     </StatsModal>
   </div>
-
-  <!-- Absence detail for selected date -->
-  {#if selectedAbsence}
-    <AbsenceModal mode="edit" editAbsence={selectedAbsence}>
-      <button
-        class="w-full text-left rounded-lg border border-border bg-information-subtle p-3 space-y-2 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-      >
-        <div class="flex items-center justify-between">
-          <span
-            class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {ABSENCE_COLORS[
-              selectedAbsence.type
-            ]}"
-          >
-            {ABSENCE_LABELS[selectedAbsence.type]}
-          </span>
-          <span class="text-xs text-muted-foreground"> Click to edit </span>
-        </div>
-        <div class="text-sm text-foreground">
-          {formatRange(selectedAbsence.startDate, selectedAbsence.endDate)}
-          {#if selectedAbsence.halfDay}
-            <span class="text-xs text-muted-foreground ml-1">(half day)</span>
-          {/if}
-        </div>
-        {#if selectedAbsence.note}
-          <p class="text-xs text-muted-foreground">{selectedAbsence.note}</p>
-        {/if}
-      </button>
-    </AbsenceModal>
-  {/if}
 </div>
