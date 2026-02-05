@@ -34,6 +34,7 @@ let hasConfiguredServices = $state(false);
 
 let mocoClient: MocoClient | null = null;
 let jiraClient: JiraWorklogClient | null = null;
+let jiraConfig: JiraConnectionConfig | null = null;
 let outlookClient: OutlookClient | null = null;
 
 export async function initializeConnections(): Promise<void> {
@@ -125,6 +126,7 @@ export async function connectJira(config: JiraConnectionConfig): Promise<boolean
     connectionsState.jira.isConnecting = false;
     connectionsState.jira.error = null;
     connectionsState.jira.lastConnected = new Date().toISOString();
+    jiraConfig = config;
 
     await setStorageItemAsync(STORAGE_KEYS.JIRA_CONFIG, config);
     hasConfiguredServices = true;
@@ -137,6 +139,7 @@ export async function connectJira(config: JiraConnectionConfig): Promise<boolean
     connectionsState.jira.error = message;
     connectionsState.jira.lastConnected = null;
     jiraClient = null;
+    jiraConfig = null;
     logger.error('Jira connection failed', error);
     return false;
   }
@@ -145,6 +148,7 @@ export async function connectJira(config: JiraConnectionConfig): Promise<boolean
 export async function disconnectJira(): Promise<void> {
   connectionsState.jira = createInitialServiceState('jira');
   jiraClient = null;
+  jiraConfig = null;
   await removeStorageItemAsync(STORAGE_KEYS.JIRA_CONFIG);
   logger.connection('Jira disconnected');
 }
@@ -235,6 +239,10 @@ export function getJiraClient(): JiraWorklogClient | null {
 
 export function getOutlookClient(): OutlookClient | null {
   return outlookClient;
+}
+
+export function getJiraBaseUrl(): string | null {
+  return jiraConfig?.baseUrl ?? null;
 }
 
 export function isAnyServiceConnected(): boolean {

@@ -3,7 +3,7 @@
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { formatHours } from '../../utils/time-format';
-  import { connectionsState } from '../../stores/connections.svelte';
+  import { connectionsState, getJiraBaseUrl } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
   import Star from '@lucide/svelte/icons/star';
   import Plus from '@lucide/svelte/icons/plus';
@@ -55,6 +55,13 @@
   );
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
+
+  let jiraIssueUrl = $derived.by(() => {
+    if (!jiraMeta) return null;
+    const baseUrl = getJiraBaseUrl();
+    if (!baseUrl) return null;
+    return `${baseUrl}/browse/${jiraMeta.issueKey}`;
+  });
 </script>
 
 {#if mocoMeta && isMocoConnected}
@@ -110,9 +117,21 @@
       {/if}
       {#if jiraMeta}
         <div class="flex items-center gap-1.5">
-          <span class="text-xs font-mono font-medium text-brand-text">
-            {jiraMeta.issueKey}
-          </span>
+          {#if jiraIssueUrl}
+            <a
+              href={jiraIssueUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-xs font-mono font-medium text-brand-text hover:underline"
+              onclick={(e) => e.stopPropagation()}
+            >
+              {jiraMeta.issueKey}
+            </a>
+          {:else}
+            <span class="text-xs font-mono font-medium text-brand-text">
+              {jiraMeta.issueKey}
+            </span>
+          {/if}
           {#if jiraMeta.projectKey}
             <span class="text-xs text-muted-foreground">{jiraMeta.projectKey}</span>
           {/if}
