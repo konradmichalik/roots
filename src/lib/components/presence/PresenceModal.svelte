@@ -1,10 +1,12 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
+  import { Switch } from '../ui/switch';
   import {
     createPresence,
     updatePresence,
     deletePresence,
-    getRawPresencesForDate
+    getRawPresencesForDate,
+    setDayHomeOffice
   } from '../../stores/presences.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatDateLong } from '../../utils/date-helpers';
@@ -12,7 +14,7 @@
   import type { Snippet } from 'svelte';
   import type { MocoPresence } from '../../types';
   import Home from '@lucide/svelte/icons/home';
-  import Clock from '@lucide/svelte/icons/clock';
+  import Building2 from '@lucide/svelte/icons/building-2';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
 
@@ -26,6 +28,7 @@
 
   let effectiveDate = $derived(date ?? dateNavState.selectedDate);
   let existingPresences = $derived(getRawPresencesForDate(effectiveDate));
+  let isHomeOfficeDay = $derived(existingPresences.length > 0 && existingPresences[0].is_home_office);
 
   let open = $state(false);
   let saving = $state(false);
@@ -34,13 +37,11 @@
   // Form state for new entry
   let newFromTime = $state('');
   let newToTime = $state('');
-  let newIsHomeOffice = $state(false);
 
   // Edit state
   let editingId = $state<number | null>(null);
   let editFromTime = $state('');
   let editToTime = $state('');
-  let editIsHomeOffice = $state(false);
 
   // Delete confirmation
   let deleteConfirmId = $state<number | null>(null);
@@ -48,7 +49,6 @@
   function resetForm(): void {
     newFromTime = '';
     newToTime = '';
-    newIsHomeOffice = false;
     editingId = null;
     deleteConfirmId = null;
     error = null;
@@ -65,12 +65,20 @@
     editingId = presence.id;
     editFromTime = presence.from;
     editToTime = presence.to ?? '';
-    editIsHomeOffice = presence.is_home_office;
     deleteConfirmId = null;
   }
 
   function cancelEdit(): void {
     editingId = null;
+  }
+
+  async function handleHomeOfficeToggle(checked: boolean): Promise<void> {
+    saving = true;
+    try {
+      await setDayHomeOffice(effectiveDate, checked);
+    } finally {
+      saving = false;
+    }
   }
 
   async function handleCreate(): Promise<void> {
@@ -80,7 +88,6 @@
       return;
     }
 
-    // To time is optional (open presence)
     let normalizedTo: string | undefined;
     if (newToTime.trim()) {
       normalizedTo = normalizeTimeInput(newToTime) ?? undefined;
@@ -98,13 +105,12 @@
         date: effectiveDate,
         from: normalizedFrom,
         to: normalizedTo,
-        is_home_office: newIsHomeOffice
+        is_home_office: isHomeOfficeDay
       });
 
       if (success) {
         newFromTime = '';
         newToTime = '';
-        newIsHomeOffice = false;
       }
     } finally {
       saving = false;
@@ -133,8 +139,7 @@
     try {
       const success = await updatePresence(id, effectiveDate, {
         from: normalizedFrom,
-        to: normalizedTo,
-        is_home_office: editIsHomeOffice
+        to: normalizedTo
       });
 
       if (success) {
@@ -189,10 +194,30 @@
         </div>
       {/if}
 
+      <!-- Home Office Toggle (only show if there are entries) -->
+      {#if existingPresences.length > 0}
+        <div class="flex items-center justify-between rounded-lg border border-border bg-card p-3">
+          <div class="flex items-center gap-2">
+            {#if isHomeOfficeDay}
+              <Home class="size-4 text-brand" />
+              <span class="text-sm font-medium text-foreground">Home Office</span>
+            {:else}
+              <Building2 class="size-4 text-muted-foreground" />
+              <span class="text-sm font-medium text-foreground">Office</span>
+            {/if}
+          </div>
+          <Switch
+            checked={isHomeOfficeDay}
+            onCheckedChange={handleHomeOfficeToggle}
+            disabled={saving}
+          />
+        </div>
+      {/if}
+
       <!-- Existing presences -->
       {#if existingPresences.length > 0}
         <div class="space-y-2">
-          <h4 class="text-sm font-medium text-foreground">Existing entries</h4>
+          <h4 class="text-sm font-medium text-foreground">Time slots</h4>
           {#each existingPresences as presence (presence.id)}
             <div class="rounded-lg border border-border bg-card p-3">
               {#if editingId === presence.id}
@@ -222,14 +247,6 @@
                       />
                     </div>
                   </div>
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      bind:checked={editIsHomeOffice}
-                      class="size-4 rounded border-input text-primary focus:ring-ring"
-                    />
-                    <span class="text-sm text-foreground">Home Office</span>
-                  </label>
                   <div class="flex gap-2">
                     <button
                       type="button"
@@ -285,11 +302,6 @@
                 <!-- View mode -->
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    {#if presence.is_home_office}
-                      <Home class="size-4 text-brand" />
-                    {:else}
-                      <Clock class="size-4 text-muted-foreground" />
-                    {/if}
                     <span class="text-sm font-mono font-medium text-foreground">
                       {formatTimeRange(presence.from, presence.to)}
                     </span>
@@ -328,7 +340,7 @@
 
       <!-- Add new entry -->
       <div class="border-t border-border pt-4">
-        <h4 class="text-sm font-medium text-foreground mb-3">Add new entry</h4>
+        <h4 class="text-sm font-medium text-foreground mb-3">Add time slot</h4>
         <div class="space-y-3">
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -354,14 +366,6 @@
               />
             </div>
           </div>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={newIsHomeOffice}
-              class="size-4 rounded border-input text-primary focus:ring-ring"
-            />
-            <span class="text-sm text-foreground">Home Office</span>
-          </label>
           <button
             type="button"
             onclick={handleCreate}
@@ -369,7 +373,7 @@
             class="w-full rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground
               hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           >
-            {saving ? 'Adding...' : 'Add Entry'}
+            {saving ? 'Adding...' : 'Add'}
           </button>
         </div>
       </div>

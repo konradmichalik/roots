@@ -92,6 +92,45 @@ function calculatePresenceHours(from: string, to: string | null, breakMinutes?: 
  * Get aggregated presence for a specific date.
  * Returns null if no presence exists for that date.
  */
+/**
+ * Set home office status for all presences on a given date
+ */
+export async function setDayHomeOffice(date: string, isHomeOffice: boolean): Promise<boolean> {
+  const presences = presencesState.cache?.byDate[date];
+  if (!presences || presences.length === 0) return false;
+
+  const client = getMocoClient();
+  if (!client) return false;
+
+  try {
+    const updates = presences.map((p) =>
+      client.updatePresence(p.id, { is_home_office: isHomeOffice })
+    );
+    const results = await Promise.all(updates);
+
+    // Update cache with new values
+    if (presencesState.cache) {
+      const updated = presences.map((p, i) => ({ ...p, ...results[i] }));
+      presencesState.cache = {
+        ...presencesState.cache,
+        byDate: {
+          ...presencesState.cache.byDate,
+          [date]: updated
+        }
+      };
+    }
+
+    toast.success(isHomeOffice ? 'Marked as Home Office' : 'Marked as Office');
+    logger.store('presences', `Set day ${date} home office: ${isHomeOffice}`);
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update';
+    logger.error('Failed to set day home office', error);
+    toast.error(message);
+    return false;
+  }
+}
+
 export function getPresenceForDate(date: string): DayPresence | null {
   const presences = presencesState.cache?.byDate[date];
   if (!presences || presences.length === 0) return null;
