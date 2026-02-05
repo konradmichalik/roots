@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
   import { Tabs } from 'bits-ui';
+  import { Switch } from '../ui/switch';
   import WeekdayHoursForm from './WeekdayHoursForm.svelte';
   import {
     autoRefreshState,
@@ -181,33 +182,17 @@
       <!-- Features Tab -->
       <Tabs.Content value="features" class="mt-0 px-6 py-4 min-h-[240px] space-y-6">
         <!-- Quick Selection -->
-        <div>
-          <h3 class="text-sm font-semibold text-foreground mb-1">Quick Selection</h3>
-          <p class="text-xs text-muted-foreground mb-3">
-            Show frequently used project+task combinations in the Moco entry modal.
-          </p>
-          <div class="flex gap-1">
-            <button
-              onclick={() => handleQuickSelectionToggle(true)}
-              class="flex-1 flex items-center justify-center px-3 py-2 text-xs rounded-md transition-colors
-                focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                {settingsState.showQuickSelection
-                ? 'bg-primary text-primary-foreground font-medium'
-                : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'}"
-            >
-              Enabled
-            </button>
-            <button
-              onclick={() => handleQuickSelectionToggle(false)}
-              class="flex-1 flex items-center justify-center px-3 py-2 text-xs rounded-md transition-colors
-                focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                {!settingsState.showQuickSelection
-                ? 'bg-primary text-primary-foreground font-medium'
-                : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'}"
-            >
-              Disabled
-            </button>
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-foreground">Quick Selection</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">
+              Show frequently used project+task combinations in the Moco modal.
+            </p>
           </div>
+          <Switch
+            checked={settingsState.showQuickSelection}
+            onCheckedChange={handleQuickSelectionToggle}
+          />
         </div>
       </Tabs.Content>
 
