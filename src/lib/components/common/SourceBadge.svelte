@@ -13,7 +13,7 @@
   const SOURCE_BADGE_COLORS: Record<ServiceType, string> = {
     moco: 'bg-success text-success-foreground',
     jira: 'bg-brand text-brand-foreground',
-    outlook: 'bg-warning text-warning-foreground'
+    outlook: 'bg-source-outlook text-white'
   };
 
   let colorClass = $derived(SOURCE_BADGE_COLORS[source]);

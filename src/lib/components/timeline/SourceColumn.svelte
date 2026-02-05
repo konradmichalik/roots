@@ -46,9 +46,9 @@
       text: 'text-brand-text'
     },
     outlook: {
-      bg: 'bg-warning/10',
-      border: 'border-l-warning',
-      text: 'text-warning-text'
+      bg: 'bg-source-outlook-subtle',
+      border: 'border-l-source-outlook',
+      text: 'text-source-outlook-text'
     }
   };
 

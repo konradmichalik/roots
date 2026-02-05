@@ -40,7 +40,7 @@
   const SOURCE_BORDER_COLORS: Record<string, string> = {
     moco: 'border-l-success',
     jira: 'border-l-brand',
-    outlook: 'border-l-warning'
+    outlook: 'border-l-source-outlook'
   };
 
   let borderColorClass = $derived(SOURCE_BORDER_COLORS[entry.source]);
