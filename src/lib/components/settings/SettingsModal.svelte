@@ -13,6 +13,9 @@
   import Sun from '@lucide/svelte/icons/sun';
   import Moon from '@lucide/svelte/icons/moon';
   import Monitor from '@lucide/svelte/icons/monitor';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
+  import { clearAllMonthCache, getCachedMonthCount } from '../../stores/timeEntries.svelte';
+  import { toast } from '../../stores/toast.svelte';
 
   let { children }: { children: Snippet } = $props();
   let open = $state(false);
@@ -23,6 +26,13 @@
 
   function handleThemeChange(theme: Theme): void {
     setTheme(theme);
+  }
+
+  let cachedMonths = $derived(getCachedMonthCount());
+
+  function handleClearCache(): void {
+    clearAllMonthCache();
+    toast.success('Cache cleared');
   }
 </script>
 
@@ -112,6 +122,26 @@
       <div>
         <h3 class="text-sm font-semibold text-foreground mb-3">Target Hours per Day</h3>
         <WeekdayHoursForm />
+      </div>
+
+      <div class="border-t border-border"></div>
+
+      <!-- Cache -->
+      <div>
+        <h3 class="text-sm font-semibold text-foreground mb-1">Cache</h3>
+        <p class="text-xs text-muted-foreground mb-3">
+          {cachedMonths} {cachedMonths === 1 ? 'month' : 'months'} cached.
+        </p>
+        <button
+          onclick={handleClearCache}
+          disabled={cachedMonths === 0}
+          class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-md transition-colors
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+            bg-danger-subtle text-danger-text hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Trash2 class="size-3.5" />
+          Clear Cache
+        </button>
       </div>
     </div>
   </Dialog.Content>
