@@ -32,7 +32,8 @@ export const STORAGE_KEYS = {
   AUTO_REFRESH: 'auto-refresh',
   TIMER: 'timer',
   DRAFTS: 'drafts',
-  MONTH_CACHE: 'month-cache'
+  MONTH_CACHE: 'month-cache',
+  RECENT_PAIRS: 'recent-pairs'
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

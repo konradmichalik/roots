@@ -2,6 +2,7 @@
   import * as Dialog from '../ui/dialog';
   import ProjectCombobox from './ProjectCombobox.svelte';
   import TaskCombobox from './TaskCombobox.svelte';
+  import RecentPairChips from './RecentPairChips.svelte';
   import TimeInput from '../common/TimeInput.svelte';
   import {
     fetchAssignedProjects,
@@ -17,6 +18,7 @@
     deleteMocoActivity
   } from '../../stores/timeEntries.svelte';
   import { addFavorite } from '../../stores/favorites.svelte';
+  import { trackPairUsage } from '../../stores/recentMocoPairs.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import type { Snippet } from 'svelte';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
@@ -135,6 +137,16 @@
     fetchProjectReport(projectId);
   }
 
+  async function handleChipSelect(projectId: number, taskId: number): Promise<void> {
+    projectValue = String(projectId);
+    selectedProjectId = projectId;
+    projectInactiveWarning = false;
+    taskInactiveWarning = false;
+    await fetchTasksForProject(projectId);
+    await fetchProjectReport(projectId);
+    taskValue = String(taskId);
+  }
+
   // Clear warnings when user selects valid values
   $effect(() => {
     if (taskValue && taskInactiveWarning) {
@@ -184,6 +196,22 @@
         if (!success) {
           error = 'Failed to create entry.';
           return;
+        }
+      }
+
+      // Track the project+task combination for quick selection
+      const project = getProjectById(Number(projectValue));
+      if (project) {
+        const tasks = getTasksForProject(Number(projectValue));
+        const task = tasks.find((t) => t.id === Number(taskValue));
+        if (task) {
+          trackPairUsage({
+            projectId: project.id,
+            taskId: task.id,
+            projectName: project.name,
+            taskName: task.name,
+            customerName: project.customer.name
+          });
         }
       }
 
@@ -303,6 +331,9 @@
         </div>
       </div>
     {:else}
+      {#if mode === 'create'}
+        <RecentPairChips onSelect={handleChipSelect} />
+      {/if}
       <form onsubmit={handleSubmit} class="space-y-4 py-4">
         <!-- Project -->
         <div>

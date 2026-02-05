@@ -62,4 +62,6 @@ export { ABSENCE_LABELS, ABSENCE_COLORS } from './unified';
 
 export type { Favorite, FavoriteEventMatch } from './favorites';
 
+export type { RecentMocoPair } from './recentPairs';
+
 export type { TimerStatus, TimerMocoBooking, TimerState, DraftEntry } from './timer';
