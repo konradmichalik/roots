@@ -114,7 +114,7 @@
 
   <!-- Footer -->
   <div class="border-t border-border bg-muted/20 px-3 py-1 flex items-center">
-    <span class="text-[10px] text-muted-foreground leading-none">
+    <span class="text-[10px] text-muted-foreground/50 leading-none">
       {entries.length}
       {entries.length === 1 ? 'entry' : 'entries'}
     </span>
