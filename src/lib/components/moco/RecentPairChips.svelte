@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getTopPairs } from '../../stores/recentMocoPairs.svelte';
+  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import Clock from '@lucide/svelte/icons/clock';
 
   let {
@@ -23,19 +24,28 @@
     </div>
     <div class="flex flex-wrap gap-1.5">
       {#each pairs as pair (pair.projectId + '-' + pair.taskId)}
-        <button
-          type="button"
-          onclick={() => onSelect(pair.projectId, pair.taskId)}
-          class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md
-            bg-accent/50 text-foreground border border-border
-            hover:bg-accent hover:border-primary/30 transition-colors duration-150
-            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          title="{pair.customerName} — {pair.projectName} / {pair.taskName}"
-        >
-          <span class="text-muted-foreground">{truncate(pair.customerName, 12)}</span>
-          <span class="text-muted-foreground/50">·</span>
-          <span>{truncate(pair.taskName, 18)}</span>
-        </button>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <button
+              type="button"
+              onclick={() => onSelect(pair.projectId, pair.taskId)}
+              class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md
+                bg-accent/50 text-foreground border border-border
+                hover:bg-accent hover:border-primary/30 transition-colors duration-150
+                focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            >
+              <span class="text-muted-foreground">{truncate(pair.customerName, 12)}</span>
+              <span class="text-muted-foreground/50">·</span>
+              <span>{truncate(pair.taskName, 18)}</span>
+            </button>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom" sideOffset={4}>
+            <div class="flex flex-col gap-0.5">
+              <span class="font-medium">{pair.customerName} — {pair.projectName}</span>
+              <span class="text-muted-foreground">{pair.taskName}</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
       {/each}
     </div>
   </div>
