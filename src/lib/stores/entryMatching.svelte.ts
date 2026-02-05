@@ -99,6 +99,41 @@ export function buildMatchResult(
     }
   }
 
+  // --- Text-based Moco <-> Outlook matching (by exact description/title match) ---
+  // Only for Moco entries that have no Jira match and no Outlook remote_id match
+  // Compares Moco description with Outlook title (event subject)
+  const outlookByTitle = groupOutlookByTitle(outlookEntries);
+
+  for (const entry of mocoEntries) {
+    // Skip if already matched to Jira or Outlook via remote_id
+    if (entryGroupMap.has(entry.id)) continue;
+
+    const description = entry.description?.trim();
+    if (!description) continue;
+
+    // Match Moco description against Outlook title (event subject)
+    const matchingOutlook = outlookByTitle.get(description);
+    if (matchingOutlook && matchingOutlook.length > 0) {
+      const groupKey = `text:${description}`;
+
+      // Add Moco entry
+      if (!usedMocoIds.has(entry.id)) {
+        sortedMoco.push(entry);
+        usedMocoIds.add(entry.id);
+      }
+      entryGroupMap.set(entry.id, groupKey);
+
+      // Add matching Outlook entries
+      for (const outlookEntry of matchingOutlook) {
+        if (!usedOutlookIds.has(outlookEntry.id)) {
+          sortedOutlook.push(outlookEntry);
+          usedOutlookIds.add(outlookEntry.id);
+        }
+        entryGroupMap.set(outlookEntry.id, groupKey);
+      }
+    }
+  }
+
   // Append unmatched entries at the bottom
   for (const entry of mocoEntries) {
     if (!usedMocoIds.has(entry.id)) {
@@ -176,6 +211,22 @@ function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeE
       group.push(entry);
     } else {
       map.set(meta.eventId, [entry]);
+    }
+  }
+  return map;
+}
+
+function groupOutlookByTitle(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    // Outlook event subject is stored in 'title', not 'description'
+    const title = entry.title?.trim();
+    if (!title) continue;
+    const group = map.get(title);
+    if (group) {
+      group.push(entry);
+    } else {
+      map.set(title, [entry]);
     }
   }
   return map;
