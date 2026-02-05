@@ -2,10 +2,8 @@
   <img src="docs/images/roots-logo.svg" alt="Roots Logo" width="200" />
 </p>
 
-<h1 align="center">roots</h1>
-
 <p align="center">
-  <strong>Unified work time overview across Moco, Jira, Outlook and Personio</strong>
+  <strong>Unified work time overview across Moco, Jira and Outlook</strong>
 </p>
 
 <p align="center">
@@ -17,11 +15,11 @@
 
 ---
 
-Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira, Outlook and Personio, then reconciles and displays everything in day, week and month views.
+Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira and Outlook, then reconciles and displays everything in day, week and month views.
 
 ## Features
 
-- **Multi-Service Integration** - Connect Moco, Jira (Cloud & Server), Outlook and Personio
+- **Multi-Service Integration** - Connect Moco, Jira (Cloud & Server) and Outlook
 - **Unified Timeline** - Day, week and month views across all services
 - **Reconciliation** - Confidence-based matching and comparison between services
 - **Native Desktop App** - Lightweight Tauri app, no browser CORS issues
@@ -65,7 +63,6 @@ npm run tauri:dev
 | **Jira Cloud** | Email + API Token |
 | **Jira Server** | Username/Password or PAT |
 | **Outlook** | OAuth2 |
-| **Personio** | API Credentials (planned) |
 
 ## Tech Stack
 
