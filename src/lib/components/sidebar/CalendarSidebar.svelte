@@ -17,13 +17,13 @@
   import { formatBalance, formatHours, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS, ABSENCE_COLORS, type AbsenceType } from '../../types';
   import Calendar from '@lucide/svelte/icons/calendar';
+  import CalendarOff from '@lucide/svelte/icons/calendar-off';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-  import Plus from '@lucide/svelte/icons/plus';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import AlertCircle from '@lucide/svelte/icons/alert-circle';
   import Scale from '@lucide/svelte/icons/scale';
 
-  let showLegend = $state(false);
+  let showLegend = $state(true);
   let showOpenDays = $state(true);
   let showBalancedDays = $state(true);
   let todayStr = $derived(today());
@@ -72,6 +72,8 @@
   );
 
   // Days with non-zero balance where presence is finished (to !== null)
+  // Excludes days that are already shown in Open Hours
+  let openDaysSet = $derived(new Set(openDays.map((d) => d.date)));
   let balancedDays = $derived(
     monthWorkingDaysUntilYesterday
       .map((date, i) => {
@@ -83,6 +85,8 @@
         };
       })
       .filter(({ date, overview, presence }) => {
+        // Exclude days already in Open Hours
+        if (openDaysSet.has(date)) return false;
         // Only include if:
         // 1. Has cached data
         // 2. Balance is not zero (over or under target)
@@ -105,192 +109,26 @@
 </script>
 
 <div class="p-4 space-y-4">
-  <div class="flex items-center gap-2">
-    <Calendar class="size-4 text-muted-foreground" />
-    <h3 class="text-sm font-semibold text-foreground">Calendar</h3>
+  <!-- Calendar Header with Absence Button -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <Calendar class="size-4 text-muted-foreground" />
+      <h3 class="text-sm font-semibold text-foreground">Calendar</h3>
+    </div>
+    <AbsenceModal mode="create" prefillDate={dateNavState.selectedDate}>
+      <button
+        class="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground
+          hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        title="Manage absences"
+      >
+        <CalendarOff class="size-4" />
+      </button>
+    </AbsenceModal>
   </div>
 
   <MiniCalendar />
 
-  <!-- Week/Month Balance Summary -->
-  <div class="flex items-center gap-3 text-xs">
-    <Tooltip.Provider delayDuration={200}>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <div
-            class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
-          >
-            <span class="text-muted-foreground">Week</span>
-            <span class="font-mono font-medium {getBalanceClass(weekBalance)}"
-              >{formatBalance(weekBalance)}</span
-            >
-          </div>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="bottom" sideOffset={4}>
-          <div class="text-xs space-y-1">
-            <div class="flex items-center justify-between gap-4">
-              <span class="text-muted-foreground">Booked:</span>
-              <span class="font-mono font-medium">{formatHours(weekActual)}</span>
-            </div>
-            <div class="flex items-center justify-between gap-4">
-              <span class="text-muted-foreground">Target:</span>
-              <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
-            </div>
-            <div class="text-muted-foreground pt-1 border-t border-border/50">
-              {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1 ? 's' : ''} (excl.
-              today)
-            </div>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-    <Tooltip.Provider delayDuration={200}>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <div
-            class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
-          >
-            <span class="text-muted-foreground">Month</span>
-            <span class="font-mono font-medium {getBalanceClass(monthBalance)}"
-              >{formatBalance(monthBalance)}</span
-            >
-          </div>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="bottom" sideOffset={4}>
-          <div class="text-xs space-y-1">
-            <div class="flex items-center justify-between gap-4">
-              <span class="text-muted-foreground">Booked:</span>
-              <span class="font-mono font-medium">{formatHours(monthActual)}</span>
-            </div>
-            <div class="flex items-center justify-between gap-4">
-              <span class="text-muted-foreground">Target:</span>
-              <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
-            </div>
-            <div class="text-muted-foreground pt-1 border-t border-border/50">
-              {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !== 1
-                ? 's'
-                : ''} (excl. today)
-            </div>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  </div>
-
-  <!-- Actions -->
-  <div class="flex items-center gap-2 border-t border-border pt-3">
-    <!-- Stats button -->
-    <StatsModal>
-      <button
-        class="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
-          hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-        title="View statistics"
-      >
-        <BarChart3 class="size-3.5" />
-        Statistics
-      </button>
-    </StatsModal>
-
-    <!-- Add absence button -->
-    {#if !selectedAbsence}
-      <AbsenceModal mode="create" prefillDate={dateNavState.selectedDate}>
-        <button
-          class="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
-            hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          title="Add absence for selected date"
-        >
-          <Plus class="size-3.5" />
-          Absence
-        </button>
-      </AbsenceModal>
-    {/if}
-  </div>
-
-  <!-- Open Days (ToDo) -->
-  {#if openDays.length > 0}
-    <div class="border-t border-border pt-3">
-      <button
-        onclick={() => {
-          showOpenDays = !showOpenDays;
-        }}
-        class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
-      >
-        <div class="flex items-center gap-1.5">
-          <AlertCircle class="size-3.5 text-warning-text" />
-          <span class="text-xs font-medium text-foreground">Open Hours</span>
-          <span
-            class="inline-flex items-center justify-center rounded-full bg-warning/20 text-warning-text text-[10px] font-medium px-1.5 min-w-[18px]"
-          >
-            {openDays.length}
-          </span>
-        </div>
-        <ChevronDown
-          class="size-3.5 text-muted-foreground transition-transform duration-200 {showOpenDays
-            ? 'rotate-180'
-            : ''}"
-        />
-      </button>
-      {#if showOpenDays}
-        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
-          {#each openDays as { date, overview } (date)}
-            <button
-              onclick={() => setDate(date)}
-              class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
-                hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
-            >
-              <span class="text-muted-foreground">{formatDateShort(date)}</span>
-              <span class="font-mono text-danger-text">{formatBalance(overview.presenceBalance ?? 0)}</span>
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
-
-  <!-- Hour Balances (finished days with non-zero balance) -->
-  {#if balancedDays.length > 0}
-    <div class="border-t border-border pt-3">
-      <button
-        onclick={() => {
-          showBalancedDays = !showBalancedDays;
-        }}
-        class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
-      >
-        <div class="flex items-center gap-1.5">
-          <Scale class="size-3.5 text-muted-foreground" />
-          <span class="text-xs font-medium text-foreground">Hour Balances</span>
-          <span
-            class="inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground text-[10px] font-medium px-1.5 min-w-[18px]"
-          >
-            {balancedDays.length}
-          </span>
-        </div>
-        <ChevronDown
-          class="size-3.5 text-muted-foreground transition-transform duration-200 {showBalancedDays
-            ? 'rotate-180'
-            : ''}"
-        />
-      </button>
-      {#if showBalancedDays}
-        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
-          {#each balancedDays as { date, overview } (date)}
-            <button
-              onclick={() => setDate(date)}
-              class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
-                hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
-            >
-              <span class="text-muted-foreground">{formatDateShort(date)}</span>
-              <span class="font-mono {getBalanceClass(overview.balance)}">{formatBalance(overview.balance)}</span>
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
-
-  <!-- Collapsible Legend -->
+  <!-- Legend (collapsible, under calendar) -->
   <div class="border-t border-border pt-3">
     <button
       onclick={() => {
@@ -325,6 +163,174 @@
         </div>
       </div>
     {/if}
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="border-t border-border pt-3 space-y-3">
+    <div class="flex items-center gap-2">
+      <BarChart3 class="size-4 text-muted-foreground" />
+      <h3 class="text-sm font-semibold text-foreground">Statistics</h3>
+    </div>
+
+    <!-- Week/Month Balance Summary -->
+    <div class="flex items-center gap-3 text-xs">
+      <Tooltip.Provider delayDuration={200}>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <div
+              class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
+            >
+              <span class="text-muted-foreground">Week</span>
+              <span class="font-mono font-medium {getBalanceClass(weekBalance)}"
+                >{formatBalance(weekBalance)}</span
+              >
+            </div>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom" sideOffset={4}>
+            <div class="text-xs space-y-1">
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Booked:</span>
+                <span class="font-mono font-medium">{formatHours(weekActual)}</span>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Target:</span>
+                <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
+              </div>
+              <div class="text-muted-foreground pt-1 border-t border-border/50">
+                {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1 ? 's' : ''} (excl.
+                today)
+              </div>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
+      <Tooltip.Provider delayDuration={200}>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <div
+              class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
+            >
+              <span class="text-muted-foreground">Month</span>
+              <span class="font-mono font-medium {getBalanceClass(monthBalance)}"
+                >{formatBalance(monthBalance)}</span
+              >
+            </div>
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom" sideOffset={4}>
+            <div class="text-xs space-y-1">
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Booked:</span>
+                <span class="font-mono font-medium">{formatHours(monthActual)}</span>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Target:</span>
+                <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
+              </div>
+              <div class="text-muted-foreground pt-1 border-t border-border/50">
+                {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !== 1
+                  ? 's'
+                  : ''} (excl. today)
+              </div>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
+    </div>
+
+    <!-- Open Hours Accordion -->
+    {#if openDays.length > 0}
+      <div>
+        <button
+          onclick={() => {
+            showOpenDays = !showOpenDays;
+          }}
+          class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
+        >
+          <div class="flex items-center gap-1.5">
+            <AlertCircle class="size-3.5 text-warning-text" />
+            <span class="text-xs font-medium text-foreground">Open Hours</span>
+            <span
+              class="inline-flex items-center justify-center rounded-full bg-warning/20 text-warning-text text-[10px] font-medium px-1.5 min-w-[18px]"
+            >
+              {openDays.length}
+            </span>
+          </div>
+          <ChevronDown
+            class="size-3.5 text-muted-foreground transition-transform duration-200 {showOpenDays
+              ? 'rotate-180'
+              : ''}"
+          />
+        </button>
+        {#if showOpenDays}
+          <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
+            {#each openDays as { date, overview } (date)}
+              <button
+                onclick={() => setDate(date)}
+                class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
+                  hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+                  {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
+              >
+                <span class="text-muted-foreground">{formatDateShort(date)}</span>
+                <span class="font-mono text-danger-text">{formatBalance(overview.presenceBalance ?? 0)}</span>
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/if}
+
+    <!-- Hour Balances Accordion -->
+    {#if balancedDays.length > 0}
+      <div>
+        <button
+          onclick={() => {
+            showBalancedDays = !showBalancedDays;
+          }}
+          class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
+        >
+          <div class="flex items-center gap-1.5">
+            <Scale class="size-3.5 text-muted-foreground" />
+            <span class="text-xs font-medium text-foreground">Hour Balances</span>
+            <span
+              class="inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground text-[10px] font-medium px-1.5 min-w-[18px]"
+            >
+              {balancedDays.length}
+            </span>
+          </div>
+          <ChevronDown
+            class="size-3.5 text-muted-foreground transition-transform duration-200 {showBalancedDays
+              ? 'rotate-180'
+              : ''}"
+          />
+        </button>
+        {#if showBalancedDays}
+          <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
+            {#each balancedDays as { date, overview } (date)}
+              <button
+                onclick={() => setDate(date)}
+                class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
+                  hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+                  {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
+              >
+                <span class="text-muted-foreground">{formatDateShort(date)}</span>
+                <span class="font-mono {getBalanceClass(overview.balance)}">{formatBalance(overview.balance)}</span>
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/if}
+
+    <!-- More Statistics Button -->
+    <StatsModal>
+      <button
+        class="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
+          hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        title="View detailed statistics"
+      >
+        More Statistics
+      </button>
+    </StatsModal>
   </div>
 
   <!-- Absence detail for selected date -->
