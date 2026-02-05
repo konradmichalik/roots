@@ -24,7 +24,7 @@
     </div>
     <div class="flex flex-wrap gap-1.5">
       {#each pairs as pair (pair.projectId + '-' + pair.taskId)}
-        <Tooltip.Root>
+        <Tooltip.Root delayDuration={400} disableHoverableContent ignoreNonKeyboardFocus>
           <Tooltip.Trigger>
             <button
               type="button"
