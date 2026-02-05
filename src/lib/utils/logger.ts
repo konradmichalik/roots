@@ -72,10 +72,7 @@ class Logger {
 
   connectionSuccess(message: string): void {
     if (!this.shouldLog('info')) return;
-    console.log(
-      `%c${this.formatMessage(ICONS.success, message)}`,
-      LOG_STYLES.success
-    );
+    console.log(`%c${this.formatMessage(ICONS.success, message)}`, LOG_STYLES.success);
   }
 
   apiRequest(method: string, endpoint: string, details?: Record<string, unknown>): void {
@@ -135,29 +132,17 @@ class Logger {
 
   error(message: string, error?: unknown): void {
     if (!this.shouldLog('error')) return;
-    console.error(
-      `%c${this.formatMessage(ICONS.error, message)}`,
-      LOG_STYLES.error,
-      error ?? ''
-    );
+    console.error(`%c${this.formatMessage(ICONS.error, message)}`, LOG_STYLES.error, error ?? '');
   }
 
   info(message: string, data?: unknown): void {
     if (!this.shouldLog('info')) return;
-    console.log(
-      `%c${this.formatMessage('\u2139\uFE0F', message)}`,
-      'color: #5e81ac;',
-      data ?? ''
-    );
+    console.log(`%c${this.formatMessage('\u2139\uFE0F', message)}`, 'color: #5e81ac;', data ?? '');
   }
 
   debug(message: string, data?: unknown): void {
     if (!this.shouldLog('debug')) return;
-    console.log(
-      `%c${this.formatMessage('\u{1F41B}', message)}`,
-      'color: #4c566a;',
-      data ?? ''
-    );
+    console.log(`%c${this.formatMessage('\u{1F41B}', message)}`, 'color: #4c566a;', data ?? '');
   }
 
   time(): () => number {

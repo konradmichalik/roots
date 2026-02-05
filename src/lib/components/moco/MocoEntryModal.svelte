@@ -3,13 +3,30 @@
   import ProjectCombobox from './ProjectCombobox.svelte';
   import TaskCombobox from './TaskCombobox.svelte';
   import TimeInput from '../common/TimeInput.svelte';
-  import { fetchAssignedProjects, fetchTasksForProject, fetchProjectReport, getProjectById, getTasksForProject, getActiveProjects } from '../../stores/mocoProjects.svelte';
-  import { createMocoActivity, updateMocoActivity, deleteMocoActivity } from '../../stores/timeEntries.svelte';
+  import {
+    fetchAssignedProjects,
+    fetchTasksForProject,
+    fetchProjectReport,
+    getProjectById,
+    getTasksForProject,
+    getActiveProjects
+  } from '../../stores/mocoProjects.svelte';
+  import {
+    createMocoActivity,
+    updateMocoActivity,
+    deleteMocoActivity
+  } from '../../stores/timeEntries.svelte';
   import { addFavorite } from '../../stores/favorites.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import type { Snippet } from 'svelte';
 
-  let { children, mode = 'create', prefill, activityId, onSuccess }: {
+  let {
+    children,
+    mode = 'create',
+    prefill,
+    activityId,
+    onSuccess
+  }: {
     children: Snippet;
     mode?: 'create' | 'edit';
     prefill?: {
@@ -120,12 +137,16 @@
 
     try {
       if (mode === 'edit' && activityId) {
-        const success = await updateMocoActivity(activityId, {
-          project_id: Number(projectValue),
-          task_id: Number(taskValue),
-          hours,
-          description: description.trim() || undefined
-        }, date);
+        const success = await updateMocoActivity(
+          activityId,
+          {
+            project_id: Number(projectValue),
+            task_id: Number(taskValue),
+            hours,
+            description: description.trim() || undefined
+          },
+          date
+        );
 
         if (!success) {
           error = 'Failed to update entry.';
@@ -205,7 +226,9 @@
     });
 
     savedAsFavorite = true;
-    setTimeout(() => { savedAsFavorite = false; }, 2000);
+    setTimeout(() => {
+      savedAsFavorite = false;
+    }, 2000);
   }
 </script>
 
@@ -231,8 +254,19 @@
       <!-- Delete Confirmation -->
       <div class="py-4 space-y-4">
         <div class="flex items-center gap-3 p-3 rounded-lg bg-danger-subtle">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-danger-text flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-danger-text flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
@@ -275,7 +309,8 @@
           <ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
           {#if projectInactiveWarning}
             <p class="mt-1 text-xs text-warning-text">
-              The previously selected project is no longer active. Please select a different project.
+              The previously selected project is no longer active. Please select a different
+              project.
             </p>
           {/if}
         </div>
@@ -295,7 +330,9 @@
         <!-- Date & Hours -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label for="moco-date" class="block text-sm font-medium text-foreground mb-1">Date</label>
+            <label for="moco-date" class="block text-sm font-medium text-foreground mb-1"
+              >Date</label
+            >
             <input
               id="moco-date"
               type="date"
@@ -305,14 +342,18 @@
             />
           </div>
           <div>
-            <label for="moco-hours" class="block text-sm font-medium text-foreground mb-1">Duration</label>
+            <label for="moco-hours" class="block text-sm font-medium text-foreground mb-1"
+              >Duration</label
+            >
             <TimeInput id="moco-hours" bind:value={hours} showStepButtons />
           </div>
         </div>
 
         <!-- Description -->
         <div>
-          <label for="moco-desc" class="block text-sm font-medium text-foreground mb-1">Description</label>
+          <label for="moco-desc" class="block text-sm font-medium text-foreground mb-1"
+            >Description</label
+          >
           <textarea
             id="moco-desc"
             bind:value={description}
@@ -338,8 +379,19 @@
               disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
             title={savedAsFavorite ? 'Saved!' : 'Save as Favorite'}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 {savedAsFavorite ? 'text-warning' : ''}" viewBox="0 0 24 24" fill={savedAsFavorite ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 {savedAsFavorite ? 'text-warning' : ''}"
+              viewBox="0 0 24 24"
+              fill={savedAsFavorite ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
             </svg>
           </button>
           <button
@@ -348,7 +400,7 @@
             class="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground
               hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
           >
-            {saving ? 'Saving...' : (mode === 'edit' ? 'Update' : 'Create')}
+            {saving ? 'Saving...' : mode === 'edit' ? 'Update' : 'Create'}
           </button>
           {#if mode === 'edit' && activityId}
             <button

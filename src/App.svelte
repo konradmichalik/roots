@@ -4,7 +4,12 @@
   import MainLayout from './lib/components/layout/MainLayout.svelte';
   import AppLoader from './lib/components/common/AppLoader.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-  import { connectionsState, initializeConnections, isAnyServiceConnected, handleOutlookCallback } from './lib/stores/connections.svelte';
+  import {
+    connectionsState,
+    initializeConnections,
+    isAnyServiceConnected,
+    handleOutlookCallback
+  } from './lib/stores/connections.svelte';
   import { initializeTheme, cleanupTheme } from './lib/stores/theme.svelte';
   import { initializeDateNavigation } from './lib/stores/dateNavigation.svelte';
   import { initializeTimeEntries } from './lib/stores/timeEntries.svelte';

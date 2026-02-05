@@ -1,7 +1,12 @@
 <script lang="ts">
   import { Calendar } from '$lib/components/ui/calendar/index.js';
   import { Calendar as CalendarPrimitive } from 'bits-ui';
-  import { CalendarDate, today as todayDate, getLocalTimeZone, isEqualDay } from '@internationalized/date';
+  import {
+    CalendarDate,
+    today as todayDate,
+    getLocalTimeZone,
+    isEqualDay
+  } from '@internationalized/date';
   import type { DateValue } from '@internationalized/date';
   import { buttonVariants } from '$lib/components/ui/button/index.js';
   import { cn } from '$lib/utils.js';
@@ -42,9 +47,10 @@
     if (dateStr > todayStr) return 'none';
 
     // Use live data for the selected date, cached data otherwise
-    const overview = dateStr === dateNavState.selectedDate
-      ? getDayOverview(dateStr)
-      : getCachedDayOverview(dateStr, getMonthStart(dateStr));
+    const overview =
+      dateStr === dateNavState.selectedDate
+        ? getDayOverview(dateStr)
+        : getCachedDayOverview(dateStr, getMonthStart(dateStr));
 
     if (overview.isWeekend) return 'none';
     if (overview.requiredHours === 0) return 'none';

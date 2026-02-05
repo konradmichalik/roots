@@ -105,15 +105,28 @@
     <Dialog.Header>
       <Dialog.Title>{mode === 'edit' ? 'Edit Absence' : 'Add Absence'}</Dialog.Title>
       <Dialog.Description>
-        {mode === 'edit' ? 'Update or remove this absence entry.' : 'Track time off for vacations, sick days, and more.'}
+        {mode === 'edit'
+          ? 'Update or remove this absence entry.'
+          : 'Track time off for vacations, sick days, and more.'}
       </Dialog.Description>
     </Dialog.Header>
 
     {#if showDeleteConfirm}
       <div class="py-4 space-y-4">
         <div class="flex items-center gap-3 p-3 rounded-lg bg-danger-subtle">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-danger-text flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-danger-text flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
@@ -143,14 +156,16 @@
     {:else}
       <form onsubmit={handleSubmit} class="space-y-4 py-4">
         <div>
-          <label for="absence-type" class="block text-sm font-medium text-foreground mb-1">Type</label>
+          <label for="absence-type" class="block text-sm font-medium text-foreground mb-1"
+            >Type</label
+          >
           <select
             id="absence-type"
             bind:value={type}
             class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground
               focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
           >
-            {#each Object.entries(ABSENCE_LABELS) as [value, label]}
+            {#each Object.entries(ABSENCE_LABELS) as [value, label] (value)}
               <option {value}>{label}</option>
             {/each}
           </select>
@@ -158,7 +173,9 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label for="absence-start" class="block text-sm font-medium text-foreground mb-1">Start Date</label>
+            <label for="absence-start" class="block text-sm font-medium text-foreground mb-1"
+              >Start Date</label
+            >
             <input
               id="absence-start"
               type="date"
@@ -168,7 +185,9 @@
             />
           </div>
           <div>
-            <label for="absence-end" class="block text-sm font-medium text-foreground mb-1">End Date</label>
+            <label for="absence-end" class="block text-sm font-medium text-foreground mb-1"
+              >End Date</label
+            >
             <input
               id="absence-end"
               type="date"
@@ -181,7 +200,9 @@
         </div>
 
         <div>
-          <label for="absence-note" class="block text-sm font-medium text-foreground mb-1">Note (optional)</label>
+          <label for="absence-note" class="block text-sm font-medium text-foreground mb-1"
+            >Note (optional)</label
+          >
           <input
             id="absence-note"
             type="text"

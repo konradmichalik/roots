@@ -15,9 +15,11 @@
 </script>
 
 <div class="space-y-2">
-  {#each DAY_LABELS as label, i}
+  {#each DAY_LABELS as label, i (label)}
     <div class="flex items-center gap-3">
-      <span class="w-10 text-sm font-medium text-foreground {i >= 5 ? 'text-muted-foreground' : ''}">
+      <span
+        class="w-10 text-sm font-medium text-foreground {i >= 5 ? 'text-muted-foreground' : ''}"
+      >
         {label}
       </span>
       <input

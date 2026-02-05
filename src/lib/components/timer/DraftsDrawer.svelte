@@ -31,15 +31,22 @@
   <Dialog.Content class="sm:max-w-md max-h-[85vh] overflow-hidden flex flex-col">
     <Dialog.Header>
       <Dialog.Title>Drafts</Dialog.Title>
-      <Dialog.Description>
-        Unsaved time entries. Save them to Moco or delete.
-      </Dialog.Description>
+      <Dialog.Description>Unsaved time entries. Save them to Moco or delete.</Dialog.Description>
     </Dialog.Header>
 
     <div class="flex-1 overflow-y-auto py-4">
       {#if drafts.length === 0}
         <div class="text-center py-8">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mx-auto text-muted-foreground/30 mb-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" />
             <path d="M15 3v4a2 2 0 0 0 2 2h4" />
           </svg>

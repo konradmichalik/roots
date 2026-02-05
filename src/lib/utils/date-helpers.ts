@@ -114,7 +114,6 @@ export function getDayOfWeekIndex(dateStr: string): number {
   return day === 0 ? 6 : day - 1; // Convert Sun=0..Sat=6 to Mon=0..Sun=6
 }
 
-
 /**
  * Format date for display (e.g., "Jan 15")
  */

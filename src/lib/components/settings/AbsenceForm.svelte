@@ -2,7 +2,11 @@
   import { addAbsence } from '../../stores/absences.svelte';
   import type { AbsenceType } from '../../types';
 
-  let { onSave, onCancel, prefillDate }: {
+  let {
+    onSave,
+    onCancel,
+    prefillDate
+  }: {
     onSave: () => void;
     onCancel: () => void;
     prefillDate?: string;
@@ -53,7 +57,7 @@
       class="w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm text-foreground
         focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     >
-      {#each Object.entries(ABSENCE_LABELS) as [value, label]}
+      {#each Object.entries(ABSENCE_LABELS) as [value, label] (value)}
         <option {value}>{label}</option>
       {/each}
     </select>
@@ -61,7 +65,8 @@
 
   <div class="grid grid-cols-2 gap-2">
     <div>
-      <label for="absence-start" class="block text-xs font-medium text-foreground mb-1">Start</label>
+      <label for="absence-start" class="block text-xs font-medium text-foreground mb-1">Start</label
+      >
       <input
         id="absence-start"
         type="date"
@@ -84,7 +89,9 @@
   </div>
 
   <div>
-    <label for="absence-note" class="block text-xs font-medium text-foreground mb-1">Note (optional)</label>
+    <label for="absence-note" class="block text-xs font-medium text-foreground mb-1"
+      >Note (optional)</label
+    >
     <input
       id="absence-note"
       type="text"

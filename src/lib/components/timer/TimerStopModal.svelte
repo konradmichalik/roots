@@ -116,9 +116,7 @@
   <Dialog.Content class="sm:max-w-sm">
     <Dialog.Header>
       <Dialog.Title>Stop Timer</Dialog.Title>
-      <Dialog.Description>
-        Save your tracked time or keep it as a draft.
-      </Dialog.Description>
+      <Dialog.Description>Save your tracked time or keep it as a draft.</Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-4 py-4">
@@ -137,7 +135,9 @@
         <div class="rounded-lg border border-border bg-muted/30 p-3">
           <div class="text-xs text-muted-foreground uppercase tracking-wide mb-1">Project</div>
           <div class="text-sm font-medium text-foreground">{booking.customerName}</div>
-          <div class="text-sm text-muted-foreground">{booking.projectName} — {booking.taskName}</div>
+          <div class="text-sm text-muted-foreground">
+            {booking.projectName} — {booking.taskName}
+          </div>
         </div>
       {/if}
 

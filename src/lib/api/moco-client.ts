@@ -1,5 +1,16 @@
 import { ApiClient, type ApiClientConfig } from './base-client';
-import type { MocoActivity, MocoUser, MocoTask, MocoProjectAssigned, MocoCreateActivity, MocoUpdateActivity, MocoPresence, MocoCreatePresence, MocoUpdatePresence, MocoProjectReport } from '../types';
+import type {
+  MocoActivity,
+  MocoUser,
+  MocoTask,
+  MocoProjectAssigned,
+  MocoCreateActivity,
+  MocoUpdateActivity,
+  MocoPresence,
+  MocoCreatePresence,
+  MocoUpdatePresence,
+  MocoProjectReport
+} from '../types';
 import { logger } from '../utils/logger';
 
 export interface MocoClientConfig extends ApiClientConfig {
@@ -38,7 +49,9 @@ export class MocoClient extends ApiClient {
       const user = await this.request<MocoUser>('GET', '/session');
 
       this.currentUserId = user.id;
-      logger.connectionSuccess(`Moco connected as ${user.firstname} ${user.lastname} (ID: ${user.id})`);
+      logger.connectionSuccess(
+        `Moco connected as ${user.firstname} ${user.lastname} (ID: ${user.id})`
+      );
       return { success: true, user };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Connection failed';
@@ -52,7 +65,9 @@ export class MocoClient extends ApiClient {
    */
   async getActivities(from: string, to: string): Promise<MocoActivity[]> {
     const userFilter = this.currentUserId ? `&user_id=${this.currentUserId}` : '';
-    logger.info(`Fetching Moco activities: ${from} to ${to} (user: ${this.currentUserId ?? 'all'})`);
+    logger.info(
+      `Fetching Moco activities: ${from} to ${to} (user: ${this.currentUserId ?? 'all'})`
+    );
     const activities = await this.request<MocoActivity[]>(
       'GET',
       `/activities?from=${from}&to=${to}${userFilter}`
@@ -87,7 +102,9 @@ export class MocoClient extends ApiClient {
   async getProjectReport(projectId: number): Promise<MocoProjectReport> {
     logger.info(`Fetching report for project ${projectId}`);
     const report = await this.request<MocoProjectReport>('GET', `/projects/${projectId}/report`);
-    logger.info(`Fetched report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`);
+    logger.info(
+      `Fetched report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`
+    );
     return report;
   }
 

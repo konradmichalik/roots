@@ -17,10 +17,19 @@
 <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
   {#each toastState.toasts as toast (toast.id)}
     <div
-      class="flex items-center gap-3 rounded-lg border-1 bg-card px-4 py-3 shadow-lg animate-in slide-in-from-right-5 fade-in duration-200 {TYPE_STYLES[toast.type]}"
+      class="flex items-center gap-3 rounded-lg border-1 bg-card px-4 py-3 shadow-lg animate-in slide-in-from-right-5 fade-in duration-200 {TYPE_STYLES[
+        toast.type
+      ]}"
       role="alert"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 flex-shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <path stroke-linecap="round" stroke-linejoin="round" d={TYPE_ICONS[toast.type]} />
       </svg>
       <span class="text-sm font-medium text-foreground">{toast.message}</span>
@@ -29,7 +38,14 @@
         class="ml-2 rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Dismiss"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>

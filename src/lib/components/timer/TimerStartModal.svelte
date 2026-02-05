@@ -4,7 +4,12 @@
   import TaskCombobox from '../moco/TaskCombobox.svelte';
   import { startTimer } from '../../stores/timer.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { fetchAssignedProjects, fetchTasksForProject, getProjectById, getTasksForProject } from '../../stores/mocoProjects.svelte';
+  import {
+    fetchAssignedProjects,
+    fetchTasksForProject,
+    getProjectById,
+    getTasksForProject
+  } from '../../stores/mocoProjects.svelte';
   import type { Snippet } from 'svelte';
   import type { TimerMocoBooking } from '../../types';
 
@@ -86,9 +91,7 @@
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
       <Dialog.Title>Start Timer</Dialog.Title>
-      <Dialog.Description>
-        Optionally select a project to track time against.
-      </Dialog.Description>
+      <Dialog.Description>Optionally select a project to track time against.</Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-4 py-4">
@@ -112,7 +115,9 @@
         <!-- Description -->
         {#if projectValue && taskValue}
           <div>
-            <label for="timer-desc" class="block text-sm font-medium text-foreground mb-1">Note (optional)</label>
+            <label for="timer-desc" class="block text-sm font-medium text-foreground mb-1"
+              >Note (optional)</label
+            >
             <input
               id="timer-desc"
               type="text"
@@ -124,9 +129,7 @@
           </div>
         {/if}
       {:else}
-        <p class="text-sm text-muted-foreground">
-          Connect to Moco to track time against projects.
-        </p>
+        <p class="text-sm text-muted-foreground">Connect to Moco to track time against projects.</p>
       {/if}
 
       <!-- Actions -->

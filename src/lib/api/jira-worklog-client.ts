@@ -139,7 +139,9 @@ export abstract class JiraWorklogClient extends ApiClient {
     return this.extractAdfText(comment);
   }
 
-  private extractAdfText(doc: { content?: Array<{ type: string; text?: string; content?: unknown[] }> }): string {
+  private extractAdfText(doc: {
+    content?: Array<{ type: string; text?: string; content?: unknown[] }>;
+  }): string {
     if (!doc.content) return '';
     const parts: string[] = [];
     for (const node of doc.content) {

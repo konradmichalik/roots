@@ -1,4 +1,9 @@
-import type { MocoConnectionConfig, JiraConnectionConfig, OutlookConnectionConfig, OAuthTokens } from '../types';
+import type {
+  MocoConnectionConfig,
+  JiraConnectionConfig,
+  OutlookConnectionConfig,
+  OAuthTokens
+} from '../types';
 import { MocoClient, type MocoClientConfig } from './moco-client';
 import { JiraCloudWorklogClient } from './jira-cloud-worklog';
 import { JiraServerWorklogClient } from './jira-server-worklog';

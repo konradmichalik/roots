@@ -151,10 +151,12 @@ export async function createPresence(data: MocoCreatePresence): Promise<boolean>
     const newPresence = await client.createPresence(data);
     logger.store('presences', `Created presence for ${data.date}`);
 
-    // Update cache with new presence
+    // Update cache with new presence (create new reference for reactivity)
     if (presencesState.cache) {
       const existing = presencesState.cache.byDate.get(data.date) ?? [];
-      presencesState.cache.byDate.set(data.date, [...existing, newPresence]);
+      const newByDate = new Map(presencesState.cache.byDate);
+      newByDate.set(data.date, [...existing, newPresence]);
+      presencesState.cache = { ...presencesState.cache, byDate: newByDate };
     }
 
     toast.success('Presence created');
@@ -170,7 +172,11 @@ export async function createPresence(data: MocoCreatePresence): Promise<boolean>
 /**
  * Update an existing presence entry
  */
-export async function updatePresence(id: number, date: string, data: MocoUpdatePresence): Promise<boolean> {
+export async function updatePresence(
+  id: number,
+  date: string,
+  data: MocoUpdatePresence
+): Promise<boolean> {
   if (!connectionsState.moco.isConnected) return false;
 
   const client = getMocoClient();
@@ -180,11 +186,13 @@ export async function updatePresence(id: number, date: string, data: MocoUpdateP
     const updatedPresence = await client.updatePresence(id, data);
     logger.store('presences', `Updated presence ${id}`);
 
-    // Update cache
+    // Update cache (create new reference for reactivity)
     if (presencesState.cache) {
       const existing = presencesState.cache.byDate.get(date) ?? [];
       const updated = existing.map((p) => (p.id === id ? updatedPresence : p));
-      presencesState.cache.byDate.set(date, updated);
+      const newByDate = new Map(presencesState.cache.byDate);
+      newByDate.set(date, updated);
+      presencesState.cache = { ...presencesState.cache, byDate: newByDate };
     }
 
     toast.success('Presence updated');
@@ -210,15 +218,17 @@ export async function deletePresence(id: number, date: string): Promise<boolean>
     await client.deletePresence(id);
     logger.store('presences', `Deleted presence ${id}`);
 
-    // Update cache
+    // Update cache (create new reference for reactivity)
     if (presencesState.cache) {
       const existing = presencesState.cache.byDate.get(date) ?? [];
       const filtered = existing.filter((p) => p.id !== id);
+      const newByDate = new Map(presencesState.cache.byDate);
       if (filtered.length === 0) {
-        presencesState.cache.byDate.delete(date);
+        newByDate.delete(date);
       } else {
-        presencesState.cache.byDate.set(date, filtered);
+        newByDate.set(date, filtered);
       }
+      presencesState.cache = { ...presencesState.cache, byDate: newByDate };
     }
 
     toast.success('Presence deleted');

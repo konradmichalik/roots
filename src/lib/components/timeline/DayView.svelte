@@ -4,7 +4,13 @@
   import PresenceModal from '../presence/PresenceModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getEntriesForDate, getDayOverview, timeEntriesState, refreshDayEntries, isAnyLoading } from '../../stores/timeEntries.svelte';
+  import {
+    getEntriesForDate,
+    getDayOverview,
+    timeEntriesState,
+    refreshDayEntries,
+    isAnyLoading
+  } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { formatDateLong, formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
@@ -16,9 +22,13 @@
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
   let rawPresences = $derived(getRawPresencesForDate(dateNavState.selectedDate));
   let isLoading = $derived(isAnyLoading());
-  let displayBalance = $derived(overview.presence ? (overview.presenceBalance ?? 0) : overview.balance);
+  let displayBalance = $derived(
+    overview.presence ? (overview.presenceBalance ?? 0) : overview.balance
+  );
   let displayTarget = $derived(overview.presence?.hours ?? overview.requiredHours);
-  let lastFetched = $derived(timeEntriesState.lastFetched ? new Date(timeEntriesState.lastFetched) : null);
+  let lastFetched = $derived(
+    timeEntriesState.lastFetched ? new Date(timeEntriesState.lastFetched) : null
+  );
 
   // Tick counter for relative time updates
   let timeTick = $state(0);
@@ -41,7 +51,9 @@
 
 <div class="mx-auto max-w-6xl space-y-4">
   <!-- Day header -->
-  <div class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+  <div
+    class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm"
+  >
     <div class="flex items-center gap-3">
       <span class="text-sm font-medium text-foreground">
         {formatDateLong(dateNavState.selectedDate)}
@@ -52,7 +64,9 @@
             <Tooltip.Provider delayDuration={200}>
               <Tooltip.Root>
                 <Tooltip.Trigger>
-                  <span class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-muted text-muted-foreground whitespace-nowrap cursor-default">
+                  <span
+                    class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-muted text-muted-foreground whitespace-nowrap cursor-default"
+                  >
                     {formatRelativeTime(lastFetched)}
                   </span>
                 </Tooltip.Trigger>
@@ -88,12 +102,18 @@
         </button>
       </div>
       {#if overview.manualAbsence}
-        <span class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text">
-          {overview.manualAbsence.type === 'vacation' ? 'Vacation'
-            : overview.manualAbsence.type === 'sick' ? 'Sick'
-            : overview.manualAbsence.type === 'public_holiday' ? 'Holiday'
-            : overview.manualAbsence.type === 'personal' ? 'Personal'
-            : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
+        <span
+          class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text"
+        >
+          {overview.manualAbsence.type === 'vacation'
+            ? 'Vacation'
+            : overview.manualAbsence.type === 'sick'
+              ? 'Sick'
+              : overview.manualAbsence.type === 'public_holiday'
+                ? 'Holiday'
+                : overview.manualAbsence.type === 'personal'
+                  ? 'Personal'
+                  : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
         </span>
       {/if}
     </div>
@@ -104,45 +124,74 @@
             <Tooltip.Provider delayDuration={200}>
               <Tooltip.Root>
                 <Tooltip.Trigger class="inline-flex items-center">
-                  <button class="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer leading-none transition-colors">
+                  <button
+                    class="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer leading-none transition-colors"
+                  >
                     {#if overview.presence.isHomeOffice}
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3.5 w-3.5 flex-shrink-0"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline
+                          points="9 22 9 12 15 12 15 22"
+                        />
                       </svg>
                     {:else}
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3.5 w-3.5 flex-shrink-0"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
                         <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                       </svg>
                     {/if}
-                    <span class="font-mono text-xs">{overview.presence.from}–{overview.presence.to ?? '...'}</span>
+                    <span class="font-mono text-xs"
+                      >{overview.presence.from}–{overview.presence.to ?? '...'}</span
+                    >
                   </button>
                 </Tooltip.Trigger>
-              <Tooltip.Content side="bottom" class="max-w-xs">
-                <div class="space-y-2">
-                  <div class="text-xs font-medium">Presence: {formatHours(overview.presence.hours)} <span class="text-muted-foreground">(click to edit)</span></div>
-                  <div class="space-y-1">
-                    {#each rawPresences as presence, i}
-                      <div class="flex items-center gap-2 text-xs">
-                        <span class="font-mono">{presence.from}–{presence.to ?? '...'}</span>
-                        {#if presence.is_home_office}
-                          <span class="text-muted-foreground">(Home)</span>
+                <Tooltip.Content side="bottom" class="max-w-xs">
+                  <div class="space-y-2">
+                    <div class="text-xs font-medium">
+                      Presence: {formatHours(overview.presence.hours)}
+                      <span class="text-muted-foreground">(click to edit)</span>
+                    </div>
+                    <div class="space-y-1">
+                      {#each rawPresences as presence, i (presence.from)}
+                        <div class="flex items-center gap-2 text-xs">
+                          <span class="font-mono">{presence.from}–{presence.to ?? '...'}</span>
+                          {#if presence.is_home_office}
+                            <span class="text-muted-foreground">(Home)</span>
+                          {/if}
+                          {#if presence.break && presence.break > 0}
+                            <span class="text-warning-text"
+                              >-{formatBreakMinutes(presence.break)} break</span
+                            >
+                          {/if}
+                        </div>
+                        {#if i < rawPresences.length - 1}
+                          {@const nextStart = rawPresences[i + 1].from}
+                          {@const currentEnd = presence.to}
+                          {#if currentEnd && nextStart > currentEnd}
+                            <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
+                              <span class="italic">Gap: {currentEnd}–{nextStart}</span>
+                            </div>
+                          {/if}
                         {/if}
-                        {#if presence.break && presence.break > 0}
-                          <span class="text-warning-text">-{formatBreakMinutes(presence.break)} break</span>
-                        {/if}
-                      </div>
-                      {#if i < rawPresences.length - 1}
-                        {@const nextStart = rawPresences[i + 1].from}
-                        {@const currentEnd = presence.to}
-                        {#if currentEnd && nextStart > currentEnd}
-                          <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
-                            <span class="italic">Gap: {currentEnd}–{nextStart}</span>
-                          </div>
-                        {/if}
-                      {/if}
-                    {/each}
+                      {/each}
+                    </div>
                   </div>
-                </div>
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -153,18 +202,37 @@
             <Tooltip.Provider delayDuration={200}>
               <Tooltip.Root>
                 <Tooltip.Trigger>
-                  <button class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors" aria-label="Add working time">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <button
+                    class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Add working time"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3.5 w-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
                       <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                     </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3 w-3"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
                       <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
                     </svg>
                   </button>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom" sideOffset={4}>
-                  Add working time
-                </Tooltip.Content>
+                <Tooltip.Content side="bottom" sideOffset={4}>Add working time</Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
           </PresenceModal>
@@ -175,7 +243,9 @@
         <Tooltip.Root>
           <Tooltip.Trigger>
             <span class="font-mono text-foreground cursor-default">
-              {formatHours(overview.totals.actual)}<span class="text-muted-foreground">/{formatHours(displayTarget)}</span>
+              {formatHours(overview.totals.actual)}<span class="text-muted-foreground"
+                >/{formatHours(displayTarget)}</span
+              >
             </span>
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom" sideOffset={4}>
@@ -185,7 +255,9 @@
                 <span class="font-mono font-medium">{formatHours(overview.totals.actual)}</span>
               </div>
               <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">{overview.presence ? 'Presence:' : 'Target:'}</span>
+                <span class="text-muted-foreground"
+                  >{overview.presence ? 'Presence:' : 'Target:'}</span
+                >
                 <span class="font-mono font-medium">{formatHours(displayTarget)}</span>
               </div>
               {#if overview.requiredHours !== displayTarget}
@@ -203,7 +275,9 @@
           <Tooltip.Trigger>
             <span
               class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium cursor-default
-                {displayBalance >= -0.01 ? 'bg-success-subtle text-success-text' : 'bg-danger-subtle text-danger-text'}"
+                {displayBalance >= -0.01
+                ? 'bg-success-subtle text-success-text'
+                : 'bg-danger-subtle text-danger-text'}"
             >
               {formatBalance(displayBalance)}
             </span>
@@ -220,11 +294,32 @@
   <div class="grid grid-cols-[1fr_1.4fr_1fr] gap-4 items-start" style="min-height: 60vh;">
     <!-- Left: Outlook Calendar -->
     {#if connectionsState.outlook.isConnected}
-      <SourceColumn source="outlook" entries={matchResult.sortedOutlook} loading={timeEntriesState.loading.outlook} entryGroupMap={matchResult.entryGroupMap} />
+      <SourceColumn
+        source="outlook"
+        entries={matchResult.sortedOutlook}
+        loading={timeEntriesState.loading.outlook}
+        entryGroupMap={matchResult.entryGroupMap}
+      />
     {:else}
-      <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
+      <div
+        class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-muted-foreground/30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
+            x1="16"
+            x2="16"
+            y1="2"
+            y2="6"
+          /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
         </svg>
         <p class="text-xs text-muted-foreground/50">Outlook not connected</p>
       </div>
@@ -232,14 +327,29 @@
 
     <!-- Center: Moco (emphasized) -->
     {#if connectionsState.moco.isConnected}
-      <SourceColumn source="moco" entries={matchResult.sortedMoco} loading={timeEntriesState.loading.moco} emphasized entryGroupMap={matchResult.entryGroupMap}>
+      <SourceColumn
+        source="moco"
+        entries={matchResult.sortedMoco}
+        loading={timeEntriesState.loading.moco}
+        emphasized
+        entryGroupMap={matchResult.entryGroupMap}
+      >
         {#snippet headerAction()}
           <MocoEntryModal mode="create" prefill={{ date: dateNavState.selectedDate }}>
             <button
               class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
               title="New Moco entry"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
               </svg>
             </button>
@@ -247,8 +357,19 @@
         {/snippet}
       </SourceColumn>
     {:else}
-      <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <div
+        class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-muted-foreground/30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
         </svg>
         <p class="text-xs text-muted-foreground/50">Moco not connected</p>
@@ -257,11 +378,29 @@
 
     <!-- Right: Jira Worklogs -->
     {#if connectionsState.jira.isConnected}
-      <SourceColumn source="jira" entries={matchResult.sortedJira} loading={timeEntriesState.loading.jira} entryGroupMap={matchResult.entryGroupMap} />
+      <SourceColumn
+        source="jira"
+        entries={matchResult.sortedJira}
+        loading={timeEntriesState.loading.jira}
+        entryGroupMap={matchResult.entryGroupMap}
+      />
     {:else}
-      <div class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" />
+      <div
+        class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 text-muted-foreground/30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path
+            d="M14 2v4a2 2 0 0 0 2 2h4"
+          />
         </svg>
         <p class="text-xs text-muted-foreground/50">Jira not connected</p>
       </div>

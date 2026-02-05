@@ -71,8 +71,8 @@ export const ABSENCE_COLORS: Record<AbsenceType, string> = {
 export interface ManualAbsence {
   id: string;
   type: AbsenceType;
-  startDate: string;   // YYYY-MM-DD
-  endDate: string;     // YYYY-MM-DD (same as startDate for single-day)
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD (same as startDate for single-day)
   halfDay: boolean;
   note?: string;
   createdAt: string;

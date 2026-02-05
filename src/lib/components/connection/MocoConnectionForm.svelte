@@ -44,9 +44,7 @@
       placeholder="API key from your Moco profile"
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
-    <p class="mt-1 text-xs text-muted-foreground">
-      Found under Profile &rarr; Integrations
-    </p>
+    <p class="mt-1 text-xs text-muted-foreground">Found under Profile &rarr; Integrations</p>
   </div>
 
   {#if connectionsState.moco.error}

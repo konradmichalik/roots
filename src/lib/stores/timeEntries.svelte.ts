@@ -1,4 +1,12 @@
-import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata, DayOverview, MocoCreateActivity, MocoUpdateActivity } from '../types';
+import type {
+  UnifiedTimeEntry,
+  MocoMetadata,
+  JiraMetadata,
+  OutlookMetadata,
+  DayOverview,
+  MocoCreateActivity,
+  MocoUpdateActivity
+} from '../types';
 import type { MocoActivity, MSGraphEvent } from '../types';
 import type { WorklogWithIssue, JiraWorklogClient } from '../api';
 import { getMocoClient, getJiraClient, getOutlookClient } from './connections.svelte';
@@ -6,7 +14,13 @@ import { connectionsState } from './connections.svelte';
 import { settingsState } from './settings.svelte';
 import { getAbsenceForDate } from './absences.svelte';
 import { fetchPresences, getPresenceForDate } from './presences.svelte';
-import { isWeekend, isToday as checkIsToday, getDayOfWeekIndex, getMonthStart, getMonthEnd } from '../utils/date-helpers';
+import {
+  isWeekend,
+  isToday as checkIsToday,
+  getDayOfWeekIndex,
+  getMonthStart,
+  getMonthEnd
+} from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';
 import { logger } from '../utils/logger';
 import { toast } from './toast.svelte';
@@ -114,11 +128,14 @@ export async function fetchMonthCache(from: string, to: string): Promise<void> {
       const client = getMocoClient();
       if (client) {
         fetches.push(
-          client.getActivities(from, to).then((activities) => {
-            entry.mocoEntries = activities.map(mapMocoActivity);
-          }).catch((error) => {
-            logger.error('Month cache: Failed to fetch Moco entries', error);
-          })
+          client
+            .getActivities(from, to)
+            .then((activities) => {
+              entry.mocoEntries = activities.map(mapMocoActivity);
+            })
+            .catch((error) => {
+              logger.error('Month cache: Failed to fetch Moco entries', error);
+            })
         );
       }
     }
@@ -281,10 +298,7 @@ export async function createMocoActivity(data: MocoCreateActivity): Promise<bool
     logger.store('timeEntries', 'Created Moco activity', { date: data.date });
 
     // Refresh both live entries and month cache
-    await Promise.allSettled([
-      refreshDayEntries(data.date),
-      refreshMonthCacheForDate(data.date)
-    ]);
+    await Promise.allSettled([refreshDayEntries(data.date), refreshMonthCacheForDate(data.date)]);
     toast.success('Entry created');
     return true;
   } catch (error) {
@@ -294,7 +308,11 @@ export async function createMocoActivity(data: MocoCreateActivity): Promise<bool
   }
 }
 
-export async function updateMocoActivity(id: number, data: MocoUpdateActivity, date: string): Promise<boolean> {
+export async function updateMocoActivity(
+  id: number,
+  data: MocoUpdateActivity,
+  date: string
+): Promise<boolean> {
   const client = getMocoClient();
   if (!client) return false;
 
@@ -302,10 +320,7 @@ export async function updateMocoActivity(id: number, data: MocoUpdateActivity, d
     await client.updateActivity(id, data);
     logger.store('timeEntries', `Updated Moco activity ${id}`);
 
-    await Promise.allSettled([
-      refreshDayEntries(date),
-      refreshMonthCacheForDate(date)
-    ]);
+    await Promise.allSettled([refreshDayEntries(date), refreshMonthCacheForDate(date)]);
     toast.success('Entry updated');
     return true;
   } catch (error) {
@@ -323,10 +338,7 @@ export async function deleteMocoActivity(id: number, date: string): Promise<bool
     await client.deleteActivity(id);
     logger.store('timeEntries', `Deleted Moco activity ${id}`);
 
-    await Promise.allSettled([
-      refreshDayEntries(date),
-      refreshMonthCacheForDate(date)
-    ]);
+    await Promise.allSettled([refreshDayEntries(date), refreshMonthCacheForDate(date)]);
     toast.success('Entry deleted');
     return true;
   } catch (error) {
@@ -366,10 +378,7 @@ function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
   };
 }
 
-function mapJiraWorklog(
-  item: WorklogWithIssue,
-  client: JiraWorklogClient
-): UnifiedTimeEntry {
+function mapJiraWorklog(item: WorklogWithIssue, client: JiraWorklogClient): UnifiedTimeEntry {
   const { worklog, issueKey, issueSummary, issueType, projectKey } = item;
 
   const metadata: JiraMetadata = {
@@ -396,7 +405,9 @@ function mapJiraWorklog(
 function mapOutlookEvent(event: MSGraphEvent): UnifiedTimeEntry {
   const startDate = event.start.dateTime.split('T')[0];
   const hours = calculateEventHours(event.start.dateTime, event.end.dateTime, event.isAllDay);
-  const startTime = event.isAllDay ? undefined : event.start.dateTime.split('T')[1]?.substring(0, 5);
+  const startTime = event.isAllDay
+    ? undefined
+    : event.start.dateTime.split('T')[1]?.substring(0, 5);
   const endTime = event.isAllDay ? undefined : event.end.dateTime.split('T')[1]?.substring(0, 5);
 
   const metadata: OutlookMetadata = {
@@ -457,7 +468,10 @@ export function getDayOverview(date: string): DayOverview {
 // ---------------------------------------------------------------------------
 // Selectors: Cached month data (used by MiniCalendar + StatsModal)
 // ---------------------------------------------------------------------------
-export function getCachedEntriesForDate(date: string, monthStart: string): {
+export function getCachedEntriesForDate(
+  date: string,
+  monthStart: string
+): {
   moco: UnifiedTimeEntry[];
   jira: UnifiedTimeEntry[];
   outlook: UnifiedTimeEntry[];
@@ -498,7 +512,9 @@ function buildDayOverview(
   // Reduce required hours for manual absences
   const manualAbsence = getAbsenceForDate(date);
   const absenceReduction = manualAbsence
-    ? (manualAbsence.halfDay ? baseTargetHours / 2 : baseTargetHours)
+    ? manualAbsence.halfDay
+      ? baseTargetHours / 2
+      : baseTargetHours
     : 0;
   const requiredHours = Math.max(0, baseTargetHours - absenceReduction);
 

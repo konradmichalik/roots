@@ -1,13 +1,21 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
-  import { createPresence, updatePresence, deletePresence, getRawPresencesForDate } from '../../stores/presences.svelte';
+  import {
+    createPresence,
+    updatePresence,
+    deletePresence,
+    getRawPresencesForDate
+  } from '../../stores/presences.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatDateLong } from '../../utils/date-helpers';
   import { normalizeTimeInput } from '../../utils/time-format';
   import type { Snippet } from 'svelte';
   import type { MocoPresence } from '../../types';
 
-  let { children, date }: {
+  let {
+    children,
+    date
+  }: {
     children: Snippet;
     date?: string;
   } = $props();
@@ -165,14 +173,14 @@
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
       <Dialog.Title>Working Time {formatDateLong(effectiveDate)}</Dialog.Title>
-      <Dialog.Description>
-        Manage your working time for this day.
-      </Dialog.Description>
+      <Dialog.Description>Manage your working time for this day.</Dialog.Description>
     </Dialog.Header>
 
     <div class="space-y-4 py-4">
       {#if error}
-        <div class="rounded-lg border border-danger bg-danger-subtle px-3 py-2 text-sm text-danger-text">
+        <div
+          class="rounded-lg border border-danger bg-danger-subtle px-3 py-2 text-sm text-danger-text"
+        >
           {error}
         </div>
       {/if}
@@ -243,7 +251,9 @@
                 <!-- Delete confirmation -->
                 <div class="space-y-3">
                   <p class="text-sm text-foreground">Delete this entry?</p>
-                  <p class="text-xs text-muted-foreground">{formatTimeRange(presence.from, presence.to)}</p>
+                  <p class="text-xs text-muted-foreground">
+                    {formatTimeRange(presence.from, presence.to)}
+                  </p>
                   <div class="flex gap-2">
                     <button
                       type="button"
@@ -256,7 +266,9 @@
                     </button>
                     <button
                       type="button"
-                      onclick={() => { deleteConfirmId = null; }}
+                      onclick={() => {
+                        deleteConfirmId = null;
+                      }}
                       disabled={saving}
                       class="rounded-lg border border-input px-3 py-2 text-sm font-medium text-foreground
                         hover:bg-accent disabled:opacity-50 transition-colors"
@@ -270,12 +282,32 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     {#if presence.is_home_office}
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 text-brand"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path
+                          d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                        />
                       </svg>
                     {:else}
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 text-muted-foreground"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                       </svg>
                     {/if}
                     <span class="text-sm font-mono font-medium text-foreground">
@@ -294,18 +326,40 @@
                       class="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                       title="Edit"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                       </svg>
                     </button>
                     <button
                       type="button"
-                      onclick={() => { deleteConfirmId = presence.id; }}
+                      onclick={() => {
+                        deleteConfirmId = presence.id;
+                      }}
                       class="rounded p-1 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle transition-colors"
                       title="Delete"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
+                          d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -368,7 +422,9 @@
     <Dialog.Footer>
       <button
         type="button"
-        onclick={() => { open = false; }}
+        onclick={() => {
+          open = false;
+        }}
         class="rounded-lg border border-input px-4 py-2 text-sm font-medium text-foreground
           hover:bg-accent transition-colors"
       >

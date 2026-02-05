@@ -5,7 +5,14 @@
   import { formatHours } from '../../utils/time-format';
   import { getSourceColor } from '../../stores/settings.svelte';
 
-  let { source, entries, loading = false, emphasized = false, entryGroupMap, headerAction }: {
+  let {
+    source,
+    entries,
+    loading = false,
+    emphasized = false,
+    entryGroupMap,
+    headerAction
+  }: {
     source: 'moco' | 'jira' | 'outlook';
     entries: UnifiedTimeEntry[];
     loading?: boolean;
@@ -63,8 +70,11 @@
   <!-- Entry list -->
   <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
     {#if loading && entries.length === 0}
-      {#each { length: 3 } as _}
-        <div class="animate-pulse rounded-xl border border-border bg-card p-3 pl-4" style="border-left: 3px solid {sourceColor}20">
+      {#each { length: 3 } as _, i (i)}
+        <div
+          class="animate-pulse rounded-xl border border-border bg-card p-3 pl-4"
+          style="border-left: 3px solid {sourceColor}20"
+        >
           <div class="flex items-start justify-between gap-2">
             <div class="flex-1 min-w-0">
               <div class="h-3.5 rounded bg-muted-foreground/15 w-3/4 mb-1.5"></div>
@@ -80,8 +90,22 @@
       {/each}
       {#if entries.length === 0}
         <div class="flex flex-col items-center gap-2 py-8 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-muted-foreground/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-muted-foreground/30"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
+              x1="16"
+              x2="16"
+              y1="2"
+              y2="6"
+            /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
           </svg>
           <p class="text-xs text-muted-foreground/50">No entries</p>
         </div>
@@ -92,7 +116,8 @@
   <!-- Footer -->
   <div class="border-t border-border bg-muted/20 px-4 py-2">
     <span class="text-xs text-muted-foreground">
-      {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
+      {entries.length}
+      {entries.length === 1 ? 'entry' : 'entries'}
     </span>
   </div>
 </div>

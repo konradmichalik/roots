@@ -46,9 +46,7 @@ export function updateAbsence(
     note?: string;
   }
 ): void {
-  absencesState.absences = absencesState.absences.map((a) =>
-    a.id === id ? { ...a, ...data } : a
-  );
+  absencesState.absences = absencesState.absences.map((a) => (a.id === id ? { ...a, ...data } : a));
   persist();
   logger.store('absences', 'Updated', { id, type: data.type });
 }

@@ -7,7 +7,12 @@
   import { sidebarState } from '../../stores/sidebar.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getDateRange } from '../../stores/dateNavigation.svelte';
-  import { fetchDayEntries, refreshDayEntries, fetchMonthCache, refreshMonthCacheIfStale } from '../../stores/timeEntries.svelte';
+  import {
+    fetchDayEntries,
+    refreshDayEntries,
+    fetchMonthCache,
+    refreshMonthCacheIfStale
+  } from '../../stores/timeEntries.svelte';
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
   import { onMount } from 'svelte';
 
@@ -58,7 +63,9 @@
 
   <div class="flex flex-1 overflow-hidden">
     {#if sidebarState.leftOpen}
-      <aside class="w-72 flex-shrink-0 border-r border-border bg-card overflow-y-auto animate-slide-in-left">
+      <aside
+        class="w-72 flex-shrink-0 border-r border-border bg-card overflow-y-auto animate-slide-in-left"
+      >
         <CalendarSidebar />
       </aside>
     {/if}
@@ -70,7 +77,9 @@
     </main>
 
     {#if sidebarState.rightOpen}
-      <aside class="w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right">
+      <aside
+        class="w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right"
+      >
         <FavoritesSidebar />
       </aside>
     {/if}

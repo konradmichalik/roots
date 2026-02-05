@@ -142,7 +142,7 @@
       </p>
     </div>
 
-  <!-- Server / DC credentials -->
+    <!-- Server / DC credentials -->
   {:else}
     <div class="flex gap-4">
       <label class="flex items-center gap-1.5 text-sm cursor-pointer">

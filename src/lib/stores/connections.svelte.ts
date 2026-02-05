@@ -7,9 +7,12 @@ import type {
 } from '../types';
 import { createInitialServiceState } from '../types';
 import {
-  createMocoClient, type MocoClient,
-  createJiraWorklogClient, type JiraWorklogClient,
-  createOutlookClient, OutlookClient
+  createMocoClient,
+  type MocoClient,
+  createJiraWorklogClient,
+  type JiraWorklogClient,
+  createOutlookClient,
+  OutlookClient
 } from '../api';
 import { exchangeCodeForTokens, getStoredOAuthConfig } from '../api/oauth-manager';
 import {
@@ -45,7 +48,9 @@ export async function initializeConnections(): Promise<void> {
     restores.push(connectJira(jiraConfig).then(() => {}));
   }
 
-  const outlookConfig = await getStorageItemAsync<OutlookConnectionConfig>(STORAGE_KEYS.OUTLOOK_CONFIG);
+  const outlookConfig = await getStorageItemAsync<OutlookConnectionConfig>(
+    STORAGE_KEYS.OUTLOOK_CONFIG
+  );
   const outlookTokens = await getStorageItemAsync<OAuthTokens>(STORAGE_KEYS.OUTLOOK_TOKENS);
   if (outlookConfig && outlookTokens) {
     logger.connection('Restoring Outlook connection from storage');
@@ -223,4 +228,3 @@ export function isAnyServiceConnected(): boolean {
     connectionsState.outlook.isConnected
   );
 }
-

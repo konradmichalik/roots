@@ -7,9 +7,16 @@
   import { connectionsState } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
 
-  import { matchHoverState, setHoveredGroup, clearHoveredGroup } from '../../stores/entryMatching.svelte';
+  import {
+    matchHoverState,
+    setHoveredGroup,
+    clearHoveredGroup
+  } from '../../stores/entryMatching.svelte';
 
-  let { entry, matchGroupId }: {
+  let {
+    entry,
+    matchGroupId
+  }: {
     entry: UnifiedTimeEntry;
     matchGroupId?: string;
   } = $props();
@@ -29,9 +36,15 @@
   }
 
   let sourceColor = $derived(getSourceColor(entry.source));
-  let mocoMeta = $derived(entry.metadata.source === 'moco' ? entry.metadata as MocoMetadata : null);
-  let jiraMeta = $derived(entry.metadata.source === 'jira' ? entry.metadata as JiraMetadata : null);
-  let outlookMeta = $derived(entry.metadata.source === 'outlook' ? entry.metadata as OutlookMetadata : null);
+  let mocoMeta = $derived(
+    entry.metadata.source === 'moco' ? (entry.metadata as MocoMetadata) : null
+  );
+  let jiraMeta = $derived(
+    entry.metadata.source === 'jira' ? (entry.metadata as JiraMetadata) : null
+  );
+  let outlookMeta = $derived(
+    entry.metadata.source === 'outlook' ? (entry.metadata as OutlookMetadata) : null
+  );
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
 </script>
@@ -136,8 +149,19 @@
                     class="rounded-md p-0.5 text-warning hover:text-warning/80 hover:bg-accent transition-colors duration-150"
                     aria-label="Book as favorite"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3.5 w-3.5"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      stroke="currentColor"
+                      stroke-width="1"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
                     </svg>
                   </button>
                 </Tooltip.Trigger>
@@ -172,14 +196,21 @@
                     class="rounded-md p-0.5 text-muted-foreground hover:text-primary hover:bg-accent transition-colors duration-150"
                     aria-label="Add to Moco"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3.5 w-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
                       <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
                     </svg>
                   </button>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="left" sideOffset={4}>
-                  Book in Moco
-                </Tooltip.Content>
+                <Tooltip.Content side="left" sideOffset={4}>Book in Moco</Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
           </MocoEntryModal>

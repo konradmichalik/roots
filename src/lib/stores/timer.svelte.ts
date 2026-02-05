@@ -240,9 +240,7 @@ export function updateDraft(
   id: string,
   updates: Partial<Omit<DraftEntry, 'id' | 'createdAt'>>
 ): void {
-  draftsState.drafts = draftsState.drafts.map((d) =>
-    d.id === id ? { ...d, ...updates } : d
-  );
+  draftsState.drafts = draftsState.drafts.map((d) => (d.id === id ? { ...d, ...updates } : d));
   persistDrafts();
   logger.store('timer', 'Draft updated', { id });
 }

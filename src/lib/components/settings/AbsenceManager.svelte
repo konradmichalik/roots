@@ -37,9 +37,15 @@
   {#if sortedAbsences.length > 0}
     <div class="space-y-2 max-h-48 overflow-y-auto">
       {#each sortedAbsences as absence (absence.id)}
-        <div class="flex items-center justify-between rounded-lg border border-border bg-card p-2.5">
+        <div
+          class="flex items-center justify-between rounded-lg border border-border bg-card p-2.5"
+        >
           <div class="flex items-center gap-2 min-w-0">
-            <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {TYPE_COLORS[absence.type]}">
+            <span
+              class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {TYPE_COLORS[
+                absence.type
+              ]}"
+            >
               {TYPE_LABELS[absence.type]}
             </span>
             <span class="text-sm text-foreground truncate">
@@ -67,12 +73,18 @@
 
   {#if showForm}
     <AbsenceForm
-      onSave={() => { showForm = false; }}
-      onCancel={() => { showForm = false; }}
+      onSave={() => {
+        showForm = false;
+      }}
+      onCancel={() => {
+        showForm = false;
+      }}
     />
   {:else}
     <button
-      onclick={() => { showForm = true; }}
+      onclick={() => {
+        showForm = true;
+      }}
       class="w-full rounded-lg border border-dashed border-border px-3 py-2 text-sm text-muted-foreground
         hover:bg-secondary hover:text-foreground hover:border-solid transition-all duration-150"
     >

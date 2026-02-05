@@ -1,7 +1,8 @@
 import type { OutlookConnectionConfig, OAuthTokens, OAuthTokenResponse } from '../types';
 import { logger } from '../utils/logger';
 
-const OAUTH_SCOPES = 'https://graph.microsoft.com/Calendars.Read https://graph.microsoft.com/User.Read offline_access';
+const OAUTH_SCOPES =
+  'https://graph.microsoft.com/Calendars.Read https://graph.microsoft.com/User.Read offline_access';
 const SESSION_KEY_VERIFIER = 'roots:oauth:code_verifier';
 const SESSION_KEY_CONFIG = 'roots:oauth:config';
 const TOKEN_EXPIRY_BUFFER_MS = 5 * 60 * 1000;
@@ -94,7 +95,8 @@ export async function exchangeCodeForTokens(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const message = (errorData as Record<string, string>).error_description || 'Token exchange failed';
+    const message =
+      (errorData as Record<string, string>).error_description || 'Token exchange failed';
     throw new Error(message);
   }
 

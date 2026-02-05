@@ -1,7 +1,12 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
   import WeekdayHoursForm from './WeekdayHoursForm.svelte';
-  import { autoRefreshState, setAutoRefreshInterval, AUTO_REFRESH_OPTIONS, type AutoRefreshInterval } from '../../stores/autoRefresh.svelte';
+  import {
+    autoRefreshState,
+    setAutoRefreshInterval,
+    AUTO_REFRESH_OPTIONS,
+    type AutoRefreshInterval
+  } from '../../stores/autoRefresh.svelte';
   import type { Snippet } from 'svelte';
 
   let { children }: { children: Snippet } = $props();
@@ -37,8 +42,8 @@
               onclick={() => handleAutoRefreshChange(option.value)}
               class="flex-1 flex items-center justify-center px-2 py-2 text-xs rounded-md transition-colors
                 {autoRefreshState.interval === option.value
-                  ? 'bg-primary text-primary-foreground font-medium'
-                  : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'}"
+                ? 'bg-primary text-primary-foreground font-medium'
+                : 'bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground'}"
             >
               {option.label}
             </button>
@@ -53,7 +58,6 @@
         <h3 class="text-sm font-semibold text-foreground mb-3">Target Hours per Day</h3>
         <WeekdayHoursForm />
       </div>
-
     </div>
   </Dialog.Content>
 </Dialog.Root>

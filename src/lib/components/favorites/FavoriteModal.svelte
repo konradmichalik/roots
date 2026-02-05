@@ -4,7 +4,12 @@
   import TaskCombobox from '../moco/TaskCombobox.svelte';
   import TimeInput from '../common/TimeInput.svelte';
   import { addFavorite, updateFavorite, removeFavorite } from '../../stores/favorites.svelte';
-  import { fetchAssignedProjects, fetchTasksForProject, getProjectById, getTasksForProject } from '../../stores/mocoProjects.svelte';
+  import {
+    fetchAssignedProjects,
+    fetchTasksForProject,
+    getProjectById,
+    getTasksForProject
+  } from '../../stores/mocoProjects.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import type { Favorite, FavoriteEventMatch } from '../../types';
   import type { Snippet } from 'svelte';
@@ -158,7 +163,9 @@
     <Dialog.Header>
       <Dialog.Title>{mode === 'edit' ? 'Edit Favorite' : 'Add Favorite'}</Dialog.Title>
       <Dialog.Description>
-        {mode === 'edit' ? 'Update or remove this favorite booking.' : 'Create a quick booking template for common tasks.'}
+        {mode === 'edit'
+          ? 'Update or remove this favorite booking.'
+          : 'Create a quick booking template for common tasks.'}
       </Dialog.Description>
     </Dialog.Header>
 
@@ -169,8 +176,19 @@
     {:else if showDeleteConfirm}
       <div class="py-4 space-y-4">
         <div class="flex items-center gap-3 p-3 rounded-lg bg-danger-subtle">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-danger-text flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-danger-text flex-shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
@@ -225,11 +243,15 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label for="fav-hours" class="block text-sm font-medium text-foreground mb-1">Default Duration</label>
+            <label for="fav-hours" class="block text-sm font-medium text-foreground mb-1"
+              >Default Duration</label
+            >
             <TimeInput id="fav-hours" bind:value={defaultHours} />
           </div>
           <div>
-            <label for="fav-desc" class="block text-sm font-medium text-foreground mb-1">Description</label>
+            <label for="fav-desc" class="block text-sm font-medium text-foreground mb-1"
+              >Description</label
+            >
             <input
               id="fav-desc"
               type="text"
@@ -249,7 +271,9 @@
         {#if enableEventMatch}
           <div class="space-y-3 pl-4 border-l-2 border-warning/30">
             <div>
-              <label for="fav-pattern" class="block text-sm font-medium text-foreground mb-1">Pattern</label>
+              <label for="fav-pattern" class="block text-sm font-medium text-foreground mb-1"
+                >Pattern</label
+              >
               <input
                 id="fav-pattern"
                 type="text"
@@ -260,7 +284,9 @@
               />
             </div>
             <div>
-              <label for="fav-match-type" class="block text-sm font-medium text-foreground mb-1">Match type</label>
+              <label for="fav-match-type" class="block text-sm font-medium text-foreground mb-1"
+                >Match type</label
+              >
               <select
                 id="fav-match-type"
                 bind:value={matchType}

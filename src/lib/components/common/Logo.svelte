@@ -1,5 +1,9 @@
 <script lang="ts">
-  let { animate = false, size = 'md', variant = 'icon' }: {
+  let {
+    animate = false,
+    size = 'md',
+    variant = 'icon'
+  }: {
     animate?: boolean;
     size?: 'sm' | 'md' | 'lg';
     variant?: 'icon' | 'full';
@@ -19,11 +23,7 @@
 </script>
 
 {#if variant === 'full'}
-  <img
-    src="/docs/images/roots-logo.svg"
-    alt="Roots"
-    class="{fullSizeClasses[size]} w-auto"
-  />
+  <img src="/docs/images/roots-logo.svg" alt="Roots" class="{fullSizeClasses[size]} w-auto" />
 {:else}
   <img
     src="/docs/images/roots-logo-sm.svg"

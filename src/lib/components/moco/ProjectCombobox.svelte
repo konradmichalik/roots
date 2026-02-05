@@ -1,7 +1,10 @@
 <script lang="ts">
   import { getActiveProjects } from '../../stores/mocoProjects.svelte';
 
-  let { value = $bindable<string>(''), onSelect }: {
+  let {
+    value = $bindable<string>(''),
+    onSelect
+  }: {
     value?: string;
     onSelect?: (projectId: number) => void;
   } = $props();
@@ -18,15 +21,11 @@
 
   let filtered = $derived(
     searchValue.trim()
-      ? items.filter((item) =>
-          item.label.toLowerCase().includes(searchValue.toLowerCase())
-        )
+      ? items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()))
       : items
   );
 
-  let selectedLabel = $derived(
-    items.find((item) => item.value === value)?.label ?? ''
-  );
+  let selectedLabel = $derived(items.find((item) => item.value === value)?.label ?? '');
 
   // Keep display in sync: when not focused, show selected label
   let displayValue = $state('');
@@ -78,14 +77,19 @@
       focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
   />
   {#if open && filtered.length > 0}
-    <div class="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+    <div
+      class="absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg"
+    >
       {#each filtered as item (item.value)}
         <button
           type="button"
           class="w-full cursor-pointer select-none px-3 py-2 text-left text-sm text-foreground
             hover:bg-accent hover:text-accent-foreground
             {item.value === value ? 'font-medium bg-accent/50' : ''}"
-          onmousedown={(e) => { e.preventDefault(); handleSelect(item); }}
+          onmousedown={(e) => {
+            e.preventDefault();
+            handleSelect(item);
+          }}
         >
           {item.label}
         </button>

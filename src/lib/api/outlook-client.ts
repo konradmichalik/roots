@@ -53,7 +53,9 @@ export class OutlookClient {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      const message = (data as Record<string, Record<string, string>>)?.error?.message || 'MS Graph request failed';
+      const message =
+        (data as Record<string, Record<string, string>>)?.error?.message ||
+        'MS Graph request failed';
       logger.apiError('GET', `[Outlook] ${endpoint}`, { status: response.status, data });
       throw new Error(message);
     }
@@ -82,7 +84,8 @@ export class OutlookClient {
     logger.info(`Fetching Outlook events: ${from} to ${to}`);
 
     const allEvents: MSGraphEvent[] = [];
-    let url: string | null = `/me/calendarView?startDateTime=${startDateTime}&endDateTime=${endDateTime}&$select=id,subject,start,end,isAllDay,showAs,responseStatus,organizer,attendees,isOnlineMeeting,webLink&$top=100`;
+    let url: string | null =
+      `/me/calendarView?startDateTime=${startDateTime}&endDateTime=${endDateTime}&$select=id,subject,start,end,isAllDay,showAs,responseStatus,organizer,attendees,isOnlineMeeting,webLink&$top=100`;
 
     while (url) {
       const response: MSGraphCalendarResponse = await this.request<MSGraphCalendarResponse>(url);

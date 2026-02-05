@@ -102,7 +102,10 @@ export async function fetchProjectReport(projectId: number): Promise<void> {
     }
 
     mocoProjectsState.loadedReports.add(projectId);
-    logger.store('mocoProjects', `Loaded report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`);
+    logger.store(
+      'mocoProjects',
+      `Loaded report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`
+    );
   } catch (error) {
     logger.error(`Failed to fetch report for project ${projectId}`, error);
   }

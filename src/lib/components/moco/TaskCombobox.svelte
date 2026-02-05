@@ -2,7 +2,10 @@
   import { getTasksForProject, getTaskLoggedHours } from '../../stores/mocoProjects.svelte';
   import { formatHours } from '../../utils/time-format';
 
-  let { projectId, value = $bindable<string>('') }: {
+  let {
+    projectId,
+    value = $bindable<string>('')
+  }: {
     projectId: number | null;
     value?: string;
   } = $props();
@@ -23,9 +26,8 @@
   let items = $derived(
     tasks.map((t): TaskItem => {
       const loggedHours = getTaskLoggedHours(t.id);
-      const budgetHours = (t.budget && t.hourly_rate && t.hourly_rate > 0)
-        ? t.budget / t.hourly_rate
-        : null;
+      const budgetHours =
+        t.budget && t.hourly_rate && t.hourly_rate > 0 ? t.budget / t.hourly_rate : null;
       const availableHours = budgetHours !== null ? budgetHours - loggedHours : null;
       return {
         value: String(t.id),
@@ -39,15 +41,11 @@
 
   let filtered = $derived(
     searchValue.trim()
-      ? items.filter((item) =>
-          item.label.toLowerCase().includes(searchValue.toLowerCase())
-        )
+      ? items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()))
       : items
   );
 
-  let selectedLabel = $derived(
-    items.find((item) => item.value === value)?.label ?? ''
-  );
+  let selectedLabel = $derived(items.find((item) => item.value === value)?.label ?? '');
 
   let isDisabled = $derived(!projectId);
 
@@ -103,19 +101,28 @@
       disabled:opacity-50 disabled:cursor-not-allowed"
   />
   {#if open && filtered.length > 0}
-    <div class="absolute z-50 mt-1 max-h-44 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+    <div
+      class="absolute z-50 mt-1 max-h-44 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg"
+    >
       {#each filtered as item (item.value)}
         <button
           type="button"
           class="w-full cursor-pointer select-none px-3 py-2 text-left text-sm text-foreground
             hover:bg-accent hover:text-accent-foreground flex items-center justify-between gap-2
             {item.value === value ? 'font-medium bg-accent/50' : ''}"
-          onmousedown={(e) => { e.preventDefault(); handleSelect(item); }}
+          onmousedown={(e) => {
+            e.preventDefault();
+            handleSelect(item);
+          }}
         >
           <span class="truncate">{item.label}</span>
           {#if item.availableHours !== null}
-            <span class="flex-shrink-0 text-xs font-mono px-1.5 py-0.5 rounded
-              {item.availableHours > 0 ? 'bg-success-subtle text-success-text' : 'bg-danger-subtle text-danger-text'}">
+            <span
+              class="flex-shrink-0 text-xs font-mono px-1.5 py-0.5 rounded
+              {item.availableHours > 0
+                ? 'bg-success-subtle text-success-text'
+                : 'bg-danger-subtle text-danger-text'}"
+            >
               {item.availableHours > 0 ? '+' : ''}{formatHours(item.availableHours)}h
             </span>
           {/if}

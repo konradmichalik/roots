@@ -4,17 +4,17 @@
   import OutlookConnectionForm from '../connection/OutlookConnectionForm.svelte';
   import ThemeToggle from '../common/ThemeToggle.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { disconnectMoco, disconnectJira, disconnectOutlook } from '../../stores/connections.svelte';
+  import {
+    disconnectMoco,
+    disconnectJira,
+    disconnectOutlook
+  } from '../../stores/connections.svelte';
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-background p-8 animate-fade-in">
   <div class="w-full max-w-md">
     <div class="mb-8 flex flex-col items-center gap-4">
-      <img
-        src="/docs/images/roots-logo-sm.svg"
-        alt="Roots Logo"
-        class="h-14 w-14"
-      />
+      <img src="/docs/images/roots-logo-sm.svg" alt="Roots Logo" class="h-14 w-14" />
       <div class="text-center">
         <h1 class="text-3xl font-bold text-foreground tracking-tight">Roots</h1>
         <p class="mt-1.5 text-sm text-muted-foreground">
@@ -27,7 +27,11 @@
     <div class="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <img src="/moco.svg" alt="Moco" class="h-5 w-auto opacity-40 grayscale dark:invert dark:opacity-30" />
+          <img
+            src="/moco.svg"
+            alt="Moco"
+            class="h-5 w-auto opacity-40 grayscale dark:invert dark:opacity-30"
+          />
           <h2 class="text-lg font-semibold text-foreground">Moco</h2>
         </div>
         {#if connectionsState.moco.isConnected}
@@ -53,7 +57,11 @@
     <div class="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <img src="/jira.svg" alt="Jira" class="h-5 w-5 opacity-40 grayscale dark:invert dark:opacity-30" />
+          <img
+            src="/jira.svg"
+            alt="Jira"
+            class="h-5 w-5 opacity-40 grayscale dark:invert dark:opacity-30"
+          />
           <h2 class="text-lg font-semibold text-foreground">Jira</h2>
         </div>
         {#if connectionsState.jira.isConnected}
@@ -79,7 +87,11 @@
     <div class="mt-4 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <img src="/icons8-outlook.svg" alt="Outlook" class="h-5 w-5 opacity-40 grayscale dark:invert dark:opacity-30" />
+          <img
+            src="/icons8-outlook.svg"
+            alt="Outlook"
+            class="h-5 w-5 opacity-40 grayscale dark:invert dark:opacity-30"
+          />
           <h2 class="text-lg font-semibold text-foreground">Outlook</h2>
         </div>
         {#if connectionsState.outlook.isConnected}

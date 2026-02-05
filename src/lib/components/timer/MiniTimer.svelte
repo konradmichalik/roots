@@ -68,14 +68,22 @@
               class="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150"
               aria-label="Start Timer"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <polygon points="6 3 20 12 6 21 6 3" />
               </svg>
             </button>
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" sideOffset={4}>
-            Start Timer
-          </Tooltip.Content>
+          <Tooltip.Content side="bottom" sideOffset={4}>Start Timer</Tooltip.Content>
         </Tooltip.Root>
       </Tooltip.Provider>
     </TimerStartModal>
@@ -114,15 +122,23 @@
                 class="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150"
                 aria-label="Pause Timer"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <rect x="14" y="4" width="4" height="16" rx="1" />
                   <rect x="6" y="4" width="4" height="16" rx="1" />
                 </svg>
               </button>
             </Tooltip.Trigger>
-            <Tooltip.Content side="bottom" sideOffset={4}>
-              Pause
-            </Tooltip.Content>
+            <Tooltip.Content side="bottom" sideOffset={4}>Pause</Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
       {:else}
@@ -134,14 +150,22 @@
                 class="rounded p-1 text-warning-text hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150"
                 aria-label="Resume Timer"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <polygon points="6 3 20 12 6 21 6 3" />
                 </svg>
               </button>
             </Tooltip.Trigger>
-            <Tooltip.Content side="bottom" sideOffset={4}>
-              Resume
-            </Tooltip.Content>
+            <Tooltip.Content side="bottom" sideOffset={4}>Resume</Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
       {/if}
@@ -155,14 +179,22 @@
                 class="rounded p-1 text-danger-text hover:bg-danger/10 active:scale-95 transition-all duration-150"
                 aria-label="Stop Timer"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <rect x="3" y="3" width="18" height="18" rx="2" />
                 </svg>
               </button>
             </Tooltip.Trigger>
-            <Tooltip.Content side="bottom" sideOffset={4}>
-              Stop & Save
-            </Tooltip.Content>
+            <Tooltip.Content side="bottom" sideOffset={4}>Stop & Save</Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
       </TimerStopModal>
@@ -179,11 +211,23 @@
               class="relative rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150"
               aria-label="Open Drafts"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" />
                 <path d="M15 3v4a2 2 0 0 0 2 2h4" />
               </svg>
-              <span class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+              <span
+                class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+              >
                 {draftsCount}
               </span>
             </button>

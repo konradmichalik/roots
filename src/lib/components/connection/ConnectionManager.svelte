@@ -3,7 +3,12 @@
   import MocoConnectionForm from './MocoConnectionForm.svelte';
   import JiraConnectionForm from './JiraConnectionForm.svelte';
   import OutlookConnectionForm from './OutlookConnectionForm.svelte';
-  import { connectionsState, disconnectMoco, disconnectJira, disconnectOutlook } from '../../stores/connections.svelte';
+  import {
+    connectionsState,
+    disconnectMoco,
+    disconnectJira,
+    disconnectOutlook
+  } from '../../stores/connections.svelte';
   import type { Snippet } from 'svelte';
 
   let { children }: { children: Snippet } = $props();
@@ -94,7 +99,6 @@
           <OutlookConnectionForm />
         {/if}
       </div>
-
     </div>
   </Dialog.Content>
 </Dialog.Root>
