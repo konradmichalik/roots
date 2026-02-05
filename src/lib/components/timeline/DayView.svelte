@@ -61,7 +61,7 @@
     class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm"
   >
     <div class="flex items-center gap-3">
-      <span class="text-sm font-medium text-foreground">
+      <span class="text-sm font-medium text-foreground leading-none">
         {formatDateLong(dateNavState.selectedDate)}
       </span>
       <div class="flex items-center gap-1.5">
@@ -69,7 +69,7 @@
           {#key `${lastFetched.getTime()}-${timeTick}`}
             <Tooltip.Provider delayDuration={200}>
               <Tooltip.Root>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger class="inline-flex">
                   <span
                     class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-muted text-muted-foreground whitespace-nowrap cursor-default"
                   >
@@ -86,29 +86,29 @@
         <button
           onclick={handleRefresh}
           disabled={isLoading}
-          class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent
+          class="inline-flex items-center justify-center size-5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent
             disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150
             focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           title="Refresh"
         >
-          <RefreshCw class="size-4 {isLoading ? 'animate-spin' : ''}" />
+          <RefreshCw class="size-3.5 {isLoading ? 'animate-spin' : ''}" />
         </button>
+        {#if overview.manualAbsence}
+          <span
+            class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-information-subtle text-brand-text whitespace-nowrap"
+          >
+            {overview.manualAbsence.type === 'vacation'
+              ? 'Vacation'
+              : overview.manualAbsence.type === 'sick'
+                ? 'Sick'
+                : overview.manualAbsence.type === 'public_holiday'
+                  ? 'Holiday'
+                  : overview.manualAbsence.type === 'personal'
+                    ? 'Personal'
+                    : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
+          </span>
+        {/if}
       </div>
-      {#if overview.manualAbsence}
-        <span
-          class="inline-flex items-center gap-1 rounded-full bg-information-subtle px-2 py-0.5 text-xs font-medium text-brand-text"
-        >
-          {overview.manualAbsence.type === 'vacation'
-            ? 'Vacation'
-            : overview.manualAbsence.type === 'sick'
-              ? 'Sick'
-              : overview.manualAbsence.type === 'public_holiday'
-                ? 'Holiday'
-                : overview.manualAbsence.type === 'personal'
-                  ? 'Personal'
-                  : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
-        </span>
-      {/if}
     </div>
     <div class="flex items-center gap-2 text-sm">
       {#if connectionsState.moco.isConnected}
