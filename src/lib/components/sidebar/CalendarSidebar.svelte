@@ -133,7 +133,7 @@
   {#if selectedAbsence}
     <AbsenceModal mode="edit" editAbsence={selectedAbsence}>
       <button
-        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        class="group w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         <div class="flex items-center gap-2">
           <span
@@ -146,7 +146,7 @@
           <span class="flex-1 text-xs text-foreground truncate">
             {formatRange(selectedAbsence.startDate, selectedAbsence.endDate)}{#if selectedAbsence.halfDay}<span class="text-muted-foreground ml-1">(½)</span>{/if}
           </span>
-          <Pencil class="size-3 text-muted-foreground shrink-0" />
+          <Pencil class="size-3 text-muted-foreground shrink-0 transition-colors group-hover:text-foreground" />
         </div>
         {#if selectedAbsence.note}
           <p class="text-[10px] text-muted-foreground truncate mt-1">{selectedAbsence.note}</p>
