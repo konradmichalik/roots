@@ -3,9 +3,9 @@
   import StatsModal from '../stats/StatsModal.svelte';
   import AbsenceModal from '../absences/AbsenceModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-  import { dateNavState } from '../../stores/dateNavigation.svelte';
+  import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
-  import { getCachedDayOverview } from '../../stores/timeEntries.svelte';
+  import { getCachedDayOverview, hasCachedDataForDate } from '../../stores/timeEntries.svelte';
   import {
     formatDateShort,
     getWeekDates,
@@ -19,33 +19,49 @@
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import Plus from '@lucide/svelte/icons/plus';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
+  import AlertCircle from '@lucide/svelte/icons/alert-circle';
 
   let showLegend = $state(false);
+  let showOpenDays = $state(true);
   let todayStr = $derived(today());
 
   let selectedAbsence = $derived(getAbsenceForDate(dateNavState.selectedDate));
 
-  // Week balance (for selected date's week, up to today)
+  // Week balance (for selected date's week, up to yesterday - today is still in progress)
   let weekDates = $derived(getWeekDates(dateNavState.selectedDate));
-  let weekDatesUntilNow = $derived(weekDates.filter((d) => d <= todayStr));
+  let weekDatesUntilYesterday = $derived(weekDates.filter((d) => d < todayStr));
   let weekOverviews = $derived(
-    weekDatesUntilNow.map((d) => getCachedDayOverview(d, getMonthStart(d)))
+    weekDatesUntilYesterday.map((d) => getCachedDayOverview(d, getMonthStart(d)))
   );
   let weekBalance = $derived(weekOverviews.reduce((sum, d) => sum + d.balance, 0));
   let weekActual = $derived(weekOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
   let weekTarget = $derived(weekOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
 
-  // Month balance (for selected date's month, up to today)
+  // Month balance (for selected date's month, up to yesterday - today is still in progress)
   let monthStart = $derived(getMonthStart(dateNavState.selectedDate));
-  let monthWorkingDaysUntilNow = $derived(
-    getMonthWorkingDays(dateNavState.selectedDate).filter((d) => d <= todayStr)
+  let monthWorkingDaysUntilYesterday = $derived(
+    getMonthWorkingDays(dateNavState.selectedDate).filter((d) => d < todayStr)
   );
   let monthOverviews = $derived(
-    monthWorkingDaysUntilNow.map((d) => getCachedDayOverview(d, monthStart))
+    monthWorkingDaysUntilYesterday.map((d) => getCachedDayOverview(d, monthStart))
   );
   let monthBalance = $derived(monthOverviews.reduce((sum, d) => sum + d.balance, 0));
   let monthActual = $derived(monthOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
   let monthTarget = $derived(monthOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
+
+  // Days with open hours (negative balance, in the past, with actual cached data)
+  let openDays = $derived(
+    monthWorkingDaysUntilYesterday
+      .map((date, i) => ({
+        date,
+        overview: monthOverviews[i]
+      }))
+      .filter(
+        ({ date, overview }) =>
+          overview.balance < 0 && hasCachedDataForDate(date, monthStart)
+      )
+      .sort((a, b) => b.date.localeCompare(a.date)) // Most recent first
+  );
 
   function formatRange(start: string, end: string): string {
     const startFmt = formatDateShort(start);
@@ -87,8 +103,8 @@
               <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
             </div>
             <div class="text-muted-foreground pt-1 border-t border-border/50">
-              {weekDatesUntilNow.length} working day{weekDatesUntilNow.length !== 1 ? 's' : ''} until
-              today
+              {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1 ? 's' : ''} (excl.
+              today)
             </div>
           </div>
         </Tooltip.Content>
@@ -117,9 +133,9 @@
               <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
             </div>
             <div class="text-muted-foreground pt-1 border-t border-border/50">
-              {monthWorkingDaysUntilNow.length} working day{monthWorkingDaysUntilNow.length !== 1
+              {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !== 1
                 ? 's'
-                : ''} until today
+                : ''} (excl. today)
             </div>
           </div>
         </Tooltip.Content>
@@ -155,6 +171,48 @@
       </AbsenceModal>
     {/if}
   </div>
+
+  <!-- Open Days (ToDo) -->
+  {#if openDays.length > 0}
+    <div class="border-t border-border pt-3">
+      <button
+        onclick={() => {
+          showOpenDays = !showOpenDays;
+        }}
+        class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
+      >
+        <div class="flex items-center gap-1.5">
+          <AlertCircle class="size-3.5 text-warning-text" />
+          <span class="text-xs font-medium text-foreground">Open Hours</span>
+          <span
+            class="inline-flex items-center justify-center rounded-full bg-warning/20 text-warning-text text-[10px] font-medium px-1.5 min-w-[18px]"
+          >
+            {openDays.length}
+          </span>
+        </div>
+        <ChevronDown
+          class="size-3.5 text-muted-foreground transition-transform duration-200 {showOpenDays
+            ? 'rotate-180'
+            : ''}"
+        />
+      </button>
+      {#if showOpenDays}
+        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
+          {#each openDays as { date, overview } (date)}
+            <button
+              onclick={() => setDate(date)}
+              class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
+                hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+                {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
+            >
+              <span class="text-muted-foreground">{formatDateShort(date)}</span>
+              <span class="font-mono text-danger-text">{formatBalance(overview.balance)}</span>
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {/if}
 
   <!-- Collapsible Legend -->
   <div class="border-t border-border pt-3">
