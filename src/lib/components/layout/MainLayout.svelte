@@ -10,8 +10,7 @@
   import {
     fetchDayEntries,
     refreshDayEntries,
-    fetchMonthCache,
-    refreshMonthCacheIfStale
+    fetchMonthCache
   } from '../../stores/timeEntries.svelte';
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
   import { onMount } from 'svelte';
@@ -38,8 +37,7 @@
 
     function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return;
-      const range = getDateRange();
-      refreshMonthCacheIfStale(range.from, range.to);
+      // Refresh current day (updates month cache automatically)
       refreshDayEntries(dateNavState.selectedDate);
     }
 

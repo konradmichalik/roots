@@ -21,11 +21,16 @@ import {
   getMonthStart,
   getMonthEnd
 } from '../utils/date-helpers';
+import {
+  getStorageItemAsync,
+  setStorageItemAsync,
+  STORAGE_KEYS
+} from '../utils/storage';
 import { secondsToHours } from '../utils/time-format';
 import { logger } from '../utils/logger';
 import { toast } from './toast.svelte';
 
-const MONTH_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Month cache persists indefinitely - only updated when day-level fetches reveal changes
 
 // ---------------------------------------------------------------------------
 // Live day entries (Moco + Jira + Outlook — fetched per day)
@@ -65,8 +70,23 @@ export const monthCacheState = $state({
 // ---------------------------------------------------------------------------
 // Initialization
 // ---------------------------------------------------------------------------
-export function initializeTimeEntries(): void {
+export async function initializeTimeEntries(): Promise<void> {
+  // Load persisted month cache from storage
+  const persistedCache = await getStorageItemAsync<Record<string, MonthCacheEntry>>(
+    STORAGE_KEYS.MONTH_CACHE
+  );
+  if (persistedCache) {
+    monthCacheState.cache = persistedCache;
+    logger.store('timeEntries', `Loaded ${Object.keys(persistedCache).length} months from cache`);
+  }
   logger.store('timeEntries', 'Initialized');
+}
+
+// ---------------------------------------------------------------------------
+// Cache persistence
+// ---------------------------------------------------------------------------
+function persistMonthCache(): void {
+  void setStorageItemAsync(STORAGE_KEYS.MONTH_CACHE, monthCacheState.cache);
 }
 
 // ---------------------------------------------------------------------------
@@ -108,11 +128,19 @@ export async function refreshDayEntries(date: string): Promise<void> {
 // Month cache fetch (Moco + Presences only)
 // ---------------------------------------------------------------------------
 export async function fetchMonthCache(from: string, to: string): Promise<void> {
+  // Always fetch presences (has its own TTL cache - important for today's data)
+  if (connectionsState.moco.isConnected) {
+    fetchPresences(from, to).catch((error) => {
+      logger.error('Failed to fetch presences', error);
+    });
+  }
+
   const monthKey = from;
   const cached = monthCacheState.cache[monthKey];
 
-  // Skip if cache exists and is not expired
-  if (cached && Date.now() - cached.lastFetched < MONTH_CACHE_TTL) return;
+  // Skip Moco entries fetch if cache already exists - it persists indefinitely
+  // Updates happen via day-level fetches (updateMonthCacheForDay)
+  if (cached) return;
 
   monthCacheState.loading = true;
 
@@ -122,57 +150,28 @@ export async function fetchMonthCache(from: string, to: string): Promise<void> {
       lastFetched: Date.now()
     };
 
-    const fetches: Promise<void>[] = [];
-
     if (connectionsState.moco.isConnected) {
       const client = getMocoClient();
       if (client) {
-        fetches.push(
-          client
-            .getActivities(from, to)
-            .then((activities) => {
-              entry.mocoEntries = activities.map(mapMocoActivity);
-            })
-            .catch((error) => {
-              logger.error('Month cache: Failed to fetch Moco entries', error);
-            })
-        );
+        try {
+          const activities = await client.getActivities(from, to);
+          entry.mocoEntries = activities.map(mapMocoActivity);
+        } catch (error) {
+          logger.error('Month cache: Failed to fetch Moco entries', error);
+        }
       }
     }
-
-    if (connectionsState.moco.isConnected) {
-      fetches.push(
-        fetchPresences(from, to).catch((error) => {
-          logger.error('Month cache: Failed to fetch presences', error);
-        })
-      );
-    }
-
-    await Promise.allSettled(fetches);
 
     monthCacheState.cache = {
       ...monthCacheState.cache,
       [monthKey]: entry
     };
     monthCacheState.loadedMonth = monthKey;
+    persistMonthCache();
     logger.store('timeEntries', `Month cache loaded for ${from} to ${to}`);
   } finally {
     monthCacheState.loading = false;
   }
-}
-
-/**
- * Refresh month cache if TTL has expired. Non-blocking — keeps stale data visible.
- */
-export async function refreshMonthCacheIfStale(from: string, to: string): Promise<void> {
-  const monthKey = from;
-  const cached = monthCacheState.cache[monthKey];
-  if (!cached) return;
-  if (Date.now() - cached.lastFetched < MONTH_CACHE_TTL) return;
-
-  logger.store('timeEntries', `Month cache stale, refreshing ${monthKey}`);
-  invalidateMonthCache(monthKey);
-  await fetchMonthCache(from, to);
 }
 
 /**
@@ -181,6 +180,18 @@ export async function refreshMonthCacheIfStale(from: string, to: string): Promis
 export function invalidateMonthCache(monthStart: string): void {
   const { [monthStart]: _, ...rest } = monthCacheState.cache;
   monthCacheState.cache = rest;
+  persistMonthCache();
+}
+
+export function clearAllMonthCache(): void {
+  monthCacheState.cache = {};
+  monthCacheState.loadedMonth = null;
+  persistMonthCache();
+  logger.store('timeEntries', 'Cleared all month cache');
+}
+
+export function getCachedMonthCount(): number {
+  return Object.keys(monthCacheState.cache).length;
 }
 
 /**
@@ -203,17 +214,19 @@ function updateMonthCacheForDay(date: string, entries: UnifiedTimeEntry[]): void
       mocoEntries: updatedEntries
     }
   };
+  persistMonthCache();
   logger.store('timeEntries', `Updated month cache for ${date}`);
 }
 
 /**
- * Invalidate and re-fetch the month cache for a given date.
- * Use after mutations to keep the calendar in sync.
+ * Refresh month cache for a specific date.
+ * Day-level fetch (refreshDayEntries) already updates the cache via updateMonthCacheForDay,
+ * so this function only ensures the month cache exists.
  */
 export async function refreshMonthCacheForDate(date: string): Promise<void> {
   const monthStart = getMonthStart(date);
   const monthEnd = getMonthEnd(date);
-  invalidateMonthCache(monthStart);
+  // Only fetch if cache doesn't exist yet - day-level updates handle the rest
   await fetchMonthCache(monthStart, monthEnd);
 }
 
@@ -560,6 +573,38 @@ export function getLoggedHoursForTask(taskId: number): number {
     }
   }
   return total;
+}
+
+// ---------------------------------------------------------------------------
+// Cache availability helpers
+// ---------------------------------------------------------------------------
+export function hasCachedDataForDate(date: string, monthStart: string): boolean {
+  const cached = monthCacheState.cache[monthStart];
+  if (!cached) return false;
+
+  // Check if we have any Moco entries for this date
+  const hasEntries = cached.mocoEntries.some((e) => e.date === date);
+  if (hasEntries) return true;
+
+  // Check if we have presence data for this date
+  const presence = getPresenceForDate(date);
+  if (presence) return true;
+
+  return false;
+}
+
+export function getCachedDatesWithData(monthStart: string): string[] {
+  const cached = monthCacheState.cache[monthStart];
+  if (!cached) return [];
+
+  const datesWithData = new Set<string>();
+
+  // Add dates with Moco entries
+  for (const entry of cached.mocoEntries) {
+    datesWithData.add(entry.date);
+  }
+
+  return Array.from(datesWithData);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
-import { refreshDayEntries, refreshMonthCacheIfStale, isAnyLoading } from './timeEntries.svelte';
-import { dateNavState, getDateRange } from './dateNavigation.svelte';
+import { refreshDayEntries, isAnyLoading } from './timeEntries.svelte';
+import { dateNavState } from './dateNavigation.svelte';
 import { logger } from '../utils/logger';
 
 export type AutoRefreshInterval = 'off' | '5min' | '30min' | '1hour';
@@ -96,12 +96,8 @@ async function performRefresh(): Promise<void> {
   logger.store('autoRefresh', 'Performing auto-refresh');
 
   try {
-    // Refresh current day and month cache
-    const range = getDateRange();
-    await Promise.allSettled([
-      refreshDayEntries(dateNavState.selectedDate),
-      refreshMonthCacheIfStale(range.from, range.to)
-    ]);
+    // Refresh current day (updates month cache automatically via updateMonthCacheForDay)
+    await refreshDayEntries(dateNavState.selectedDate);
   } catch (error) {
     logger.error('Auto-refresh failed', error);
   }
