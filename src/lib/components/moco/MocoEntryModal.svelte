@@ -27,9 +27,11 @@
     mode = 'create',
     prefill,
     activityId,
-    onSuccess
+    onSuccess,
+    onClose,
+    defaultOpen = false
   }: {
-    children: Snippet;
+    children?: Snippet;
     mode?: 'create' | 'edit';
     prefill?: {
       date?: string;
@@ -42,9 +44,11 @@
     };
     activityId?: number;
     onSuccess?: () => void;
+    onClose?: () => void;
+    defaultOpen?: boolean;
   } = $props();
 
-  let open = $state(false);
+  let open = $state(defaultOpen);
   let saving = $state(false);
   let error = $state<string | null>(null);
   let savedAsFavorite = $state(false);
@@ -73,8 +77,19 @@
     taskInactiveWarning = false;
   }
 
+  // Initialize form when opened via defaultOpen prop
+  $effect(() => {
+    if (defaultOpen && open) {
+      resetForm();
+      fetchAssignedProjects();
+    }
+  });
+
   function handleOpen(isOpen: boolean): void {
     open = isOpen;
+    if (!isOpen) {
+      onClose?.();
+    }
     if (isOpen) {
       resetForm();
       fetchAssignedProjects().then(async () => {
@@ -235,15 +250,15 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpen}>
-  <Dialog.Trigger>
-    {#snippet child({ props })}
-      <div {...props} style="display: contents;">
-        {#if children}
+  {#if children}
+    <Dialog.Trigger>
+      {#snippet child({ props })}
+        <div {...props} style="display: contents;">
           {@render children()}
-        {/if}
-      </div>
-    {/snippet}
-  </Dialog.Trigger>
+        </div>
+      {/snippet}
+    </Dialog.Trigger>
+  {/if}
   <Dialog.Content class="sm:max-w-md max-h-[85vh] overflow-y-auto">
     <Dialog.Header>
       <Dialog.Title>{mode === 'edit' ? 'Edit Moco Entry' : 'New Moco Entry'}</Dialog.Title>

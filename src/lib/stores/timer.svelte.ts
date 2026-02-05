@@ -23,6 +23,25 @@ export const draftsState = $state<{ drafts: DraftEntry[] }>({
   drafts: []
 });
 
+// State for pending Moco modal (survives component unmount)
+export const pendingMocoModal = $state<{
+  show: boolean;
+  prefill: { date: string; hours: number; description?: string } | null;
+}>({
+  show: false,
+  prefill: null
+});
+
+export function openPendingMocoModal(prefill: { date: string; hours: number; description?: string }): void {
+  pendingMocoModal.prefill = prefill;
+  pendingMocoModal.show = true;
+}
+
+export function closePendingMocoModal(): void {
+  pendingMocoModal.show = false;
+  pendingMocoModal.prefill = null;
+}
+
 // ============ Initialization ============
 
 export async function initializeTimer(): Promise<void> {

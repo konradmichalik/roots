@@ -6,12 +6,15 @@
     pauseTimer,
     resumeTimer,
     getElapsedSeconds,
-    formatElapsedTime
+    formatElapsedTime,
+    pendingMocoModal,
+    closePendingMocoModal
   } from '../../stores/timer.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import TimerStartModal from './TimerStartModal.svelte';
   import TimerStopModal from './TimerStopModal.svelte';
   import DraftsDrawer from './DraftsDrawer.svelte';
+  import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import Play from '@lucide/svelte/icons/play';
   import Pause from '@lucide/svelte/icons/pause';
   import Square from '@lucide/svelte/icons/square';
@@ -182,3 +185,14 @@
     </DraftsDrawer>
   {/if}
 </div>
+
+<!-- Global Moco Modal for timer entries (rendered outside conditional blocks) -->
+{#if pendingMocoModal.show && pendingMocoModal.prefill}
+  <MocoEntryModal
+    mode="create"
+    prefill={pendingMocoModal.prefill}
+    defaultOpen={true}
+    onSuccess={closePendingMocoModal}
+    onClose={closePendingMocoModal}
+  />
+{/if}

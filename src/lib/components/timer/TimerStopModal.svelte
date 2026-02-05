@@ -1,12 +1,12 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
-  import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import {
     timerState,
     stopTimer,
     addDraft,
     getElapsedSeconds,
-    formatElapsedTime
+    formatElapsedTime,
+    openPendingMocoModal
   } from '../../stores/timer.svelte';
   import { createMocoActivity } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
@@ -21,7 +21,6 @@
   let saving = $state(false);
   let note = $state('');
   let elapsedSeconds = $state(0);
-  let stoppedHours = $state(0); // Hours after timer is stopped for Moco modal
 
   const isMocoConnected = $derived(connectionsState.moco.isConnected);
   const hasBooking = $derived(timerState.mocoBooking !== null);
@@ -40,13 +39,20 @@
   async function handleSaveDirectly(): Promise<void> {
     if (!booking) return;
 
+    // Capture booking data BEFORE stopping timer (stopTimer resets mocoBooking to null)
+    const bookingData = {
+      projectId: booking.projectId,
+      taskId: booking.taskId,
+      description: booking.description
+    };
+    const currentNote = note.trim();
+
     saving = true;
     try {
       const seconds = stopTimer();
       const decimalHours = secondsToHours(seconds);
 
       if (decimalHours < 0.02) {
-        // Less than ~1 minute
         toast.error('Timer too short to save');
         open = false;
         return;
@@ -54,10 +60,10 @@
 
       const success = await createMocoActivity({
         date: today(),
-        project_id: booking.projectId,
-        task_id: booking.taskId,
+        project_id: bookingData.projectId,
+        task_id: bookingData.taskId,
         hours: decimalHours,
-        description: note.trim() || booking.description || undefined
+        description: currentNote || bookingData.description || undefined
       });
 
       if (success) {
@@ -65,6 +71,8 @@
       } else {
         toast.error('Failed to save entry');
       }
+    } catch (err) {
+      toast.error('Failed to save entry');
     } finally {
       saving = false;
     }
@@ -91,9 +99,23 @@
   }
 
   function handlePrepareForMoco(): void {
-    // Stop timer and store hours for Moco modal
+    // Stop timer and prepare data for Moco modal
     const seconds = stopTimer();
-    stoppedHours = secondsToHours(seconds);
+    const stoppedHours = secondsToHours(seconds);
+
+    if (stoppedHours < 0.02) {
+      toast.error('Timer too short to save');
+      open = false;
+      return;
+    }
+
+    // Use global state that survives component unmount
+    openPendingMocoModal({
+      date: today(),
+      hours: stoppedHours,
+      description: note.trim() || undefined
+    });
+
     open = false;
   }
 
@@ -170,23 +192,14 @@
 
         <!-- Open Moco modal (if connected but no booking) -->
         {#if isMocoConnected && !hasBooking}
-          <MocoEntryModal
-            mode="create"
-            prefill={{
-              date: today(),
-              hours,
-              description: note.trim() || undefined
-            }}
+          <button
+            onclick={handlePrepareForMoco}
+            disabled={saving}
+            class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground
+              hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
           >
-            <button
-              onclick={handlePrepareForMoco}
-              disabled={saving}
-              class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground
-                hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
-            >
-              Save to Moco...
-            </button>
-          </MocoEntryModal>
+            Save to Moco...
+          </button>
         {/if}
 
         <!-- Save as draft -->
