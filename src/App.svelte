@@ -35,7 +35,7 @@
         await initializeTimer();
         initializeDateNavigation();
         initializeSidebar();
-        initializeTimeEntries();
+        await initializeTimeEntries();
 
         // Check for OAuth callback before restoring connections
         const oauthCallback = detectOAuthCallback();

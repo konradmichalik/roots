@@ -151,8 +151,8 @@ export async function disconnectJira(): Promise<void> {
 
 async function restoreOutlook(config: OutlookConnectionConfig, tokens: OAuthTokens): Promise<void> {
   try {
-    outlookClient = createOutlookClient(config, tokens, (fresh) => {
-      setStorageItemAsync(STORAGE_KEYS.OUTLOOK_TOKENS, fresh);
+    outlookClient = createOutlookClient(config, tokens, async (fresh) => {
+      await setStorageItemAsync(STORAGE_KEYS.OUTLOOK_TOKENS, fresh);
     });
     const result = await outlookClient.testConnection();
     if (!result.success) {
@@ -166,6 +166,11 @@ async function restoreOutlook(config: OutlookConnectionConfig, tokens: OAuthToke
     const message = error instanceof Error ? error.message : 'Outlook restore failed';
     connectionsState.outlook.error = message;
     logger.error('Outlook restore failed', error);
+
+    // Clear invalid tokens to prevent repeated failures
+    await removeStorageItemAsync(STORAGE_KEYS.OUTLOOK_TOKENS);
+    await removeStorageItemAsync(STORAGE_KEYS.OUTLOOK_CONFIG);
+    logger.connection('Cleared invalid Outlook tokens from storage');
   }
 }
 
