@@ -3,6 +3,7 @@
   import DraftCard from './DraftCard.svelte';
   import { draftsState, getSortedDrafts, clearAllDrafts } from '../../stores/timer.svelte';
   import type { Snippet } from 'svelte';
+  import FileText from '@lucide/svelte/icons/file-text';
 
   let { children }: { children: Snippet } = $props();
 
@@ -37,19 +38,7 @@
     <div class="flex-1 overflow-y-auto py-4">
       {#if drafts.length === 0}
         <div class="text-center py-8">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-12 w-12 mx-auto text-muted-foreground/30 mb-3"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" />
-            <path d="M15 3v4a2 2 0 0 0 2 2h4" />
-          </svg>
+          <FileText class="size-12 mx-auto text-muted-foreground/30 mb-3" strokeWidth={1.5} />
           <p class="text-sm text-muted-foreground">No drafts yet</p>
           <p class="text-xs text-muted-foreground mt-1">
             Stop a timer and save as draft to see it here
@@ -69,7 +58,7 @@
         <button
           onclick={handleClearAll}
           class="w-full rounded-lg px-4 py-2 text-sm text-muted-foreground
-            hover:text-danger-text hover:bg-danger-subtle active:scale-[0.98] transition-all duration-150"
+            hover:text-danger-text hover:bg-danger-subtle active:scale-[0.98] transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         >
           Delete all drafts
         </button>

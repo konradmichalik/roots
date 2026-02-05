@@ -3,6 +3,7 @@
   import { addAbsence, updateAbsence, removeAbsence } from '../../stores/absences.svelte';
   import { ABSENCE_LABELS, type AbsenceType, type ManualAbsence } from '../../types';
   import type { Snippet } from 'svelte';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 
   let {
     children,
@@ -114,22 +115,7 @@
     {#if showDeleteConfirm}
       <div class="py-4 space-y-4">
         <div class="flex items-center gap-3 p-3 rounded-lg bg-danger-subtle">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 text-danger-text flex-shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-            />
-            <line x1="12" y1="9" x2="12" y2="13" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
+          <AlertTriangle class="size-6 text-danger-text flex-shrink-0" />
           <p class="text-sm text-danger-text">
             Are you sure you want to delete this absence? This action cannot be undone.
           </p>
@@ -139,7 +125,7 @@
             type="button"
             onclick={cancelDelete}
             class="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground
-              hover:bg-accent transition-all duration-150"
+              hover:bg-accent transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             Cancel
           </button>
@@ -147,7 +133,7 @@
             type="button"
             onclick={confirmDelete}
             class="flex-1 rounded-lg bg-danger px-4 py-2.5 text-sm font-medium text-danger-foreground
-              hover:bg-danger/90 transition-all duration-150"
+              hover:bg-danger/90 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             Delete
           </button>
@@ -223,7 +209,7 @@
             type="submit"
             disabled={!startDate}
             class="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground
-              hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+              hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             {mode === 'edit' ? 'Update' : 'Save'}
           </button>
@@ -232,7 +218,7 @@
               type="button"
               onclick={requestDelete}
               class="rounded-lg border border-border-danger px-4 py-2.5 text-sm font-medium text-danger-text
-                hover:bg-danger-subtle transition-all duration-150"
+                hover:bg-danger-subtle transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
             >
               Delete
             </button>

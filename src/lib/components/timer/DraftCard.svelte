@@ -5,6 +5,8 @@
   import { formatHours } from '../../utils/time-format';
   import { formatDateShort } from '../../utils/date-helpers';
   import type { DraftEntry } from '../../types';
+  import Download from '@lucide/svelte/icons/download';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
 
   let {
     draft,
@@ -72,48 +74,20 @@
           onSuccess={handleMocoSaved}
         >
           <button
-            class="rounded p-1.5 text-primary hover:bg-primary/10 active:scale-95 transition-all duration-150"
+            class="rounded p-1.5 text-primary hover:bg-primary/10 active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
             title="Save to Moco"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 3v12" />
-              <path d="m8 11 4 4 4-4" />
-              <path d="M8 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4" />
-            </svg>
+            <Download class="size-4" />
           </button>
         </MocoEntryModal>
       {/if}
 
       <button
         onclick={handleDelete}
-        class="rounded p-1.5 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle active:scale-95 transition-all duration-150"
+        class="rounded p-1.5 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Delete draft"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 6h18" />
-          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-        </svg>
+        <Trash2 class="size-4" />
       </button>
     </div>
   </div>

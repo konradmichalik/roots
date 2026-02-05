@@ -14,6 +14,8 @@
   import { getSourceColor } from '../../stores/settings.svelte';
   import type { Snippet } from 'svelte';
   import type { MocoMetadata } from '../../types';
+  import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+  import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
   let { children }: { children: Snippet } = $props();
 
@@ -198,21 +200,11 @@
     <div class="flex items-center justify-between py-2">
       <button
         onclick={prevMonth}
-        class="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        class="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
+          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         aria-label="Previous month"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="m15 18-6-6 6-6" />
-        </svg>
+        <ChevronLeft class="size-4" />
       </button>
 
       <span class="text-sm font-medium text-foreground">{monthLabel}</span>
@@ -221,21 +213,11 @@
         onclick={nextMonth}
         disabled={isCurrentMonth}
         class="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
-          disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+          disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent
+          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         aria-label="Next month"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="m9 18 6-6-6-6" />
-        </svg>
+        <ChevronRight class="size-4" />
       </button>
     </div>
 

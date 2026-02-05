@@ -15,6 +15,10 @@
   } from '../../utils/date-helpers';
   import { formatBalance, formatHours, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS, ABSENCE_COLORS, type AbsenceType } from '../../types';
+  import Calendar from '@lucide/svelte/icons/calendar';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+  import Plus from '@lucide/svelte/icons/plus';
+  import ChevronDown from '@lucide/svelte/icons/chevron-down';
 
   let showLegend = $state(false);
   let todayStr = $derived(today());
@@ -52,23 +56,7 @@
 
 <div class="p-4 space-y-4">
   <div class="flex items-center gap-2">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-4 w-4 text-muted-foreground"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
-        x1="16"
-        x2="16"
-        y1="2"
-        y2="6"
-      /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
-    </svg>
+    <Calendar class="size-4 text-muted-foreground" />
     <h3 class="text-sm font-semibold text-foreground">Calendar</h3>
   </div>
 
@@ -145,26 +133,10 @@
     <StatsModal>
       <button
         class="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
-          hover:text-foreground hover:bg-accent transition-colors duration-150"
+          hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="View statistics"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-3.5 w-3.5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line
-            x1="6"
-            x2="6"
-            y1="20"
-            y2="14"
-          />
-        </svg>
+        <BarChart3 class="size-3.5" />
         Statistics
       </button>
     </StatsModal>
@@ -174,21 +146,10 @@
       <AbsenceModal mode="create" prefillDate={dateNavState.selectedDate}>
         <button
           class="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
-            hover:text-foreground hover:bg-accent transition-colors duration-150"
+            hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           title="Add absence for selected date"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-3.5 w-3.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
-          </svg>
+          <Plus class="size-3.5" />
           Absence
         </button>
       </AbsenceModal>
@@ -201,40 +162,31 @@
       onclick={() => {
         showLegend = !showLegend;
       }}
-      class="flex items-center justify-between w-full text-left"
+      class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
     >
       <span class="text-xs font-medium text-muted-foreground">Legend</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 {showLegend
+      <ChevronDown
+        class="size-3.5 text-muted-foreground transition-transform duration-200 {showLegend
           ? 'rotate-180'
           : ''}"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
+      />
     </button>
     {#if showLegend}
       <div class="mt-2 space-y-1.5">
         <div class="flex items-center gap-2">
-          <div class="h-2 w-2 rounded-full bg-success"></div>
+          <div class="size-2 rounded-full bg-success"></div>
           <span class="text-xs text-muted-foreground">Fully booked</span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="h-2 w-2 rounded-full bg-warning"></div>
+          <div class="size-2 rounded-full bg-warning"></div>
           <span class="text-xs text-muted-foreground">Partially booked</span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="h-2 w-2 rounded-full bg-danger"></div>
+          <div class="size-2 rounded-full bg-danger"></div>
           <span class="text-xs text-muted-foreground">Not booked</span>
         </div>
         <div class="flex items-center gap-2">
-          <div class="h-2 w-2 rounded-full bg-brand"></div>
+          <div class="size-2 rounded-full bg-brand"></div>
           <span class="text-xs text-muted-foreground">Absence</span>
         </div>
       </div>
@@ -245,7 +197,7 @@
   {#if selectedAbsence}
     <AbsenceModal mode="edit" editAbsence={selectedAbsence}>
       <button
-        class="w-full text-left rounded-lg border border-border bg-information-subtle p-3 space-y-2 hover:bg-information-subtle/80 transition-colors"
+        class="w-full text-left rounded-lg border border-border bg-information-subtle p-3 space-y-2 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         <div class="flex items-center justify-between">
           <span

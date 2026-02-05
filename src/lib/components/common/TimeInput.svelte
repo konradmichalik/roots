@@ -4,6 +4,8 @@
     timeStringToHours,
     normalizeTimeInput
   } from '../../utils/time-format';
+  import Minus from '@lucide/svelte/icons/minus';
+  import Plus from '@lucide/svelte/icons/plus';
 
   let {
     value = $bindable(0),
@@ -82,21 +84,10 @@
       {disabled}
       class="flex-shrink-0 rounded-lg border border-input bg-background p-2 text-muted-foreground
         hover:bg-accent hover:text-foreground active:scale-95
-        disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+        disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       title="−15 min"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <line x1="5" x2="19" y1="12" y2="12" />
-      </svg>
+      <Minus class="size-4" />
     </button>
   {/if}
   <input
@@ -121,21 +112,10 @@
       {disabled}
       class="flex-shrink-0 rounded-lg border border-input bg-background p-2 text-muted-foreground
         hover:bg-accent hover:text-foreground active:scale-95
-        disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+        disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       title="+15 min"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
-      </svg>
+      <Plus class="size-4" />
     </button>
   {/if}
 </div>

@@ -14,6 +14,15 @@
   import { formatHours } from '../../utils/time-format';
   import { toast } from '../../stores/toast.svelte';
   import type { Favorite } from '../../types';
+  import Star from '@lucide/svelte/icons/star';
+  import Plus from '@lucide/svelte/icons/plus';
+  import Calendar from '@lucide/svelte/icons/calendar';
+  import GripVertical from '@lucide/svelte/icons/grip-vertical';
+  import Pencil from '@lucide/svelte/icons/pencil';
+  import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+  import CalendarCheck from '@lucide/svelte/icons/calendar-check';
+  import CircleCheck from '@lucide/svelte/icons/circle-check';
+  import XCircle from '@lucide/svelte/icons/x-circle';
 
   let regularFavorites = $derived(getRegularFavorites());
   let eventFavorites = $derived(getEventFavorites());
@@ -157,39 +166,15 @@
 <div class="space-y-3">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4 text-warning"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <polygon
-          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-        />
-      </svg>
+      <Star class="size-4 text-warning" />
       <h3 class="text-sm font-semibold text-foreground">Favorites</h3>
     </div>
     <FavoriteModal mode="create">
       <button
-        class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
+        class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Add favorite"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-3.5 w-3.5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
-        </svg>
+        <Plus class="size-3.5" />
       </button>
     </FavoriteModal>
   </div>
@@ -202,23 +187,7 @@
   {#if regularFavorites.length > 0}
     <div class="space-y-1.5">
       <div class="flex items-center gap-1.5 px-1">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-3 w-3 text-muted-foreground"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
-            x1="16"
-            x2="16"
-            y1="2"
-            y2="6"
-          /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
-        </svg>
+        <Calendar class="size-3 text-muted-foreground" />
         <span class="text-xs font-medium text-muted-foreground">Quick</span>
       </div>
 
@@ -242,26 +211,7 @@
           <div
             class="absolute left-0 top-0 bottom-0 w-5 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover/fav:opacity-100 transition-opacity"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-3 w-3 text-muted-foreground"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="9" cy="5" r="1" /><circle cx="9" cy="12" r="1" /><circle
-                cx="9"
-                cy="19"
-                r="1"
-              /><circle cx="15" cy="5" r="1" /><circle cx="15" cy="12" r="1" /><circle
-                cx="15"
-                cy="19"
-                r="1"
-              />
-            </svg>
+            <GripVertical class="size-3 text-muted-foreground" />
           </div>
 
           <MocoEntryModal
@@ -307,21 +257,10 @@
             <FavoriteModal mode="edit" editFavorite={favorite}>
               <button
                 type="button"
-                class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
+                class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                 title="Edit favorite"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-3 w-3"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                </svg>
+                <Pencil class="size-3" />
               </button>
             </FavoriteModal>
           </div>
@@ -335,20 +274,7 @@
     <div class="space-y-1.5">
       <div class="flex items-center justify-between px-1">
         <div class="flex items-center gap-1.5">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-3 w-3 text-warning"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polygon
-              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-            />
-          </svg>
+          <Star class="size-3 text-warning" />
           <span class="text-xs font-medium text-muted-foreground">Event Matching</span>
         </div>
         {#if hasMatchingEvents}
@@ -359,45 +285,12 @@
                   onclick={addAllFromEvents}
                   disabled={!canAddFromEvents}
                   class="rounded p-0.5 text-source-outlook hover:text-source-outlook hover:bg-source-outlook/10
-										disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+										disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                 >
                   {#if isAdding}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-3.5 w-3.5 animate-spin"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                      <path d="M3 3v5h5" />
-                    </svg>
+                    <LoaderCircle class="size-3.5 animate-spin" />
                   {:else}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-3.5 w-3.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
-                        x1="16"
-                        x2="16"
-                        y1="2"
-                        y2="6"
-                      /><line x1="8" x2="8" y1="2" y2="6" /><line
-                        x1="3"
-                        x2="21"
-                        y1="10"
-                        y2="10"
-                      /><path d="m9 16 2 2 4-4" />
-                    </svg>
+                    <CalendarCheck class="size-3.5" />
                   {/if}
                 </button>
               </Tooltip.Trigger>
@@ -433,26 +326,7 @@
           <div
             class="absolute left-0 top-0 bottom-0 w-5 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover/fav:opacity-100 transition-opacity"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-3 w-3 text-muted-foreground"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="9" cy="5" r="1" /><circle cx="9" cy="12" r="1" /><circle
-                cx="9"
-                cy="19"
-                r="1"
-              /><circle cx="15" cy="5" r="1" /><circle cx="15" cy="12" r="1" /><circle
-                cx="15"
-                cy="19"
-                r="1"
-              />
-            </svg>
+            <GripVertical class="size-3 text-muted-foreground" />
           </div>
 
           {#if matched}
@@ -471,18 +345,7 @@
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3 w-3 text-success flex-shrink-0"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="m9 11 3 3L22 4" />
-                      </svg>
+                      <CircleCheck class="size-3 text-success flex-shrink-0" />
                       <span class="text-sm font-medium text-foreground truncate"
                         >{favorite.name}</span
                       >
@@ -526,20 +389,7 @@
                       <div class="flex items-start justify-between gap-2">
                         <div class="flex-1 min-w-0">
                           <div class="flex items-center gap-1.5">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-3 w-3 text-muted-foreground flex-shrink-0"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            >
-                              <circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path
-                                d="m9 9 6 6"
-                              />
-                            </svg>
+                            <XCircle class="size-3 text-muted-foreground flex-shrink-0" />
                             <span class="text-sm font-medium text-foreground truncate"
                               >{favorite.name}</span
                             >
@@ -587,21 +437,10 @@
             <FavoriteModal mode="edit" editFavorite={favorite}>
               <button
                 type="button"
-                class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
+                class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                 title="Edit favorite"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-3 w-3"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                </svg>
+                <Pencil class="size-3" />
               </button>
             </FavoriteModal>
           </div>

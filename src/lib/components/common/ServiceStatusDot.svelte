@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { ServiceType } from '../../types';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { getSourceColor } from '../../stores/settings.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
   let { service }: { service: ServiceType } = $props();
@@ -12,21 +11,28 @@
     outlook: 'Outlook'
   };
 
+  // Map services to styleguide semantic colors
+  const serviceColors: Record<ServiceType, string> = {
+    moco: 'text-success-text',
+    jira: 'text-brand-text',
+    outlook: 'text-warning-text'
+  };
+
   let isConnected = $derived(connectionsState[service].isConnected);
+  let colorClass = $derived(isConnected ? serviceColors[service] : 'text-muted-foreground');
 </script>
 
 <Tooltip.Provider delayDuration={200}>
   <Tooltip.Root>
     <Tooltip.Trigger>
       <div
-        class="flex items-center justify-center h-6 w-6 rounded transition-all duration-200
-          {isConnected ? 'opacity-50' : 'opacity-20 grayscale'}"
-        style="color: {isConnected ? getSourceColor(service) : 'var(--ds-text-subtlest)'}"
+        class="flex items-center justify-center size-6 transition-all duration-200
+          {colorClass} {isConnected ? '' : 'grayscale'}"
       >
         {#if service === 'moco'}
           <!-- Moco Logo -->
           <svg
-            class="h-4 w-4"
+            class="size-4"
             viewBox="0 0 76 76"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +54,7 @@
         {:else if service === 'jira'}
           <!-- Jira Logo -->
           <svg
-            class="h-4 w-4"
+            class="size-4"
             viewBox="0 0 24 24"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +66,7 @@
         {:else if service === 'outlook'}
           <!-- Outlook Logo -->
           <svg
-            class="h-4 w-4"
+            class="size-4"
             viewBox="0 0 50 50"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"

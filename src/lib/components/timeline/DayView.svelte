@@ -16,6 +16,12 @@
   import { formatDateLong, formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+  import Home from '@lucide/svelte/icons/home';
+  import Clock from '@lucide/svelte/icons/clock';
+  import Plus from '@lucide/svelte/icons/plus';
+  import Calendar from '@lucide/svelte/icons/calendar';
+  import FileText from '@lucide/svelte/icons/file-text';
 
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira, entries.outlook));
@@ -81,24 +87,11 @@
           onclick={handleRefresh}
           disabled={isLoading}
           class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent
-            disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+            disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           title="Refresh"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 {isLoading ? 'animate-spin' : ''}"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-            <path d="M3 3v5h5" />
-            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-            <path d="M16 16h5v5" />
-          </svg>
+          <RefreshCw class="size-4 {isLoading ? 'animate-spin' : ''}" />
         </button>
       </div>
       {#if overview.manualAbsence}
@@ -128,33 +121,9 @@
                     class="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer leading-none transition-colors"
                   >
                     {#if overview.presence.isHomeOffice}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5 flex-shrink-0"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline
-                          points="9 22 9 12 15 12 15 22"
-                        />
-                      </svg>
+                      <Home class="size-3.5 flex-shrink-0" />
                     {:else}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5 flex-shrink-0"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                      </svg>
+                      <Clock class="size-3.5 flex-shrink-0" />
                     {/if}
                     <span class="font-mono text-xs"
                       >{overview.presence.from}–{overview.presence.to ?? '...'}</span
@@ -203,33 +172,12 @@
               <Tooltip.Root>
                 <Tooltip.Trigger>
                   <button
-                    class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                    class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors
+                      focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     aria-label="Add working time"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-3.5 w-3.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                    </svg>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-3 w-3"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
-                    </svg>
+                    <Clock class="size-3.5" />
+                    <Plus class="size-3" />
                   </button>
                 </Tooltip.Trigger>
                 <Tooltip.Content side="bottom" sideOffset={4}>Add working time</Tooltip.Content>
@@ -304,23 +252,7 @@
       <div
         class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 text-muted-foreground/30"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
-            x1="16"
-            x2="16"
-            y1="2"
-            y2="6"
-          /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
-        </svg>
+        <Calendar class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
         <p class="text-xs text-muted-foreground/50">Outlook not connected</p>
       </div>
     {/if}
@@ -337,21 +269,11 @@
         {#snippet headerAction()}
           <MocoEntryModal mode="create" prefill={{ date: dateNavState.selectedDate }}>
             <button
-              class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
+              class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150
+                focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
               title="New Moco entry"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
-              </svg>
+              <Plus class="size-4" />
             </button>
           </MocoEntryModal>
         {/snippet}
@@ -360,18 +282,7 @@
       <div
         class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 text-muted-foreground/30"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-        </svg>
+        <Clock class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
         <p class="text-xs text-muted-foreground/50">Moco not connected</p>
       </div>
     {/if}
@@ -388,20 +299,7 @@
       <div
         class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 text-muted-foreground/30"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path
-            d="M14 2v4a2 2 0 0 0 2 2h4"
-          />
-        </svg>
+        <FileText class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
         <p class="text-xs text-muted-foreground/50">Jira not connected</p>
       </div>
     {/if}

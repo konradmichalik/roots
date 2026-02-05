@@ -11,6 +11,10 @@
   import { normalizeTimeInput } from '../../utils/time-format';
   import type { Snippet } from 'svelte';
   import type { MocoPresence } from '../../types';
+  import Home from '@lucide/svelte/icons/home';
+  import Clock from '@lucide/svelte/icons/clock';
+  import Pencil from '@lucide/svelte/icons/pencil';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
 
   let {
     children,
@@ -222,7 +226,7 @@
                     <input
                       type="checkbox"
                       bind:checked={editIsHomeOffice}
-                      class="h-4 w-4 rounded border-input text-primary focus:ring-ring"
+                      class="size-4 rounded border-input text-primary focus:ring-ring"
                     />
                     <span class="text-sm text-foreground">Home Office</span>
                   </label>
@@ -232,7 +236,7 @@
                       onclick={() => handleUpdate(presence.id)}
                       disabled={saving}
                       class="flex-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground
-                        hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                        hover:bg-primary/90 disabled:opacity-50 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     >
                       {saving ? 'Saving...' : 'Save'}
                     </button>
@@ -241,7 +245,7 @@
                       onclick={cancelEdit}
                       disabled={saving}
                       class="rounded-lg border border-input px-3 py-2 text-sm font-medium text-foreground
-                        hover:bg-accent disabled:opacity-50 transition-colors"
+                        hover:bg-accent disabled:opacity-50 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     >
                       Cancel
                     </button>
@@ -260,7 +264,7 @@
                       onclick={() => handleDelete(presence.id)}
                       disabled={saving}
                       class="flex-1 rounded-lg bg-danger px-3 py-2 text-sm font-medium text-danger-text
-                        hover:bg-danger/90 disabled:opacity-50 transition-colors"
+                        hover:bg-danger/90 disabled:opacity-50 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     >
                       {saving ? 'Deleting...' : 'Delete'}
                     </button>
@@ -271,7 +275,7 @@
                       }}
                       disabled={saving}
                       class="rounded-lg border border-input px-3 py-2 text-sm font-medium text-foreground
-                        hover:bg-accent disabled:opacity-50 transition-colors"
+                        hover:bg-accent disabled:opacity-50 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     >
                       Cancel
                     </button>
@@ -282,33 +286,9 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     {#if presence.is_home_office}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-brand"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path
-                          d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-                        />
-                      </svg>
+                      <Home class="size-4 text-brand" />
                     {:else}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-muted-foreground"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                      </svg>
+                      <Clock class="size-4 text-muted-foreground" />
                     {/if}
                     <span class="text-sm font-mono font-medium text-foreground">
                       {formatTimeRange(presence.from, presence.to)}
@@ -323,44 +303,20 @@
                     <button
                       type="button"
                       onclick={() => startEdit(presence)}
-                      class="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                      class="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                       title="Edit"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                      </svg>
+                      <Pencil class="size-3.5" />
                     </button>
                     <button
                       type="button"
                       onclick={() => {
                         deleteConfirmId = presence.id;
                       }}
-                      class="rounded p-1 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle transition-colors"
+                      class="rounded p-1 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                       title="Delete"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
-                          d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-                        />
-                      </svg>
+                      <Trash2 class="size-3.5" />
                     </button>
                   </div>
                 </div>
@@ -402,7 +358,7 @@
             <input
               type="checkbox"
               bind:checked={newIsHomeOffice}
-              class="h-4 w-4 rounded border-input text-primary focus:ring-ring"
+              class="size-4 rounded border-input text-primary focus:ring-ring"
             />
             <span class="text-sm text-foreground">Home Office</span>
           </label>
@@ -411,7 +367,7 @@
             onclick={handleCreate}
             disabled={saving || !newFromTime.trim()}
             class="w-full rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground
-              hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             {saving ? 'Adding...' : 'Add Entry'}
           </button>
@@ -426,7 +382,7 @@
           open = false;
         }}
         class="rounded-lg border border-input px-4 py-2 text-sm font-medium text-foreground
-          hover:bg-accent transition-colors"
+          hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         Close
       </button>
