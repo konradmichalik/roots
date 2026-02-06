@@ -179,11 +179,11 @@
       <div class="mt-2 space-y-1.5">
         <div class="flex items-center gap-2">
           <div class="size-2 rounded-full bg-success"></div>
-          <span class="text-xs text-muted-foreground">Fully booked</span>
+          <span class="text-xs text-muted-foreground">≥95% of presence booked</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="size-2 rounded-full bg-warning"></div>
-          <span class="text-xs text-muted-foreground">Partially booked</span>
+          <span class="text-xs text-muted-foreground">&lt;95% of presence booked</span>
         </div>
         <div class="flex items-center gap-2">
           <div class="size-2 rounded-full bg-danger"></div>

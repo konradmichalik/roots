@@ -55,6 +55,15 @@
     if (overview.isWeekend) return 'none';
     if (overview.requiredHours === 0) return 'none';
 
+    // If presence exists and is finished (to !== null), compare against presence hours
+    if (overview.presence && overview.presence.to !== null && overview.presence.hours > 0) {
+      const ratio = overview.totals.actual / overview.presence.hours;
+      if (ratio >= 0.95) return 'full';
+      if (ratio > 0) return 'partial';
+      return 'empty';
+    }
+
+    // Fallback: no presence data, compare against required hours
     const ratio = overview.totals.actual / overview.requiredHours;
     if (ratio >= 0.95) return 'full';
     if (ratio > 0) return 'partial';
