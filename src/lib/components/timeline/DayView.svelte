@@ -9,8 +9,7 @@
   import { getEntriesForDate, getDayOverview, timeEntriesState } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { formatDateLong } from '../../utils/date-helpers';
-  import { formatHours, formatBalance } from '../../utils/time-format';
+    import { formatHours, formatBalance } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
@@ -30,33 +29,28 @@
 </script>
 
 <div class="mx-auto max-w-6xl space-y-4">
-  <!-- Combined Day header with presence bar -->
+  <!-- Day header with presence bar -->
   <div
     class="flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3 shadow-sm"
   >
-    <!-- Left: Date and absence badge -->
-    <div class="flex items-center gap-2 shrink-0">
-      <span class="text-sm font-medium text-foreground leading-none whitespace-nowrap">
-        {formatDateLong(dateNavState.selectedDate)}
+    <!-- Absence badge (if any) -->
+    {#if overview.manualAbsence}
+      <span
+        class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-information-subtle text-brand-text whitespace-nowrap shrink-0"
+      >
+        {overview.manualAbsence.type === 'vacation'
+          ? 'Vacation'
+          : overview.manualAbsence.type === 'sick'
+            ? 'Sick'
+            : overview.manualAbsence.type === 'public_holiday'
+              ? 'Holiday'
+              : overview.manualAbsence.type === 'personal'
+                ? 'Personal'
+                : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
       </span>
-      {#if overview.manualAbsence}
-        <span
-          class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-information-subtle text-brand-text whitespace-nowrap"
-        >
-          {overview.manualAbsence.type === 'vacation'
-            ? 'Vacation'
-            : overview.manualAbsence.type === 'sick'
-              ? 'Sick'
-              : overview.manualAbsence.type === 'public_holiday'
-                ? 'Holiday'
-                : overview.manualAbsence.type === 'personal'
-                  ? 'Personal'
-                  : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
-        </span>
-      {/if}
-    </div>
+    {/if}
 
-    <!-- Center: Presence progress bar (or empty placeholder for alignment) -->
+    <!-- Presence progress bar (or empty placeholder for alignment) -->
     <div class="flex-1 min-w-0 -mt-0.5">
       {#if hasPresence && isLoadingMoco}
         <!-- Loading skeleton while fetching booked hours -->

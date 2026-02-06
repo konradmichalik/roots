@@ -110,21 +110,31 @@
 </script>
 
 <div class="p-4 space-y-4">
-  <!-- Calendar Header with Absence Button -->
+  <!-- Calendar Header with Today and Absence Buttons -->
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-2">
       <Calendar class="size-4 text-muted-foreground" />
       <h3 class="text-sm font-semibold text-foreground">Calendar</h3>
     </div>
-    <AbsenceModal mode="create" prefillDate={dateNavState.selectedDate}>
+    <div class="flex items-center gap-1">
       <button
-        class="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground
+        onclick={() => setDate(todayStr)}
+        class="rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground
           hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-        title="Manage absences"
+        title="Go to today"
       >
-        <CalendarOff class="size-4" />
+        Today
       </button>
-    </AbsenceModal>
+      <AbsenceModal mode="create" prefillDate={dateNavState.selectedDate}>
+        <button
+          class="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground
+            hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          title="Manage absences"
+        >
+          <CalendarOff class="size-4" />
+        </button>
+      </AbsenceModal>
+    </div>
   </div>
 
   <MiniCalendar />
