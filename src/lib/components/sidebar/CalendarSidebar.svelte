@@ -24,7 +24,7 @@
   import Scale from '@lucide/svelte/icons/scale';
   import Pencil from '@lucide/svelte/icons/pencil';
 
-  let showLegend = $state(true);
+  let showLegend = $state(false);
   let showOpenDays = $state(true);
   let showBalancedDays = $state(true);
   let todayStr = $derived(today());
