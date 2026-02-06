@@ -3,6 +3,7 @@
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
   import PresenceProgressBar from '../presence/PresenceProgressBar.svelte';
   import PresenceModal from '../presence/PresenceModal.svelte';
+  import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getEntriesForDate, getDayOverview, timeEntriesState } from '../../stores/timeEntries.svelte';
@@ -21,6 +22,7 @@
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
   let rawPresences = $derived(getRawPresencesForDate(dateNavState.selectedDate));
   let hasPresence = $derived(rawPresences.length > 0);
+  let isLoadingMoco = $derived(timeEntriesState.loading.moco);
   let displayBalance = $derived(
     overview.presence ? (overview.presenceBalance ?? 0) : overview.balance
   );
@@ -56,7 +58,14 @@
 
     <!-- Center: Presence progress bar (or empty placeholder for alignment) -->
     <div class="flex-1 min-w-0 -mt-0.5">
-      {#if hasPresence}
+      {#if hasPresence && isLoadingMoco}
+        <!-- Loading skeleton while fetching booked hours -->
+        <div class="flex items-center gap-2">
+          <Skeleton class="h-3 w-10" />
+          <Skeleton class="h-1.5 flex-1 rounded-full" />
+          <Skeleton class="h-3 w-10" />
+        </div>
+      {:else if hasPresence}
         <PresenceProgressBar
           date={dateNavState.selectedDate}
           targetHours={overview.requiredHours}
@@ -83,9 +92,9 @@
         <Tooltip.Root>
           <Tooltip.Trigger>
             <span class="font-mono text-sm text-foreground cursor-default">
-              {formatHours(overview.totals.actual)}<span class="text-muted-foreground"
-                >/{formatHours(displayTarget)}</span
-              >
+              {formatHours(overview.totals.actual)}
+              <span class="text-muted-foreground/50"> / </span>
+              <span class="text-muted-foreground">{formatHours(displayTarget)}</span>
             </span>
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom" sideOffset={4}>
