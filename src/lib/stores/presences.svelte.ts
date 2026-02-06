@@ -36,7 +36,10 @@ export async function initializePresences(): Promise<void> {
   const persistedCache = await getStorageItemAsync<PresenceCache>(STORAGE_KEYS.PRESENCES_CACHE);
   if (persistedCache) {
     presencesState.cache = persistedCache;
-    logger.store('presences', `Loaded ${Object.keys(persistedCache.byDate).length} days from cache`);
+    logger.store(
+      'presences',
+      `Loaded ${Object.keys(persistedCache.byDate).length} days from cache`
+    );
   }
   logger.store('presences', 'Initialized');
 }

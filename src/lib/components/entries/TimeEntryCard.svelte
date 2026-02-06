@@ -182,7 +182,6 @@
 <ContextMenu.Root>
   <ContextMenu.Trigger>
     {#snippet child({ props })}
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
         {...props}
         class="group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
