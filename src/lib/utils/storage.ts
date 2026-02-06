@@ -39,6 +39,49 @@ export const STORAGE_KEYS = {
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
 
+// Keys that represent cached/temporary data (can be cleared)
+const CACHE_STORAGE_KEYS: StorageKey[] = [
+  STORAGE_KEYS.MONTH_CACHE,
+  STORAGE_KEYS.PRESENCES_CACHE,
+  STORAGE_KEYS.RECENT_PAIRS,
+  STORAGE_KEYS.DRAFTS
+];
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
+export async function getCacheSize(): Promise<{ bytes: number; formatted: string }> {
+  let totalBytes = 0;
+
+  for (const key of CACHE_STORAGE_KEYS) {
+    const fullKey = `${STORAGE_PREFIX}${key}`;
+
+    if (isTauri()) {
+      try {
+        const store = await getTauriStore();
+        const value = await store.get(fullKey);
+        if (value !== null && value !== undefined) {
+          totalBytes += JSON.stringify(value).length * 2; // UTF-16 = 2 bytes per char
+        }
+      } catch {
+        // Ignore errors
+      }
+    } else {
+      const item = localStorage.getItem(fullKey);
+      if (item) {
+        totalBytes += item.length * 2; // UTF-16 = 2 bytes per char
+      }
+    }
+  }
+
+  return { bytes: totalBytes, formatted: formatBytes(totalBytes) };
+}
+
 export async function getStorageItemAsync<T>(key: StorageKey): Promise<T | null> {
   const fullKey = `${STORAGE_PREFIX}${key}`;
 

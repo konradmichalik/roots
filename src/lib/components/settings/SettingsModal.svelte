@@ -22,11 +22,23 @@
   import Database from '@lucide/svelte/icons/database';
   import Trash2 from '@lucide/svelte/icons/trash-2';
   import { clearAllMonthCache, getCachedMonthCount } from '../../stores/timeEntries.svelte';
+  import { invalidatePresenceCache } from '../../stores/presences.svelte';
   import { toast } from '../../stores/toast.svelte';
+  import { getCacheSize } from '../../utils/storage';
 
   let { children }: { children: Snippet } = $props();
   let open = $state(false);
   let activeTab = $state('appearance');
+  let cacheSize = $state<string>('...');
+
+  // Load cache size when data tab is shown
+  $effect(() => {
+    if (open && activeTab === 'data') {
+      getCacheSize().then(({ formatted }) => {
+        cacheSize = formatted;
+      });
+    }
+  });
 
   function handleAutoRefreshChange(value: AutoRefreshInterval): void {
     setAutoRefreshInterval(value);
@@ -42,9 +54,13 @@
 
   let cachedMonths = $derived(getCachedMonthCount());
 
-  function handleClearCache(): void {
+  async function handleClearCache(): Promise<void> {
     clearAllMonthCache();
+    invalidatePresenceCache();
     toast.success('Cache cleared');
+    // Update cache size display
+    const { formatted } = await getCacheSize();
+    cacheSize = formatted;
   }
 </script>
 
@@ -197,22 +213,37 @@
       </Tabs.Content>
 
       <!-- Data Tab -->
-      <Tabs.Content value="data" class="mt-0 px-6 py-4 min-h-[240px]">
-        <h3 class="text-sm font-semibold text-foreground mb-1">Cache</h3>
-        <p class="text-xs text-muted-foreground mb-3">
-          {cachedMonths}
-          {cachedMonths === 1 ? 'month' : 'months'} cached.
-        </p>
-        <button
-          onclick={handleClearCache}
-          disabled={cachedMonths === 0}
-          class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-md transition-colors
-            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-            bg-danger-subtle text-danger-text hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Trash2 class="size-3.5" />
-          Clear Cache
-        </button>
+      <Tabs.Content value="data" class="mt-0 px-6 py-4 min-h-[240px] space-y-4">
+        <!-- Cache Size Info -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+          <Database class="size-5 text-muted-foreground" />
+          <div>
+            <p class="text-lg font-semibold">{cacheSize}</p>
+            <p class="text-xs text-muted-foreground">
+              Cache Size ({cachedMonths}
+              {cachedMonths === 1 ? 'month' : 'months'})
+            </p>
+          </div>
+        </div>
+
+        <!-- Clear Cache -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-foreground">Clear Cache</h3>
+          <p class="text-xs text-muted-foreground">
+            Remove cached time entries and presences. Your settings and connections will be
+            preserved.
+          </p>
+          <button
+            onclick={handleClearCache}
+            disabled={cachedMonths === 0}
+            class="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-md transition-colors
+              focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+              bg-danger-subtle text-danger-text hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Trash2 class="size-3.5" />
+            Clear Cache
+          </button>
+        </div>
       </Tabs.Content>
     </Tabs.Root>
   </Dialog.Content>
