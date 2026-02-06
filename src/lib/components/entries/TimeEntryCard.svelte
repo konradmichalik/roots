@@ -1,12 +1,17 @@
 <script lang="ts">
   import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../../types';
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
-  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+  import JiraEntryModal from '../jira/JiraEntryModal.svelte';
+  import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
   import { formatHours } from '../../utils/time-format';
+  import { extractFirstIssueKey } from '../../utils/jira-issue-parser';
   import { connectionsState, getJiraBaseUrl } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
-  import Star from '@lucide/svelte/icons/star';
+  import Pencil from '@lucide/svelte/icons/pencil';
   import Plus from '@lucide/svelte/icons/plus';
+  import Upload from '@lucide/svelte/icons/upload';
+  import Star from '@lucide/svelte/icons/star';
+  import ExternalLink from '@lucide/svelte/icons/external-link';
 
   import {
     matchHoverState,
@@ -54,7 +59,25 @@
     entry.metadata.source === 'outlook' ? (entry.metadata as OutlookMetadata) : null
   );
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
+  let isJiraConnected = $derived(connectionsState.jira.isConnected);
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
+
+  // Detect Jira issue key in Moco entry description or remoteTicketKey
+  let mocoIssueKey = $derived.by(() => {
+    if (!mocoMeta) return null;
+
+    // Check remoteTicketKey first (Moco's native Jira integration)
+    if (mocoMeta.remoteTicketKey) {
+      return extractFirstIssueKey(mocoMeta.remoteTicketKey);
+    }
+
+    // Then check description for #ABC-123 pattern
+    if (entry.description) {
+      return extractFirstIssueKey(entry.description);
+    }
+
+    return null;
+  });
 
   let jiraIssueUrl = $derived.by(() => {
     if (!jiraMeta) return null;
@@ -62,8 +85,32 @@
     if (!baseUrl) return null;
     return `${baseUrl}/browse/${jiraMeta.issueKey}`;
   });
+
+  // Modal states
+  let showMocoEditModal = $state(false);
+  let showMocoCreateModal = $state(false);
+  let showJiraEditModal = $state(false);
+  let showJiraSyncModal = $state(false);
+
+  // Context menu actions
+  function openMocoEdit(): void {
+    showMocoEditModal = true;
+  }
+
+  function openMocoCreate(): void {
+    showMocoCreateModal = true;
+  }
+
+  function openJiraEdit(): void {
+    showJiraEditModal = true;
+  }
+
+  function openJiraSync(): void {
+    showJiraSyncModal = true;
+  }
 </script>
 
+<!-- Moco Edit Modal -->
 {#if mocoMeta && isMocoConnected}
   <MocoEntryModal
     mode="edit"
@@ -75,29 +122,147 @@
       projectId: mocoMeta.projectId,
       taskId: mocoMeta.taskId
     }}
-  >
-    <button
-      class="w-full text-left group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150 cursor-pointer
-        {isDimmed ? 'opacity-40' : ''}
-        {isInHoveredGroup ? 'shadow-md' : ''}"
-      onmouseenter={handleMouseEnter}
-      onmouseleave={handleMouseLeave}
-    >
-      {@render cardContent()}
-    </button>
-  </MocoEntryModal>
-{:else}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class="group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
-      {isDimmed ? 'opacity-40' : ''}
-      {isInHoveredGroup ? 'shadow-md' : ''}"
-    onmouseenter={handleMouseEnter}
-    onmouseleave={handleMouseLeave}
-  >
-    {@render cardContent()}
-  </div>
+    defaultOpen={showMocoEditModal}
+    onClose={() => (showMocoEditModal = false)}
+  />
 {/if}
+
+<!-- Jira Edit Modal -->
+{#if jiraMeta && isJiraConnected}
+  <JiraEntryModal
+    mode="edit"
+    prefill={{
+      date: entry.date,
+      hours: entry.hours,
+      comment: entry.description ?? '',
+      issueKey: jiraMeta.issueKey,
+      worklogId: jiraMeta.worklogId
+    }}
+    defaultOpen={showJiraEditModal}
+    onClose={() => (showJiraEditModal = false)}
+  />
+{/if}
+
+<!-- Moco Create Modal (from Jira/Outlook) -->
+{#if (jiraMeta || outlookMeta) && isMocoConnected}
+  <MocoEntryModal
+    mode="create"
+    prefill={{
+      date: entry.date,
+      hours: matchedFavorite?.defaultHours ?? entry.hours,
+      description:
+        matchedFavorite?.description ??
+        (jiraMeta ? `#${jiraMeta.issueKey} ${jiraMeta.issueSummary}` : entry.title),
+      projectId: matchedFavorite?.projectId,
+      taskId: matchedFavorite?.taskId,
+      remoteService: jiraMeta ? 'jira' : undefined,
+      remoteId: jiraMeta?.issueKey
+    }}
+    defaultOpen={showMocoCreateModal}
+    onClose={() => (showMocoCreateModal = false)}
+  />
+{/if}
+
+<!-- Jira Sync Modal (from Moco) -->
+{#if mocoMeta && mocoIssueKey && isJiraConnected}
+  <JiraEntryModal
+    mode="create"
+    prefill={{
+      date: entry.date,
+      hours: entry.hours,
+      issueKey: mocoIssueKey,
+      comment: entry.description
+    }}
+    defaultOpen={showJiraSyncModal}
+    onClose={() => (showJiraSyncModal = false)}
+  />
+{/if}
+
+<!-- Card with Context Menu -->
+<ContextMenu.Root>
+  <ContextMenu.Trigger>
+    {#snippet child({ props })}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        {...props}
+        class="group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
+          {isDimmed ? 'opacity-40' : ''}
+          {isInHoveredGroup ? 'shadow-md' : ''}"
+        onmouseenter={handleMouseEnter}
+        onmouseleave={handleMouseLeave}
+      >
+        {@render cardContent()}
+      </div>
+    {/snippet}
+  </ContextMenu.Trigger>
+
+  <ContextMenu.Content>
+    <!-- Moco Entry Actions -->
+    {#if mocoMeta && isMocoConnected}
+      <ContextMenu.Item onclick={openMocoEdit}>
+        <Pencil class="text-muted-foreground" />
+        <span>Edit Entry</span>
+      </ContextMenu.Item>
+
+      {#if mocoIssueKey && isJiraConnected}
+        <ContextMenu.Separator />
+        <ContextMenu.Item onclick={openJiraSync}>
+          <Upload class="text-brand-text" />
+          <span>Sync to Jira</span>
+          <span class="ml-auto text-xs text-muted-foreground font-mono">{mocoIssueKey}</span>
+        </ContextMenu.Item>
+      {/if}
+    {/if}
+
+    <!-- Jira Entry Actions -->
+    {#if jiraMeta && isJiraConnected}
+      <ContextMenu.Item onclick={openJiraEdit}>
+        <Pencil class="text-muted-foreground" />
+        <span>Edit Worklog</span>
+      </ContextMenu.Item>
+
+      {#if jiraIssueUrl}
+        <ContextMenu.Item>
+          <a
+            href={jiraIssueUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 w-full"
+          >
+            <ExternalLink class="text-muted-foreground" />
+            <span>Open in Jira</span>
+          </a>
+        </ContextMenu.Item>
+      {/if}
+
+      {#if isMocoConnected}
+        <ContextMenu.Separator />
+        <ContextMenu.Item onclick={openMocoCreate}>
+          <Plus class="text-success" />
+          <span>Book in Moco</span>
+        </ContextMenu.Item>
+      {/if}
+    {/if}
+
+    <!-- Outlook Entry Actions -->
+    {#if outlookMeta && isMocoConnected}
+      {#if matchedFavorite}
+        <ContextMenu.Item onclick={openMocoCreate}>
+          <Star class="text-warning" />
+          <span>Book as Favorite</span>
+          <span class="ml-auto text-xs text-muted-foreground truncate max-w-[120px]"
+            >{matchedFavorite.name}</span
+          >
+        </ContextMenu.Item>
+      {:else}
+        <ContextMenu.Item onclick={openMocoCreate}>
+          <Plus class="text-success" />
+          <span>Book in Moco</span>
+        </ContextMenu.Item>
+      {/if}
+    {/if}
+  </ContextMenu.Content>
+</ContextMenu.Root>
 
 {#snippet cardContent()}
   <div class="flex items-start justify-between gap-2">
@@ -155,68 +320,6 @@
       <span class="text-sm font-mono font-medium text-foreground">
         {formatHours(entry.hours)}
       </span>
-      {#if outlookMeta && matchedFavorite && isMocoConnected}
-        <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 mt-0.5">
-          <MocoEntryModal
-            mode="create"
-            prefill={{
-              date: entry.date,
-              hours: matchedFavorite.defaultHours ?? entry.hours,
-              description: matchedFavorite.description ?? entry.title,
-              projectId: matchedFavorite.projectId,
-              taskId: matchedFavorite.taskId
-            }}
-          >
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <button
-                    class="rounded-md p-0.5 text-warning hover:text-warning/80 hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-                    aria-label="Book as favorite"
-                  >
-                    <Star class="size-3.5" fill="currentColor" />
-                  </button>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="left" sideOffset={4}>
-                  <div class="text-xs">
-                    <div class="font-medium">Book as favorite</div>
-                    <div class="text-muted-foreground">{matchedFavorite.name}</div>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          </MocoEntryModal>
-        </div>
-      {:else if (jiraMeta || outlookMeta) && isMocoConnected}
-        <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 mt-0.5">
-          <MocoEntryModal
-            mode="create"
-            prefill={{
-              date: entry.date,
-              hours: entry.hours,
-              description: jiraMeta
-                ? `#${jiraMeta.issueKey} ${jiraMeta.issueSummary}`
-                : entry.title,
-              remoteService: jiraMeta ? 'jira' : undefined,
-              remoteId: jiraMeta?.issueKey
-            }}
-          >
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <button
-                    class="rounded-md p-0.5 text-muted-foreground hover:text-primary hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-                    aria-label="Add to Moco"
-                  >
-                    <Plus class="size-3.5" />
-                  </button>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="left" sideOffset={4}>Book in Moco</Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          </MocoEntryModal>
-        </div>
-      {/if}
     </div>
   </div>
 {/snippet}

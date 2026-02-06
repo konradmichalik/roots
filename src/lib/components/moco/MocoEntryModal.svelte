@@ -80,11 +80,14 @@
     taskInactiveWarning = false;
   }
 
-  // Initialize form when opened via defaultOpen prop
+  // Sync open state with defaultOpen prop changes
   $effect(() => {
-    if (defaultOpen && open) {
-      resetForm();
-      fetchAssignedProjects();
+    if (defaultOpen !== open) {
+      open = defaultOpen;
+      if (defaultOpen) {
+        resetForm();
+        fetchAssignedProjects();
+      }
     }
   });
 

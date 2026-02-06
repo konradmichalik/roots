@@ -1,5 +1,10 @@
 import { JiraWorklogClient, type JiraWorklogClientConfig } from './jira-worklog-client';
-import type { JiraUser, JiraWorklogAuthor } from '../types';
+import type {
+  JiraUser,
+  JiraWorklogAuthor,
+  JiraCreateWorklogPayload,
+  JiraUpdateWorklogPayload
+} from '../types';
 
 interface JiraCloudConfig extends JiraWorklogClientConfig {
   email: string;
@@ -37,5 +42,27 @@ export class JiraCloudWorklogClient extends JiraWorklogClient {
   protected isCurrentUser(author: JiraWorklogAuthor): boolean {
     if (!this.accountId) return false;
     return author.accountId === this.accountId;
+  }
+
+  protected formatWorklogPayload(
+    payload: JiraCreateWorklogPayload | JiraUpdateWorklogPayload
+  ): Record<string, unknown> {
+    const formatted: Record<string, unknown> = { ...payload };
+
+    // Cloud API v3 uses ADF (Atlassian Document Format) for comments
+    if (typeof payload.comment === 'string' && payload.comment) {
+      formatted.comment = {
+        type: 'doc',
+        version: 1,
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: payload.comment }]
+          }
+        ]
+      };
+    }
+
+    return formatted;
   }
 }

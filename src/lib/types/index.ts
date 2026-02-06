@@ -34,7 +34,11 @@ export type {
   JiraWorklogAuthor,
   JiraAdfDocument,
   JiraUser,
-  JiraWorklogResponse
+  JiraWorklogResponse,
+  JiraCreateWorklogPayload,
+  JiraUpdateWorklogPayload,
+  JiraCreateWorklog,
+  JiraUpdateWorklog
 } from './jira';
 
 export type {

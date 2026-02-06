@@ -1,5 +1,10 @@
 import { JiraWorklogClient, type JiraWorklogClientConfig } from './jira-worklog-client';
-import type { JiraUser, JiraWorklogAuthor } from '../types';
+import type {
+  JiraUser,
+  JiraWorklogAuthor,
+  JiraCreateWorklogPayload,
+  JiraUpdateWorklogPayload
+} from '../types';
 
 interface JiraServerConfig extends JiraWorklogClientConfig {
   authMethod: 'basic' | 'pat';
@@ -53,5 +58,12 @@ export class JiraServerWorklogClient extends JiraWorklogClient {
     if (this.userKey && author.key === this.userKey) return true;
     if (this.userName && author.name === this.userName) return true;
     return false;
+  }
+
+  protected formatWorklogPayload(
+    payload: JiraCreateWorklogPayload | JiraUpdateWorklogPayload
+  ): Record<string, unknown> {
+    // Server API v2 accepts plain string comments directly
+    return { ...payload };
   }
 }

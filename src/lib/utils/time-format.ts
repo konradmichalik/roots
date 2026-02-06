@@ -22,6 +22,13 @@ export function secondsToHours(seconds: number): number {
 }
 
 /**
+ * Convert decimal hours to seconds
+ */
+export function hoursToSeconds(hours: number): number {
+  return Math.round(hours * 3600);
+}
+
+/**
  * Format a balance value with sign and color hint
  * e.g., 1.5 -> "+1,5h", -0.5 -> "-0,5h"
  */

@@ -4,10 +4,11 @@ import type {
   JiraIssue,
   JiraWorklog,
   JiraUser,
-  JiraWorklogResponse
+  JiraWorklogResponse,
+  JiraCreateWorklogPayload,
+  JiraUpdateWorklogPayload
 } from '../types';
 import { logger } from '../utils/logger';
-import { secondsToHours } from '../utils/time-format';
 
 export interface JiraWorklogClientConfig extends ApiClientConfig {
   instanceType: 'cloud' | 'server';
@@ -31,6 +32,9 @@ export abstract class JiraWorklogClient extends ApiClient {
   protected abstract get apiVersion(): string;
   protected abstract isCurrentUser(author: JiraWorklog['author']): boolean;
   protected abstract storeCurrentUser(user: JiraUser): void;
+  protected abstract formatWorklogPayload(
+    payload: JiraCreateWorklogPayload | JiraUpdateWorklogPayload
+  ): Record<string, unknown>;
 
   async testConnection(): Promise<{ success: boolean; user?: JiraUser; error?: string }> {
     try {
@@ -152,5 +156,46 @@ export abstract class JiraWorklogClient extends ApiClient {
       }
     }
     return parts.join('');
+  }
+
+  /**
+   * Create a new worklog on an issue
+   */
+  async createWorklog(issueKey: string, payload: JiraCreateWorklogPayload): Promise<JiraWorklog> {
+    logger.info(`Creating worklog on ${issueKey}`, { seconds: payload.timeSpentSeconds });
+    const formattedPayload = this.formatWorklogPayload(payload);
+    return this.request<JiraWorklog>(
+      'POST',
+      `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog`,
+      formattedPayload
+    );
+  }
+
+  /**
+   * Update an existing worklog
+   */
+  async updateWorklog(
+    issueKey: string,
+    worklogId: string,
+    payload: JiraUpdateWorklogPayload
+  ): Promise<JiraWorklog> {
+    logger.info(`Updating worklog ${worklogId} on ${issueKey}`);
+    const formattedPayload = this.formatWorklogPayload(payload);
+    return this.request<JiraWorklog>(
+      'PUT',
+      `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog/${worklogId}`,
+      formattedPayload
+    );
+  }
+
+  /**
+   * Delete a worklog
+   */
+  async deleteWorklog(issueKey: string, worklogId: string): Promise<void> {
+    logger.info(`Deleting worklog ${worklogId} from ${issueKey}`);
+    await this.request<void>(
+      'DELETE',
+      `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog/${worklogId}`
+    );
   }
 }

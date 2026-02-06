@@ -57,3 +57,32 @@ export interface JiraWorklogResponse {
   total: number;
   worklogs: JiraWorklog[];
 }
+
+// Request payload for creating a worklog
+export interface JiraCreateWorklogPayload {
+  timeSpentSeconds: number;
+  started: string; // ISO 8601: "2024-02-06T09:00:00.000+0000"
+  comment?: string | JiraAdfDocument;
+}
+
+// Request payload for updating a worklog
+export interface JiraUpdateWorklogPayload {
+  timeSpentSeconds?: number;
+  started?: string;
+  comment?: string | JiraAdfDocument;
+}
+
+// Store-level input types (simpler than API payloads)
+export interface JiraCreateWorklog {
+  issueKey: string;
+  date: string; // YYYY-MM-DD
+  hours: number; // Decimal hours
+  startTime?: string; // HH:mm, defaults to 09:00
+  comment?: string;
+}
+
+export interface JiraUpdateWorklog {
+  hours?: number;
+  startTime?: string;
+  comment?: string;
+}

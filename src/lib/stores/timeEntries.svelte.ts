@@ -5,7 +5,11 @@ import type {
   OutlookMetadata,
   DayOverview,
   MocoCreateActivity,
-  MocoUpdateActivity
+  MocoUpdateActivity,
+  JiraCreateWorklog,
+  JiraUpdateWorklog,
+  JiraCreateWorklogPayload,
+  JiraUpdateWorklogPayload
 } from '../types';
 import type { MocoActivity, MSGraphEvent } from '../types';
 import type { WorklogWithIssue, JiraWorklogClient } from '../api';
@@ -22,7 +26,7 @@ import {
   getMonthEnd
 } from '../utils/date-helpers';
 import { getStorageItemAsync, setStorageItemAsync, STORAGE_KEYS } from '../utils/storage';
-import { secondsToHours } from '../utils/time-format';
+import { secondsToHours, hoursToSeconds } from '../utils/time-format';
 import { logger } from '../utils/logger';
 import { toast } from './toast.svelte';
 
@@ -353,6 +357,115 @@ export async function deleteMocoActivity(id: number, date: string): Promise<bool
   } catch (error) {
     logger.error(`Failed to delete Moco activity ${id}`, error);
     toast.error('Failed to delete entry');
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Jira worklog mutations
+// ---------------------------------------------------------------------------
+
+/**
+ * Build ISO timestamp from date and time for Jira API
+ * Jira expects: 2024-02-06T09:00:00.000+0000
+ */
+function buildJiraTimestamp(date: string, time: string = '09:00'): string {
+  const [hours, minutes] = time.split(':').map(Number);
+  const dateObj = new Date(
+    `${date}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+  );
+  return dateObj.toISOString().replace('Z', '+0000');
+}
+
+export async function createJiraWorklog(data: JiraCreateWorklog): Promise<boolean> {
+  const client = getJiraClient();
+  if (!client) {
+    toast.error('Jira not connected');
+    return false;
+  }
+
+  try {
+    const payload: JiraCreateWorklogPayload = {
+      timeSpentSeconds: hoursToSeconds(data.hours),
+      started: buildJiraTimestamp(data.date, data.startTime),
+      comment: data.comment
+    };
+
+    await client.createWorklog(data.issueKey, payload);
+    logger.store('timeEntries', 'Created Jira worklog', { issueKey: data.issueKey });
+
+    await refreshDayEntries(data.date);
+    toast.success('Jira worklog created');
+    return true;
+  } catch (error) {
+    logger.error('Failed to create Jira worklog', error);
+    const message = error instanceof Error ? error.message : 'Failed to create worklog';
+    toast.error(message);
+    return false;
+  }
+}
+
+export async function updateJiraWorklog(
+  issueKey: string,
+  worklogId: string,
+  data: JiraUpdateWorklog,
+  date: string
+): Promise<boolean> {
+  const client = getJiraClient();
+  if (!client) {
+    toast.error('Jira not connected');
+    return false;
+  }
+
+  try {
+    const payload: JiraUpdateWorklogPayload = {};
+
+    if (data.hours !== undefined) {
+      payload.timeSpentSeconds = hoursToSeconds(data.hours);
+    }
+    if (data.startTime !== undefined) {
+      payload.started = buildJiraTimestamp(date, data.startTime);
+    }
+    if (data.comment !== undefined) {
+      payload.comment = data.comment;
+    }
+
+    await client.updateWorklog(issueKey, worklogId, payload);
+    logger.store('timeEntries', `Updated Jira worklog ${worklogId}`);
+
+    await refreshDayEntries(date);
+    toast.success('Jira worklog updated');
+    return true;
+  } catch (error) {
+    logger.error(`Failed to update Jira worklog ${worklogId}`, error);
+    const message = error instanceof Error ? error.message : 'Failed to update worklog';
+    toast.error(message);
+    return false;
+  }
+}
+
+export async function deleteJiraWorklog(
+  issueKey: string,
+  worklogId: string,
+  date: string
+): Promise<boolean> {
+  const client = getJiraClient();
+  if (!client) {
+    toast.error('Jira not connected');
+    return false;
+  }
+
+  try {
+    await client.deleteWorklog(issueKey, worklogId);
+    logger.store('timeEntries', `Deleted Jira worklog ${worklogId}`);
+
+    await refreshDayEntries(date);
+    toast.success('Jira worklog deleted');
+    return true;
+  } catch (error) {
+    logger.error(`Failed to delete Jira worklog ${worklogId}`, error);
+    const message = error instanceof Error ? error.message : 'Failed to delete worklog';
+    toast.error(message);
     return false;
   }
 }
