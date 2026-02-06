@@ -7,7 +7,11 @@
   import MiniTimer from '../timer/MiniTimer.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { sidebarState, toggleLeftSidebar, toggleRightSidebar } from '../../stores/sidebar.svelte';
-  import { isAnyLoading, timeEntriesState, refreshDayEntries } from '../../stores/timeEntries.svelte';
+  import {
+    isAnyLoading,
+    timeEntriesState,
+    refreshDayEntries
+  } from '../../stores/timeEntries.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
   import PanelLeft from '@lucide/svelte/icons/panel-left';

@@ -6,10 +6,14 @@
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getEntriesForDate, getDayOverview, timeEntriesState } from '../../stores/timeEntries.svelte';
+  import {
+    getEntriesForDate,
+    getDayOverview,
+    timeEntriesState
+  } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-    import { formatHours, formatBalance } from '../../utils/time-format';
+  import { formatHours, formatBalance } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
@@ -30,9 +34,7 @@
 
 <div class="mx-auto max-w-6xl space-y-4">
   <!-- Day header with presence bar -->
-  <div
-    class="flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3 shadow-sm"
-  >
+  <div class="flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
     <!-- Absence badge (if any) -->
     {#if overview.manualAbsence}
       <span

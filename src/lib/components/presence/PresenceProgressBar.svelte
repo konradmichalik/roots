@@ -97,7 +97,7 @@
     for (let i = 0; i < rawPresences.length; i++) {
       const p = rawPresences[i];
       const presenceStart = timeToMinutes(p.from);
-      const presenceEnd = p.to ? timeToMinutes(p.to) : (isToday ? nowMinutes : presenceStart + 60);
+      const presenceEnd = p.to ? timeToMinutes(p.to) : isToday ? nowMinutes : presenceStart + 60;
 
       // Add gap before this presence
       if (i > 0) {
@@ -189,7 +189,9 @@
             </span>
 
             <!-- Progress bar -->
-            <div class="relative h-1.5 flex-1 rounded-full bg-muted/30 group-hover:bg-muted/50 transition-colors">
+            <div
+              class="relative h-1.5 flex-1 rounded-full bg-muted/30 group-hover:bg-muted/50 transition-colors"
+            >
               {#each timeline.segments as segment}
                 {#if segment.type === 'booked'}
                   <!-- Booked time: full intensity -->
@@ -222,7 +224,11 @@
             </div>
 
             <!-- End time -->
-            <span class="text-[10px] font-mono text-muted-foreground shrink-0 {timeline.projectedEndMinutes ? 'opacity-50' : ''}">
+            <span
+              class="text-[10px] font-mono text-muted-foreground shrink-0 {timeline.projectedEndMinutes
+                ? 'opacity-50'
+                : ''}"
+            >
               {formatTime(timeline.endMinutes)}{#if timeline.projectedEndMinutes}?{/if}
             </span>
           </div>
@@ -236,12 +242,16 @@
               </div>
               <div class="flex items-center justify-between gap-4">
                 <span class="text-muted-foreground">Booked:</span>
-                <span class="font-mono font-medium text-success-text">{formatHours(bookedHours)}</span>
+                <span class="font-mono font-medium text-success-text"
+                  >{formatHours(bookedHours)}</span
+                >
               </div>
               {#if openHours > 0.01}
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-muted-foreground">Open:</span>
-                  <span class="font-mono font-medium text-danger-text">{formatHours(openHours)}</span>
+                  <span class="font-mono font-medium text-danger-text"
+                    >{formatHours(openHours)}</span
+                  >
                 </div>
               {/if}
               <div class="text-muted-foreground/70 text-[10px] pt-1">Click to edit presence</div>

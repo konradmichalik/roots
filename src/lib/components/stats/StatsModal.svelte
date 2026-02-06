@@ -121,34 +121,53 @@
 
   // Month project+task distribution from cache
   interface TaskStats {
-    projectName: string;
     taskName: string;
+    hours: number;
+  }
+
+  interface ProjectStats {
+    projectId: number;
+    projectName: string;
     customerName: string;
     hours: number;
+    tasks: TaskStats[];
   }
 
   let monthProjectStats = $derived.by(() => {
     const cached = monthCacheState.cache[monthStart];
-    if (!cached) return { tasks: [] as TaskStats[], billable: 0, nonBillable: 0, total: 0 };
+    if (!cached) return { projects: [] as ProjectStats[], billable: 0, nonBillable: 0, total: 0 };
 
-    const taskRecord: Record<string, TaskStats> = {};
+    const projectRecord: Record<number, ProjectStats & { taskMap: Record<string, TaskStats> }> = {};
     let billable = 0;
     let nonBillable = 0;
 
     for (const entry of cached.mocoEntries) {
       const meta = entry.metadata as MocoMetadata;
-      const key = `${meta.projectId}-${meta.taskId}`;
 
-      if (!taskRecord[key]) {
-        taskRecord[key] = {
+      // Initialize project if needed
+      if (!projectRecord[meta.projectId]) {
+        projectRecord[meta.projectId] = {
+          projectId: meta.projectId,
           projectName: meta.projectName,
-          taskName: meta.taskName,
           customerName: meta.customerName,
+          hours: 0,
+          tasks: [],
+          taskMap: {}
+        };
+      }
+
+      const project = projectRecord[meta.projectId];
+
+      // Aggregate by taskName within the project
+      if (!project.taskMap[meta.taskName]) {
+        project.taskMap[meta.taskName] = {
+          taskName: meta.taskName,
           hours: 0
         };
       }
 
-      taskRecord[key].hours += entry.hours;
+      project.taskMap[meta.taskName].hours += entry.hours;
+      project.hours += entry.hours;
 
       if (meta.billable) {
         billable += entry.hours;
@@ -157,8 +176,18 @@
       }
     }
 
-    const tasks = Object.values(taskRecord).sort((a, b) => b.hours - a.hours);
-    return { tasks, billable, nonBillable, total: billable + nonBillable };
+    // Convert taskMap to array and sort
+    const projects = Object.values(projectRecord)
+      .sort((a, b) => b.hours - a.hours)
+      .map((project) => ({
+        projectId: project.projectId,
+        projectName: project.projectName,
+        customerName: project.customerName,
+        hours: project.hours,
+        tasks: Object.values(project.taskMap).sort((a, b) => b.hours - a.hours)
+      }));
+
+    return { projects, billable, nonBillable, total: billable + nonBillable };
   });
 
   // Colors for project bars (cycling through a palette)
@@ -177,6 +206,72 @@
   function getProjectColor(index: number): string {
     return PROJECT_COLORS[index % PROJECT_COLORS.length];
   }
+
+  function getPercent(hours: number, total: number): number {
+    if (total === 0) return 0;
+    return Math.round((hours / total) * 100);
+  }
+
+  // Generate pie chart segments
+  let pieSegments = $derived.by(() => {
+    if (monthProjectStats.total === 0) return [];
+
+    const segments: Array<{
+      project: ProjectStats;
+      color: string;
+      percent: number;
+      startAngle: number;
+      endAngle: number;
+    }> = [];
+
+    let currentAngle = -90; // Start from top
+
+    monthProjectStats.projects.forEach((project, i) => {
+      const percent = (project.hours / monthProjectStats.total) * 100;
+      const angle = (percent / 100) * 360;
+
+      segments.push({
+        project,
+        color: getProjectColor(i),
+        percent,
+        startAngle: currentAngle,
+        endAngle: currentAngle + angle
+      });
+
+      currentAngle += angle;
+    });
+
+    return segments;
+  });
+
+  function describeArc(
+    cx: number,
+    cy: number,
+    r: number,
+    startAngle: number,
+    endAngle: number
+  ): string {
+    const start = polarToCartesian(cx, cy, r, endAngle);
+    const end = polarToCartesian(cx, cy, r, startAngle);
+    const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+
+    return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y} Z`;
+  }
+
+  function polarToCartesian(
+    cx: number,
+    cy: number,
+    r: number,
+    angleInDegrees: number
+  ): { x: number; y: number } {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
+    return {
+      x: cx + r * Math.cos(angleInRadians),
+      y: cy + r * Math.sin(angleInRadians)
+    };
+  }
+
+  let hoveredSegment = $state<number | null>(null);
 </script>
 
 <Dialog.Root bind:open>
@@ -189,7 +284,7 @@
       </div>
     {/snippet}
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-md">
+  <Dialog.Content class="sm:max-w-2xl">
     <Dialog.Header>
       <Dialog.Title>Statistics</Dialog.Title>
       <Dialog.Description>Overview of your time bookings for week and month.</Dialog.Description>
@@ -403,9 +498,9 @@
                     </p>
                   </div>
                   <div>
-                    <p class="text-xs text-muted-foreground">Tasks</p>
+                    <p class="text-xs text-muted-foreground">Projects</p>
                     <p class="font-mono text-lg font-medium text-foreground">
-                      {monthProjectStats.tasks.length}
+                      {monthProjectStats.projects.length}
                     </p>
                   </div>
                 </div>
@@ -418,60 +513,130 @@
           </div>
         {:else if activeSlide === 'projects'}
           <!-- Projects/Tasks Slide -->
-          <div class="space-y-4 animate-in fade-in duration-200">
-            {#if monthProjectStats.tasks.length > 0}
-              <div class="rounded-xl border border-border bg-card p-4 space-y-4 shadow-sm">
-                <h4 class="text-sm font-semibold text-foreground">Tasks This Month</h4>
+          <div class="space-y-3 animate-in fade-in duration-200">
+            {#if monthProjectStats.projects.length > 0}
+              <!-- Pie Chart with Tooltip -->
+              <div class="flex flex-col items-center gap-2 py-2">
+                <div class="relative">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    {#each pieSegments as segment, i (segment.project.projectId)}
+                      <path
+                        role="img"
+                        aria-label="{segment.project.customerName} — {segment.project
+                          .projectName}: {formatHours(segment.project.hours)}"
+                        d={describeArc(50, 50, 45, segment.startAngle, segment.endAngle)}
+                        fill={segment.color}
+                        class="transition-opacity duration-150 cursor-pointer"
+                        opacity={hoveredSegment === null || hoveredSegment === i ? 1 : 0.4}
+                        onmouseenter={() => (hoveredSegment = i)}
+                        onmouseleave={() => (hoveredSegment = null)}
+                      />
+                    {/each}
+                    <!-- Center hole for donut effect -->
+                    <circle cx="50" cy="50" r="32" fill="var(--background)" />
+                  </svg>
+                  <!-- Center text -->
+                  <div
+                    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+                  >
+                    {#if hoveredSegment !== null}
+                      <span class="text-base font-mono font-semibold text-foreground">
+                        {Math.round(pieSegments[hoveredSegment].percent)}%
+                      </span>
+                    {:else}
+                      <span class="text-[10px] text-muted-foreground">Total</span>
+                      <span class="text-xs font-mono font-medium text-foreground">
+                        {formatHours(monthProjectStats.total)}
+                      </span>
+                    {/if}
+                  </div>
+                </div>
 
-                <div class="space-y-3">
-                  {#each monthProjectStats.tasks.slice(0, 8) as task, i (`${task.projectName}-${task.taskName}`)}
-                    <div class="space-y-1">
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                          <div
-                            class="h-3 w-3 rounded-full flex-shrink-0"
-                            style="background-color: {getProjectColor(i)}"
-                          ></div>
-                          <div class="min-w-0 flex-1">
-                            <span
-                              class="text-sm text-foreground truncate block"
-                              title={task.projectName}
-                            >
-                              {task.projectName}
-                            </span>
-                            <span
-                              class="text-xs text-muted-foreground truncate block"
-                              title={task.taskName}
-                            >
-                              {task.taskName}
-                            </span>
-                          </div>
-                        </div>
-                        <span
-                          class="text-sm font-mono font-medium text-foreground ml-2 flex-shrink-0"
-                        >
-                          {formatHours(task.hours)}
-                        </span>
-                      </div>
-                      <div class="h-1.5 rounded-full bg-muted overflow-hidden ml-5">
-                        <div
-                          class="h-full rounded-full transition-all duration-300"
-                          style="width: {(task.hours / monthProjectStats.total) *
-                            100}%; background-color: {getProjectColor(i)}"
-                        ></div>
-                      </div>
+                <!-- Hover Tooltip -->
+                <div class="h-12 flex items-center justify-center text-center px-4">
+                  {#if hoveredSegment !== null}
+                    {@const hovered = pieSegments[hoveredSegment].project}
+                    <div class="flex flex-col items-center gap-0.5">
+                      <span class="text-sm font-medium text-foreground line-clamp-1">
+                        {hovered.customerName} — {hovered.projectName}
+                      </span>
+                      <span class="text-xs text-muted-foreground font-mono">
+                        {formatHours(hovered.hours)}
+                      </span>
                     </div>
-                  {/each}
-                  {#if monthProjectStats.tasks.length > 8}
-                    <p class="text-xs text-muted-foreground pt-2">
-                      +{monthProjectStats.tasks.length - 8} more tasks
-                    </p>
+                  {:else}
+                    <span class="text-xs text-muted-foreground">
+                      Hover über Segmente für Details
+                    </span>
                   {/if}
                 </div>
               </div>
+
+              <!-- Project List -->
+              {#each monthProjectStats.projects as project, i (project.projectId)}
+                <div
+                  role="listitem"
+                  class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm"
+                >
+                  <!-- Project Header -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                      <div
+                        class="h-3 w-3 rounded-full flex-shrink-0"
+                        style="background-color: {getProjectColor(i)}"
+                      ></div>
+                      <span
+                        class="text-sm font-medium text-foreground truncate"
+                        title="{project.customerName} — {project.projectName}"
+                      >
+                        {project.customerName} — {project.projectName}
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2 ml-2 flex-shrink-0">
+                      <span class="text-xs text-muted-foreground">
+                        {getPercent(project.hours, monthProjectStats.total)}%
+                      </span>
+                      <span class="text-sm font-mono font-semibold text-foreground">
+                        {formatHours(project.hours)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Project Progress Bar -->
+                  <div class="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      class="h-full rounded-full transition-all duration-300"
+                      style="width: {getPercent(
+                        project.hours,
+                        monthProjectStats.total
+                      )}%; background-color: {getProjectColor(i)}"
+                    ></div>
+                  </div>
+
+                  <!-- Tasks within Project -->
+                  <div class="pl-5 space-y-1 pt-1">
+                    {#each project.tasks as task, taskIndex (`${project.projectId}-${taskIndex}`)}
+                      <div class="flex items-center justify-between text-xs gap-2">
+                        <span
+                          class="text-muted-foreground truncate min-w-0 flex-1"
+                          title={task.taskName}
+                        >
+                          {task.taskName}
+                        </span>
+                        <span class="text-muted-foreground/70 flex-shrink-0 w-8 text-right">
+                          {getPercent(task.hours, monthProjectStats.total)}%
+                        </span>
+                        <span class="font-mono text-muted-foreground flex-shrink-0 w-14 text-right">
+                          {formatHours(task.hours)}
+                        </span>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              {/each}
             {:else}
               <div class="rounded-xl border border-border bg-card p-8 text-center">
-                <p class="text-sm text-muted-foreground">No tasks tracked this month.</p>
+                <p class="text-sm text-muted-foreground">No projects tracked this month.</p>
               </div>
             {/if}
           </div>

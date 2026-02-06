@@ -1,12 +1,7 @@
 <script lang="ts">
   import { Calendar } from '$lib/components/ui/calendar/index.js';
   import { Calendar as CalendarPrimitive } from 'bits-ui';
-  import {
-    CalendarDate,
-    today as todayDate,
-    getLocalTimeZone,
-    isEqualDay
-  } from '@internationalized/date';
+  import { CalendarDate } from '@internationalized/date';
   import type { DateValue } from '@internationalized/date';
   import { buttonVariants } from '$lib/components/ui/button/index.js';
   import { cn } from '$lib/utils.js';
