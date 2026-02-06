@@ -11,7 +11,8 @@
     handleOutlookCallback
   } from './lib/stores/connections.svelte';
   import { initializeTheme, cleanupTheme } from './lib/stores/theme.svelte';
-  import { initializeDateNavigation } from './lib/stores/dateNavigation.svelte';
+  import { initializeDateNavigation, dateNavState } from './lib/stores/dateNavigation.svelte';
+  import { formatDateLong } from './lib/utils/date-helpers';
   import { initializeTimeEntries } from './lib/stores/timeEntries.svelte';
   import { initializePresences } from './lib/stores/presences.svelte';
   import { initializeSettings } from './lib/stores/settings.svelte';
@@ -25,6 +26,11 @@
   import { onMount } from 'svelte';
 
   let isInitializing = $state(true);
+
+  // Update document title based on selected date
+  $effect(() => {
+    document.title = `roots - ${formatDateLong(dateNavState.selectedDate)}`;
+  });
 
   onMount(() => {
     async function initialize() {

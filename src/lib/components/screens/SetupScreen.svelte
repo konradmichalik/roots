@@ -14,9 +14,9 @@
 <div class="flex min-h-screen items-center justify-center bg-background p-8 animate-fade-in">
   <div class="w-full max-w-md">
     <div class="mb-8 flex flex-col items-center gap-4">
-      <img src="/docs/images/roots-logo-sm.svg" alt="Roots Logo" class="h-14 w-14" />
+      <img src="/docs/images/roots-logo-sm.svg" alt="roots logo" class="h-14 w-14" />
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-foreground tracking-tight">Roots</h1>
+        <h1 class="text-3xl font-bold text-foreground tracking-tight">roots</h1>
         <p class="mt-1.5 text-sm text-muted-foreground">
           Connect your time tracking to get started.
         </p>

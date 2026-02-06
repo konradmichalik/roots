@@ -39,7 +39,7 @@ class Logger {
     showTimestamp: true
   };
 
-  private prefix = '[Roots]';
+  private prefix = '[roots]';
 
   configure(config: Partial<LogConfig>): void {
     this.config = { ...this.config, ...config };
