@@ -11,9 +11,25 @@
   import { buttonVariants } from '$lib/components/ui/button/index.js';
   import { cn } from '$lib/utils.js';
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
-  import { getCachedDayOverview, getDayOverview } from '../../stores/timeEntries.svelte';
+  import {
+    getCachedDayOverview,
+    getDayOverview,
+    monthCacheState
+  } from '../../stores/timeEntries.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
+  import { presencesState } from '../../stores/presences.svelte';
   import { today, parseDate, getMonthStart } from '../../utils/date-helpers';
+
+  let currentMonthStart = $derived(getMonthStart(dateNavState.selectedDate));
+
+  // Key to force calendar re-render when cache data changes
+  let calendarKey = $derived.by(() => {
+    const presenceTs = presencesState.cache?.lastFetched ?? 0;
+    const monthCache = monthCacheState.cache[currentMonthStart];
+    const monthTs = monthCache?.lastFetched ?? 0;
+    const entryCount = monthCache?.mocoEntries.length ?? 0;
+    return `${presenceTs}-${monthTs}-${entryCount}`;
+  });
 
   function toCalendarDate(dateStr: string): CalendarDate {
     const d = parseDate(dateStr);
@@ -79,33 +95,35 @@
   };
 </script>
 
-<Calendar
-  type="single"
-  value={calendarValue}
-  onValueChange={handleValueChange}
-  locale="en-US"
-  weekStartsOn={1}
-  weekdayFormat="narrow"
-  class="w-full [--cell-size:--spacing(7)]"
->
-  {#snippet day({ day: dayValue, outsideMonth })}
-    {@const status = outsideMonth ? 'none' : getBookingStatus(dayValue)}
-    <CalendarPrimitive.Day
-      class={cn(
-        buttonVariants({ variant: 'ghost' }),
-        'flex size-(--cell-size) flex-col items-center justify-center gap-0.5 p-0 leading-none font-normal whitespace-nowrap select-none text-xs',
-        '[&[data-today]:not([data-selected])]:bg-accent [&[data-today]:not([data-selected])]:text-accent-foreground',
-        'data-[selected]:bg-primary data-[selected]:text-primary-foreground',
-        '[&[data-outside-month]:not([data-selected])]:text-muted-foreground/40',
-        'data-[disabled]:text-muted-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-      )}
-    >
-      {#snippet children({ day: dayNum })}
-        <span>{dayNum}</span>
-        {#if status !== 'none'}
-          <span class="h-1 w-1 rounded-full {STATUS_COLORS[status]}"></span>
-        {/if}
-      {/snippet}
-    </CalendarPrimitive.Day>
-  {/snippet}
-</Calendar>
+{#key calendarKey}
+  <Calendar
+    type="single"
+    value={calendarValue}
+    onValueChange={handleValueChange}
+    locale="en-US"
+    weekStartsOn={1}
+    weekdayFormat="narrow"
+    class="w-full [--cell-size:--spacing(7)]"
+  >
+    {#snippet day({ day: dayValue, outsideMonth })}
+      {@const status = outsideMonth ? 'none' : getBookingStatus(dayValue)}
+      <CalendarPrimitive.Day
+        class={cn(
+          buttonVariants({ variant: 'ghost' }),
+          'flex size-(--cell-size) flex-col items-center justify-center gap-0.5 p-0 leading-none font-normal whitespace-nowrap select-none text-xs',
+          '[&[data-today]:not([data-selected])]:bg-accent [&[data-today]:not([data-selected])]:text-accent-foreground',
+          'data-[selected]:bg-primary data-[selected]:text-primary-foreground',
+          '[&[data-outside-month]:not([data-selected])]:text-muted-foreground/40',
+          'data-[disabled]:text-muted-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+        )}
+      >
+        {#snippet children({ day: dayNum })}
+          <span>{dayNum}</span>
+          {#if status !== 'none'}
+            <span class="h-1 w-1 rounded-full {STATUS_COLORS[status]}"></span>
+          {/if}
+        {/snippet}
+      </CalendarPrimitive.Day>
+    {/snippet}
+  </Calendar>
+{/key}
