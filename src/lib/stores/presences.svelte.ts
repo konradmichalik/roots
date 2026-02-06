@@ -4,6 +4,7 @@ import { getMocoClient } from './connections.svelte';
 import { connectionsState } from './connections.svelte';
 import { logger } from '../utils/logger';
 import { toast } from './toast.svelte';
+import { getStorageItemAsync, setStorageItemAsync, STORAGE_KEYS } from '../utils/storage';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -23,6 +24,44 @@ export const presencesState = $state<{
   loading: false,
   error: null
 });
+
+// ---------------------------------------------------------------------------
+// Initialization & Persistence
+// ---------------------------------------------------------------------------
+
+/**
+ * Initialize presences store from persisted cache.
+ */
+export async function initializePresences(): Promise<void> {
+  const persistedCache = await getStorageItemAsync<PresenceCache>(STORAGE_KEYS.PRESENCES_CACHE);
+  if (persistedCache) {
+    presencesState.cache = persistedCache;
+    logger.store('presences', `Loaded ${Object.keys(persistedCache.byDate).length} days from cache`);
+  }
+  logger.store('presences', 'Initialized');
+}
+
+/**
+ * Persist presences cache to storage.
+ */
+function persistPresencesCache(): void {
+  if (presencesState.cache) {
+    void setStorageItemAsync(STORAGE_KEYS.PRESENCES_CACHE, presencesState.cache);
+  }
+}
+
+/**
+ * Update cache entries for a specific date and persist.
+ */
+function updateCacheForDate(date: string, entries: MocoPresence[]): void {
+  if (!presencesState.cache) return;
+  const { [date]: _, ...restByDate } = presencesState.cache.byDate;
+  presencesState.cache = {
+    ...presencesState.cache,
+    byDate: entries.length === 0 ? restByDate : { ...restByDate, [date]: entries }
+  };
+  persistPresencesCache();
+}
 
 /**
  * Fetch presences for a date range with TTL-based caching.
@@ -56,6 +95,7 @@ export async function fetchPresences(from: string, to: string): Promise<void> {
     }
 
     presencesState.cache = { byDate, lastFetched: Date.now(), from, to };
+    persistPresencesCache();
     logger.store('presences', `Loaded ${presences.length} presences for ${from} to ${to}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch presences';
@@ -89,10 +129,6 @@ function calculatePresenceHours(from: string, to: string | null, breakMinutes?: 
 }
 
 /**
- * Get aggregated presence for a specific date.
- * Returns null if no presence exists for that date.
- */
-/**
  * Set home office status for all presences on a given date
  */
 export async function setDayHomeOffice(date: string, isHomeOffice: boolean): Promise<boolean> {
@@ -109,16 +145,8 @@ export async function setDayHomeOffice(date: string, isHomeOffice: boolean): Pro
     const results = await Promise.all(updates);
 
     // Update cache with new values
-    if (presencesState.cache) {
-      const updated = presences.map((p, i) => ({ ...p, ...results[i] }));
-      presencesState.cache = {
-        ...presencesState.cache,
-        byDate: {
-          ...presencesState.cache.byDate,
-          [date]: updated
-        }
-      };
-    }
+    const updated = presences.map((p, i) => ({ ...p, ...results[i] }));
+    updateCacheForDate(date, updated);
 
     toast.success(isHomeOffice ? 'Marked as Home Office' : 'Marked as Office');
     logger.store('presences', `Set day ${date} home office: ${isHomeOffice}`);
@@ -174,6 +202,7 @@ export function getRawPresencesForDate(date: string): MocoPresence[] {
  */
 export function invalidatePresenceCache(): void {
   presencesState.cache = null;
+  void setStorageItemAsync(STORAGE_KEYS.PRESENCES_CACHE, null);
   logger.store('presences', 'Cache invalidated');
 }
 
@@ -190,17 +219,9 @@ export async function createPresence(data: MocoCreatePresence): Promise<boolean>
     const newPresence = await client.createPresence(data);
     logger.store('presences', `Created presence for ${data.date}`);
 
-    // Update cache with new presence (create new reference for reactivity)
-    if (presencesState.cache) {
-      const existing = presencesState.cache.byDate[data.date] ?? [];
-      presencesState.cache = {
-        ...presencesState.cache,
-        byDate: {
-          ...presencesState.cache.byDate,
-          [data.date]: [...existing, newPresence]
-        }
-      };
-    }
+    // Update cache with new presence
+    const existing = presencesState.cache?.byDate[data.date] ?? [];
+    updateCacheForDate(data.date, [...existing, newPresence]);
 
     toast.success('Presence created');
     return true;
@@ -229,18 +250,10 @@ export async function updatePresence(
     const updatedPresence = await client.updatePresence(id, data);
     logger.store('presences', `Updated presence ${id}`);
 
-    // Update cache (create new reference for reactivity)
-    if (presencesState.cache) {
-      const existing = presencesState.cache.byDate[date] ?? [];
-      const updated = existing.map((p) => (p.id === id ? updatedPresence : p));
-      presencesState.cache = {
-        ...presencesState.cache,
-        byDate: {
-          ...presencesState.cache.byDate,
-          [date]: updated
-        }
-      };
-    }
+    // Update cache
+    const existing = presencesState.cache?.byDate[date] ?? [];
+    const updated = existing.map((p) => (p.id === id ? updatedPresence : p));
+    updateCacheForDate(date, updated);
 
     toast.success('Presence updated');
     return true;
@@ -265,16 +278,10 @@ export async function deletePresence(id: number, date: string): Promise<boolean>
     await client.deletePresence(id);
     logger.store('presences', `Deleted presence ${id}`);
 
-    // Update cache (create new reference for reactivity)
-    if (presencesState.cache) {
-      const existing = presencesState.cache.byDate[date] ?? [];
-      const filtered = existing.filter((p) => p.id !== id);
-      const { [date]: _, ...restByDate } = presencesState.cache.byDate;
-      presencesState.cache = {
-        ...presencesState.cache,
-        byDate: filtered.length === 0 ? restByDate : { ...restByDate, [date]: filtered }
-      };
-    }
+    // Update cache
+    const existing = presencesState.cache?.byDate[date] ?? [];
+    const filtered = existing.filter((p) => p.id !== id);
+    updateCacheForDate(date, filtered);
 
     toast.success('Presence deleted');
     return true;

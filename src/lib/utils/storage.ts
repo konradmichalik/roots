@@ -33,6 +33,7 @@ export const STORAGE_KEYS = {
   TIMER: 'timer',
   DRAFTS: 'drafts',
   MONTH_CACHE: 'month-cache',
+  PRESENCES_CACHE: 'presences-cache',
   RECENT_PAIRS: 'recent-pairs'
 } as const;
 

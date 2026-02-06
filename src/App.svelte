@@ -13,6 +13,7 @@
   import { initializeTheme, cleanupTheme } from './lib/stores/theme.svelte';
   import { initializeDateNavigation } from './lib/stores/dateNavigation.svelte';
   import { initializeTimeEntries } from './lib/stores/timeEntries.svelte';
+  import { initializePresences } from './lib/stores/presences.svelte';
   import { initializeSettings } from './lib/stores/settings.svelte';
   import { initializeAbsences } from './lib/stores/absences.svelte';
   import { initializeFavorites } from './lib/stores/favorites.svelte';
@@ -37,6 +38,7 @@
         await initializeTimer();
         initializeDateNavigation();
         initializeSidebar();
+        await initializePresences();
         await initializeTimeEntries();
 
         // Check for OAuth callback before restoring connections
