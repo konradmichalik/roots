@@ -220,6 +220,7 @@
       }
 
       open = false;
+      onClose?.();
       onSuccess?.();
     } finally {
       saving = false;
@@ -244,6 +245,7 @@
       const success = await deleteMocoActivity(activityId, date);
       if (success) {
         open = false;
+        onClose?.();
       } else {
         error = 'Failed to delete entry.';
         showDeleteConfirm = false;

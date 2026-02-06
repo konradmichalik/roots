@@ -116,6 +116,7 @@
       }
 
       open = false;
+      onClose?.();
       onSuccess?.();
     } finally {
       saving = false;
@@ -140,6 +141,7 @@
       const success = await deleteJiraWorklog(prefill.issueKey, prefill.worklogId, date);
       if (success) {
         open = false;
+        onClose?.();
       } else {
         error = 'Failed to delete worklog.';
         showDeleteConfirm = false;
