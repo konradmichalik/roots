@@ -1,23 +1,16 @@
 <script lang="ts">
   import SourceColumn from './SourceColumn.svelte';
   import MocoEntryModal from '../moco/MocoEntryModal.svelte';
+  import PresenceProgressBar from '../presence/PresenceProgressBar.svelte';
   import PresenceModal from '../presence/PresenceModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import {
-    getEntriesForDate,
-    getDayOverview,
-    timeEntriesState,
-    refreshDayEntries,
-    isAnyLoading
-  } from '../../stores/timeEntries.svelte';
+  import { getEntriesForDate, getDayOverview, timeEntriesState } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { formatDateLong, formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
-  import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
+  import { formatDateLong } from '../../utils/date-helpers';
+  import { formatHours, formatBalance } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
-  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-  import Home from '@lucide/svelte/icons/home';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
   import Calendar from '@lucide/svelte/icons/calendar';
@@ -27,170 +20,69 @@
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira, entries.outlook));
   let overview = $derived(getDayOverview(dateNavState.selectedDate));
   let rawPresences = $derived(getRawPresencesForDate(dateNavState.selectedDate));
-  let isLoading = $derived(isAnyLoading());
+  let hasPresence = $derived(rawPresences.length > 0);
   let displayBalance = $derived(
     overview.presence ? (overview.presenceBalance ?? 0) : overview.balance
   );
   let displayTarget = $derived(overview.presence?.hours ?? overview.requiredHours);
-  let lastFetched = $derived(
-    timeEntriesState.lastFetched ? new Date(timeEntriesState.lastFetched) : null
-  );
-
-  // Tick counter for relative time updates
-  let timeTick = $state(0);
-  $effect(() => {
-    const interval = setInterval(() => timeTick++, 30000);
-    return () => clearInterval(interval);
-  });
-
-  function formatBreakMinutes(minutes: number): string {
-    if (minutes < 60) return `${minutes}min`;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    return m > 0 ? `${h}h ${m}min` : `${h}h`;
-  }
-
-  function handleRefresh(): void {
-    refreshDayEntries(dateNavState.selectedDate);
-  }
 </script>
 
 <div class="mx-auto max-w-6xl space-y-4">
-  <!-- Day header -->
+  <!-- Combined Day header with presence bar -->
   <div
-    class="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-sm"
+    class="flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3 shadow-sm"
   >
-    <div class="flex items-center gap-3">
-      <span class="text-sm font-medium text-foreground leading-none">
+    <!-- Left: Date and absence badge -->
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="text-sm font-medium text-foreground leading-none whitespace-nowrap">
         {formatDateLong(dateNavState.selectedDate)}
       </span>
-      <div class="flex items-center gap-1.5">
-        {#if lastFetched}
-          {#key `${lastFetched.getTime()}-${timeTick}`}
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger class="inline-flex">
-                  <span
-                    class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-muted text-muted-foreground whitespace-nowrap cursor-default"
-                  >
-                    {formatRelativeTime(lastFetched)}
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="bottom" sideOffset={4}>
-                  {formatDateTime(timeEntriesState.lastFetched!)}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          {/key}
-        {/if}
-        <button
-          onclick={handleRefresh}
-          disabled={isLoading}
-          class="inline-flex items-center justify-center size-5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent
-            disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150
-            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          title="Refresh"
+      {#if overview.manualAbsence}
+        <span
+          class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-information-subtle text-brand-text whitespace-nowrap"
         >
-          <RefreshCw class="size-3.5 {isLoading ? 'animate-spin' : ''}" />
-        </button>
-        {#if overview.manualAbsence}
-          <span
-            class="inline-flex items-center justify-center h-5 px-2 text-[10px] font-medium rounded-full bg-information-subtle text-brand-text whitespace-nowrap"
-          >
-            {overview.manualAbsence.type === 'vacation'
-              ? 'Vacation'
-              : overview.manualAbsence.type === 'sick'
-                ? 'Sick'
-                : overview.manualAbsence.type === 'public_holiday'
-                  ? 'Holiday'
-                  : overview.manualAbsence.type === 'personal'
-                    ? 'Personal'
-                    : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
-          </span>
-        {/if}
-      </div>
-    </div>
-    <div class="flex items-center gap-2 text-sm">
-      {#if connectionsState.moco.isConnected}
-        {#if overview.presence}
-          <PresenceModal date={dateNavState.selectedDate}>
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger class="inline-flex items-center">
-                  <button
-                    class="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer leading-none transition-colors"
-                  >
-                    {#if overview.presence.isHomeOffice}
-                      <Home class="size-3.5 flex-shrink-0" />
-                    {:else}
-                      <Clock class="size-3.5 flex-shrink-0" />
-                    {/if}
-                    <span class="font-mono text-xs"
-                      >{overview.presence.from}–{overview.presence.to ?? '...'}</span
-                    >
-                  </button>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="bottom" class="max-w-xs">
-                  <div class="space-y-2">
-                    <div class="text-xs font-medium">
-                      Presence: {formatHours(overview.presence.hours)}
-                      <span class="text-muted-foreground">(click to edit)</span>
-                    </div>
-                    <div class="space-y-1">
-                      {#each rawPresences as presence, i (presence.from)}
-                        <div class="flex items-center gap-2 text-xs">
-                          <span class="font-mono">{presence.from}–{presence.to ?? '...'}</span>
-                          {#if presence.is_home_office}
-                            <span class="text-muted-foreground">(Home)</span>
-                          {/if}
-                          {#if presence.break && presence.break > 0}
-                            <span class="text-warning-text"
-                              >-{formatBreakMinutes(presence.break)} break</span
-                            >
-                          {/if}
-                        </div>
-                        {#if i < rawPresences.length - 1}
-                          {@const nextStart = rawPresences[i + 1].from}
-                          {@const currentEnd = presence.to}
-                          {#if currentEnd && nextStart > currentEnd}
-                            <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
-                              <span class="italic">Gap: {currentEnd}–{nextStart}</span>
-                            </div>
-                          {/if}
-                        {/if}
-                      {/each}
-                    </div>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          </PresenceModal>
-          <span class="text-border">|</span>
-        {:else}
-          <PresenceModal date={dateNavState.selectedDate}>
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <button
-                    class="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors
-                      focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-                    aria-label="Add working time"
-                  >
-                    <Clock class="size-3.5" />
-                    <Plus class="size-3" />
-                  </button>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="bottom" sideOffset={4}>Add working time</Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          </PresenceModal>
-          <span class="text-border">|</span>
-        {/if}
+          {overview.manualAbsence.type === 'vacation'
+            ? 'Vacation'
+            : overview.manualAbsence.type === 'sick'
+              ? 'Sick'
+              : overview.manualAbsence.type === 'public_holiday'
+                ? 'Holiday'
+                : overview.manualAbsence.type === 'personal'
+                  ? 'Personal'
+                  : 'Absence'}{overview.manualAbsence.halfDay ? ' (½)' : ''}
+        </span>
       {/if}
+    </div>
+
+    <!-- Center: Presence progress bar (or empty placeholder for alignment) -->
+    <div class="flex-1 min-w-0 -mt-0.5">
+      {#if hasPresence}
+        <PresenceProgressBar
+          date={dateNavState.selectedDate}
+          targetHours={overview.requiredHours}
+          bookedHours={overview.totals.actual}
+        />
+      {:else if connectionsState.moco.isConnected}
+        <!-- Placeholder with add presence button when no presence -->
+        <PresenceModal date={dateNavState.selectedDate}>
+          <button
+            class="flex items-center justify-center gap-1.5 w-full h-6 rounded-lg border border-dashed border-border/50
+              text-muted-foreground/50 hover:border-border hover:text-muted-foreground hover:bg-accent/30
+              transition-colors text-[10px]"
+          >
+            <Clock class="size-3" />
+            <span>Add working time</span>
+          </button>
+        </PresenceModal>
+      {/if}
+    </div>
+
+    <!-- Right: Hours and balance (visually separated) -->
+    <div class="flex items-center gap-2 shrink-0 pl-2 border-l border-border">
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <span class="font-mono text-foreground cursor-default">
+            <span class="font-mono text-sm text-foreground cursor-default">
               {formatHours(overview.totals.actual)}<span class="text-muted-foreground"
                 >/{formatHours(displayTarget)}</span
               >
