@@ -11,6 +11,7 @@
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatDateLong } from '../../utils/date-helpers';
   import { normalizeTimeInput } from '../../utils/time-format';
+  import ClockTimeInput from '../common/ClockTimeInput.svelte';
   import type { Snippet } from 'svelte';
   import type { MocoPresence } from '../../types';
   import Home from '@lucide/svelte/icons/home';
@@ -225,27 +226,21 @@
               {#if editingId === presence.id}
                 <!-- Edit mode -->
                 <div class="space-y-3">
-                  <div class="grid grid-cols-2 gap-2">
+                  <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label for="edit-from-time" class="text-xs text-muted-foreground">From</label>
-                      <input
+                      <ClockTimeInput
                         id="edit-from-time"
-                        type="text"
                         bind:value={editFromTime}
                         placeholder="08:00"
-                        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono
-                          focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
                       />
                     </div>
                     <div>
                       <label for="edit-to-time" class="text-xs text-muted-foreground">To</label>
-                      <input
+                      <ClockTimeInput
                         id="edit-to-time"
-                        type="text"
                         bind:value={editToTime}
                         placeholder="17:00"
-                        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono
-                          focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
                       />
                     </div>
                   </div>
@@ -344,27 +339,21 @@
       <div class="border-t border-border pt-4">
         <h4 class="text-sm font-medium text-foreground mb-3">Add time slot</h4>
         <div class="space-y-3">
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-4">
             <div>
               <label for="new-from-time" class="text-xs text-muted-foreground">From</label>
-              <input
+              <ClockTimeInput
                 id="new-from-time"
-                type="text"
                 bind:value={newFromTime}
                 placeholder="08:00"
-                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono
-                  focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
               />
             </div>
             <div>
               <label for="new-to-time" class="text-xs text-muted-foreground">To (optional)</label>
-              <input
+              <ClockTimeInput
                 id="new-to-time"
-                type="text"
                 bind:value={newToTime}
                 placeholder="17:00"
-                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono
-                  focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring"
               />
             </div>
           </div>
