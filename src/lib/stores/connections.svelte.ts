@@ -14,7 +14,7 @@ import {
   createOutlookClient,
   OutlookClient
 } from '../api';
-import { exchangeCodeForTokens, getStoredOAuthConfig } from '../api/oauth-manager';
+import { exchangeCodeForTokens, getStoredOAuthConfig, startOAuthFlow } from '../api/oauth-manager';
 import {
   getStorageItemAsync,
   setStorageItemAsync,
@@ -22,6 +22,7 @@ import {
   STORAGE_KEYS
 } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { withRetry } from '../utils/retry';
 
 export const connectionsState = $state<AllConnectionsState>({
   moco: createInitialServiceState('moco'),
@@ -158,23 +159,33 @@ async function restoreOutlook(config: OutlookConnectionConfig, tokens: OAuthToke
     outlookClient = createOutlookClient(config, tokens, async (fresh) => {
       await setStorageItemAsync(STORAGE_KEYS.OUTLOOK_TOKENS, fresh);
     });
-    const result = await outlookClient.testConnection();
-    if (!result.success) {
-      throw new Error(result.error || 'Outlook connection failed');
-    }
+
+    const result = await withRetry(
+      async () => {
+        const res = await outlookClient!.testConnection();
+        if (!res.success) {
+          throw new Error(res.error || 'Outlook connection failed');
+        }
+        return res;
+      },
+      { maxRetries: 3, baseDelayMs: 2000 }
+    );
+
     connectionsState.outlook.isConnected = true;
+    connectionsState.outlook.needsReauth = false;
     connectionsState.outlook.lastConnected = new Date().toISOString();
     logger.connectionSuccess(`Outlook restored as ${result.user?.displayName ?? 'unknown'}`);
   } catch (error) {
     outlookClient = null;
     const message = error instanceof Error ? error.message : 'Outlook restore failed';
+    connectionsState.outlook.isConnected = false;
+    connectionsState.outlook.needsReauth = true;
     connectionsState.outlook.error = message;
     logger.error('Outlook restore failed', error);
 
-    // Clear invalid tokens to prevent repeated failures
+    // Only clear tokens — keep config so user can re-authenticate without re-entering credentials
     await removeStorageItemAsync(STORAGE_KEYS.OUTLOOK_TOKENS);
-    await removeStorageItemAsync(STORAGE_KEYS.OUTLOOK_CONFIG);
-    logger.connection('Cleared invalid Outlook tokens from storage');
+    logger.connection('Cleared expired Outlook tokens, config preserved for re-auth');
   }
 }
 
@@ -202,6 +213,7 @@ export async function handleOutlookCallback(code: string): Promise<boolean> {
 
     connectionsState.outlook.isConnected = true;
     connectionsState.outlook.isConnecting = false;
+    connectionsState.outlook.needsReauth = false;
     connectionsState.outlook.error = null;
     connectionsState.outlook.lastConnected = new Date().toISOString();
 
@@ -255,4 +267,13 @@ export function isAnyServiceConnected(): boolean {
 
 export function hasAnyServiceConfigured(): boolean {
   return hasConfiguredServices;
+}
+
+export async function reauthenticateOutlook(): Promise<void> {
+  const config = await getStorageItemAsync<OutlookConnectionConfig>(STORAGE_KEYS.OUTLOOK_CONFIG);
+  if (!config) return;
+
+  connectionsState.outlook.isConnecting = true;
+  connectionsState.outlook.error = null;
+  startOAuthFlow(config);
 }
