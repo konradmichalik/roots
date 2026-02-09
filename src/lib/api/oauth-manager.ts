@@ -150,10 +150,7 @@ export async function refreshAccessToken(
       });
 
       if (!response.ok) {
-        throw new TokenRefreshError(
-          'Token refresh failed. Please sign in again.',
-          response.status
-        );
+        throw new TokenRefreshError('Token refresh failed. Please sign in again.', response.status);
       }
 
       const data: OAuthTokenResponse = await response.json();

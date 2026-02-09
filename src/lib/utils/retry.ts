@@ -13,10 +13,7 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  options?: RetryOptions
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> {
   const maxRetries = options?.maxRetries ?? DEFAULT_MAX_RETRIES;
   const baseDelayMs = options?.baseDelayMs ?? DEFAULT_BASE_DELAY_MS;
   const shouldRetry = options?.shouldRetry ?? (() => true);

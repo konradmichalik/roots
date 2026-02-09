@@ -80,10 +80,18 @@ export class OutlookClient {
     }
 
     // On transient errors (5xx, 429): retry with backoff
-    for (let retry = 0; retry < MAX_REQUEST_RETRIES && !response.ok && isRetryableStatus(response.status); retry++) {
+    for (
+      let retry = 0;
+      retry < MAX_REQUEST_RETRIES && !response.ok && isRetryableStatus(response.status);
+      retry++
+    ) {
       const retryAfter = response.headers.get('Retry-After');
-      const delayMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : RETRY_DELAY_MS * Math.pow(2, retry);
-      logger.info(`Outlook request retry ${retry + 1}/${MAX_REQUEST_RETRIES} in ${delayMs}ms (status ${response.status})`);
+      const delayMs = retryAfter
+        ? parseInt(retryAfter, 10) * 1000
+        : RETRY_DELAY_MS * Math.pow(2, retry);
+      logger.info(
+        `Outlook request retry ${retry + 1}/${MAX_REQUEST_RETRIES} in ${delayMs}ms (status ${response.status})`
+      );
       await delay(delayMs);
       response = await this.executeRequest(endpoint, token);
     }

@@ -35,9 +35,7 @@
 
 {#if connectionsState.outlook.needsReauth}
   <div class="space-y-3">
-    <p class="text-sm text-muted-foreground">
-      Session expired. Sign in again to reconnect.
-    </p>
+    <p class="text-sm text-muted-foreground">Session expired. Sign in again to reconnect.</p>
 
     {#if connectionsState.outlook.error}
       <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.outlook.error}</p>
