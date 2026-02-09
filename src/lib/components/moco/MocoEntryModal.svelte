@@ -2,6 +2,7 @@
   import * as Dialog from '../ui/dialog';
   import ProjectCombobox from './ProjectCombobox.svelte';
   import TaskCombobox from './TaskCombobox.svelte';
+  import BudgetSummary from './BudgetSummary.svelte';
   import RecentPairChips from './RecentPairChips.svelte';
   import TimeInput from '../common/TimeInput.svelte';
   import {
@@ -10,8 +11,11 @@
     fetchProjectReport,
     getProjectById,
     getTasksForProject,
-    getActiveProjects
+    getActiveProjects,
+    getTaskLoggedHours,
+    mocoProjectsState
   } from '../../stores/mocoProjects.svelte';
+
   import {
     createMocoActivity,
     updateMocoActivity,
@@ -67,6 +71,24 @@
   let projectInactiveWarning = $state(false);
   let taskInactiveWarning = $state(false);
 
+  let projectReport = $derived(
+    selectedProjectId
+      ? (mocoProjectsState.projectReportsCache[String(selectedProjectId)] ?? null)
+      : null
+  );
+
+  let taskReport = $derived.by(() => {
+    if (!selectedProjectId || !taskValue) return null;
+    const tasks = getTasksForProject(selectedProjectId);
+    const task = tasks.find((t) => t.id === Number(taskValue));
+    if (!task) return null;
+    const loggedHours = getTaskLoggedHours(task.id);
+    const hasBudget = !!(task.budget && task.hourly_rate && task.hourly_rate > 0);
+    const budgetHours = hasBudget ? task.budget! / task.hourly_rate! : 0;
+    const remaining = hasBudget ? budgetHours - loggedHours : 0;
+    return { loggedHours, budgetHours, remaining, hasBudget };
+  });
+
   function resetForm(): void {
     date = prefill?.date ?? dateNavState.selectedDate;
     hours = prefill?.hours ?? 0;
@@ -80,6 +102,38 @@
     taskInactiveWarning = false;
   }
 
+  function initModal(): void {
+    resetForm();
+    fetchAssignedProjects().then(async () => {
+      // Check if prefilled project is still active
+      if (prefill?.projectId) {
+        const activeProjects = getActiveProjects();
+        const projectExists = activeProjects.some((p) => p.id === prefill.projectId);
+        if (!projectExists) {
+          projectInactiveWarning = true;
+          projectValue = '';
+          taskValue = '';
+          selectedProjectId = null;
+          return;
+        }
+      }
+
+      if (selectedProjectId) {
+        await fetchTasksForProject(selectedProjectId);
+        await fetchProjectReport(selectedProjectId);
+        // Check if prefilled task is still available (active)
+        if (prefill?.taskId) {
+          const tasks = getTasksForProject(selectedProjectId);
+          const taskExists = tasks.some((t) => t.id === prefill.taskId);
+          if (!taskExists) {
+            taskInactiveWarning = true;
+            taskValue = '';
+          }
+        }
+      }
+    });
+  }
+
   // Sync open state with defaultOpen prop changes (only react to prop changes, not internal open state)
   let prevDefaultOpen = defaultOpen;
   $effect(() => {
@@ -89,8 +143,7 @@
         prevDefaultOpen = newDefaultOpen;
         open = newDefaultOpen;
         if (newDefaultOpen) {
-          resetForm();
-          fetchAssignedProjects();
+          initModal();
         }
       }
     });
@@ -102,35 +155,7 @@
       onClose?.();
     }
     if (isOpen) {
-      resetForm();
-      fetchAssignedProjects().then(async () => {
-        // Check if prefilled project is still active
-        if (prefill?.projectId) {
-          const activeProjects = getActiveProjects();
-          const projectExists = activeProjects.some((p) => p.id === prefill.projectId);
-          if (!projectExists) {
-            projectInactiveWarning = true;
-            projectValue = '';
-            taskValue = '';
-            selectedProjectId = null;
-            return; // Don't check task if project is inactive
-          }
-        }
-
-        if (selectedProjectId) {
-          await fetchTasksForProject(selectedProjectId);
-          await fetchProjectReport(selectedProjectId);
-          // Check if prefilled task is still available (active)
-          if (prefill?.taskId) {
-            const tasks = getTasksForProject(selectedProjectId);
-            const taskExists = tasks.some((t) => t.id === prefill.taskId);
-            if (!taskExists) {
-              taskInactiveWarning = true;
-              taskValue = ''; // Clear invalid task
-            }
-          }
-        }
-      });
+      initModal();
     }
   }
 
@@ -345,7 +370,7 @@
       {#if mode === 'create' && settingsState.showQuickSelection}
         <RecentPairChips onSelect={handleChipSelect} />
       {/if}
-      <form onsubmit={handleSubmit} class="space-y-4 py-4">
+      <form onsubmit={handleSubmit} class="space-y-3 pt-2 pb-4">
         <!-- Project -->
         <div>
           <!-- svelte-ignore a11y_label_has_associated_control -->
@@ -359,6 +384,17 @@
           {/if}
         </div>
 
+        <!-- Project Budget Summary -->
+        {#if projectReport && projectReport.hours_total > 0}
+          {@const hasBudget = projectReport.budget_total > 0}
+          <BudgetSummary
+            logged={projectReport.hours_total}
+            {hasBudget}
+            budgetHours={hasBudget ? projectReport.hours_total + projectReport.hours_remaining : 0}
+            remaining={projectReport.hours_remaining}
+          />
+        {/if}
+
         <!-- Task -->
         <div>
           <!-- svelte-ignore a11y_label_has_associated_control -->
@@ -370,6 +406,16 @@
             </p>
           {/if}
         </div>
+
+        <!-- Task Budget Summary -->
+        {#if taskReport && taskReport.loggedHours > 0}
+          <BudgetSummary
+            logged={taskReport.loggedHours}
+            hasBudget={taskReport.hasBudget}
+            budgetHours={taskReport.budgetHours}
+            remaining={taskReport.remaining}
+          />
+        {/if}
 
         <!-- Date & Hours -->
         <div class="grid grid-cols-2 gap-3">

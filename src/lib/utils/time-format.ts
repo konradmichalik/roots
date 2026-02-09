@@ -15,6 +15,14 @@ export function formatHours(hours: number): string {
 }
 
 /**
+ * Format hours as person-days (Personentage).
+ * 1 PT = 8h. Returns absolute value with 1 decimal.
+ */
+export function formatPT(hours: number): string {
+  return (Math.abs(hours) / 8).toFixed(1);
+}
+
+/**
  * Convert seconds to decimal hours
  */
 export function secondsToHours(seconds: number): number {

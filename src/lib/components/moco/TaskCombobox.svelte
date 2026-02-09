@@ -123,7 +123,7 @@
                 ? 'bg-success-subtle text-success-text'
                 : 'bg-danger-subtle text-danger-text'}"
             >
-              {item.availableHours > 0 ? '+' : ''}{formatHours(item.availableHours)}h
+              {item.availableHours > 0 ? '+' : ''}{formatHours(item.availableHours)}
             </span>
           {/if}
         </button>

@@ -10,8 +10,10 @@ export const mocoProjectsState = $state({
   lastFetched: null as number | null,
   // Task hours from project reports: taskId -> hours_total
   taskHoursCache: new Map<number, number>(),
-  // Track which projects have been loaded
-  loadedReports: new Set<number>()
+  // Full project reports: projectId -> report
+  projectReportsCache: {} as Record<string, MocoProjectReport>,
+  // Track which projects have had detailed tasks loaded
+  loadedTaskDetails: new Set<number>(),
 });
 
 export async function fetchAssignedProjects(): Promise<void> {
@@ -53,27 +55,24 @@ export function getTasksForProject(projectId: number): MocoTask[] {
 }
 
 /**
- * Fetch tasks for a project from the API.
- * Always fetches from /projects/:id/tasks to get the `active` field,
- * which is not included in /projects/assigned responses.
+ * Fetch detailed tasks for a project from /projects/:id/tasks.
+ * This endpoint returns budget, hourly_rate and active fields
+ * which are NOT included in /projects/assigned.
  */
 export async function fetchTasksForProject(projectId: number): Promise<void> {
-  const project = getProjectById(projectId);
+  if (mocoProjectsState.loadedTaskDetails.has(projectId)) return;
 
+  const project = getProjectById(projectId);
   const client = getMocoClient();
   if (!client || !project) return;
 
-  // Check if tasks already have the `active` field (were fetched from /tasks endpoint)
-  const hasActiveField = project.tasks?.some((t) => t.active !== undefined);
-  if (hasActiveField) return;
-
   try {
     const tasks = await client.getProjectTasks(projectId);
-    // Update the project's tasks in place
     const idx = mocoProjectsState.projects.findIndex((p) => p.id === projectId);
     if (idx !== -1) {
       mocoProjectsState.projects[idx] = { ...mocoProjectsState.projects[idx], tasks };
     }
+    mocoProjectsState.loadedTaskDetails.add(projectId);
     logger.store('mocoProjects', `Loaded ${tasks.length} tasks for project ${projectId}`);
   } catch (error) {
     logger.error(`Failed to fetch tasks for project ${projectId}`, error);
@@ -82,12 +81,9 @@ export async function fetchTasksForProject(projectId: number): Promise<void> {
 
 /**
  * Fetch project report to get hours logged per task.
- * Results are cached in taskHoursCache.
+ * Always fetches fresh data from the API.
  */
 export async function fetchProjectReport(projectId: number): Promise<void> {
-  // Skip if already loaded
-  if (mocoProjectsState.loadedReports.has(projectId)) return;
-
   const client = getMocoClient();
   if (!client) return;
 
@@ -101,7 +97,10 @@ export async function fetchProjectReport(projectId: number): Promise<void> {
       }
     }
 
-    mocoProjectsState.loadedReports.add(projectId);
+    mocoProjectsState.projectReportsCache = {
+      ...mocoProjectsState.projectReportsCache,
+      [String(projectId)]: report
+    };
     logger.store(
       'mocoProjects',
       `Loaded report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`
@@ -118,3 +117,5 @@ export async function fetchProjectReport(projectId: number): Promise<void> {
 export function getTaskLoggedHours(taskId: number): number {
   return mocoProjectsState.taskHoursCache.get(taskId) ?? 0;
 }
+
+
