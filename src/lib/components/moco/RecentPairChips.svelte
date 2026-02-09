@@ -23,7 +23,7 @@
 </script>
 
 {#if pairs.length > 0}
-  <div class="mb-4">
+  <div class="mb-1">
     <div class="flex items-center gap-1.5 mb-2 text-xs text-muted-foreground">
       <Clock class="size-3" />
       <span>Frequently used</span>
