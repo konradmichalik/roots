@@ -11,6 +11,7 @@
   import Plus from '@lucide/svelte/icons/plus';
   import Upload from '@lucide/svelte/icons/upload';
   import Star from '@lucide/svelte/icons/star';
+  import Copy from '@lucide/svelte/icons/copy';
   import ExternalLink from '@lucide/svelte/icons/external-link';
 
   import {
@@ -89,6 +90,7 @@
   // Modal states
   let showMocoEditModal = $state(false);
   let showMocoCreateModal = $state(false);
+  let showMocoDuplicateModal = $state(false);
   let showJiraEditModal = $state(false);
   let showJiraSyncModal = $state(false);
 
@@ -99,6 +101,10 @@
 
   function openMocoCreate(): void {
     showMocoCreateModal = true;
+  }
+
+  function openMocoDuplicate(): void {
+    showMocoDuplicateModal = true;
   }
 
   function openJiraEdit(): void {
@@ -124,6 +130,22 @@
     }}
     defaultOpen={showMocoEditModal}
     onClose={() => (showMocoEditModal = false)}
+  />
+{/if}
+
+<!-- Moco Duplicate Modal -->
+{#if mocoMeta && isMocoConnected}
+  <MocoEntryModal
+    mode="create"
+    prefill={{
+      date: entry.date,
+      hours: entry.hours,
+      description: entry.description ?? '',
+      projectId: mocoMeta.projectId,
+      taskId: mocoMeta.taskId
+    }}
+    defaultOpen={showMocoDuplicateModal}
+    onClose={() => (showMocoDuplicateModal = false)}
   />
 {/if}
 
@@ -201,6 +223,10 @@
       <ContextMenu.Item onclick={openMocoEdit}>
         <Pencil class="text-muted-foreground" />
         <span>Edit Entry</span>
+      </ContextMenu.Item>
+      <ContextMenu.Item onclick={openMocoDuplicate}>
+        <Copy class="text-muted-foreground" />
+        <span>Duplicate Entry</span>
       </ContextMenu.Item>
 
       {#if mocoIssueKey && isJiraConnected}
