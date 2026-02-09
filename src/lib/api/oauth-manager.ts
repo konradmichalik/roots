@@ -1,5 +1,6 @@
 import type { OutlookConnectionConfig, OAuthTokens, OAuthTokenResponse } from '../types';
 import { logger } from '../utils/logger';
+import { withRetry } from '../utils/retry';
 
 const OAUTH_SCOPES =
   'https://graph.microsoft.com/Calendars.Read https://graph.microsoft.com/User.Read offline_access';
@@ -113,37 +114,69 @@ export async function exchangeCodeForTokens(
   };
 }
 
+export class TokenRefreshError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode?: number
+  ) {
+    super(message);
+    this.name = 'TokenRefreshError';
+  }
+
+  get isPermanent(): boolean {
+    return this.statusCode !== undefined && this.statusCode >= 400 && this.statusCode < 500;
+  }
+}
+
 export async function refreshAccessToken(
   config: OutlookConnectionConfig,
   refreshToken: string
 ): Promise<OAuthTokens> {
-  const body = new URLSearchParams({
-    client_id: config.clientId,
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken,
-    scope: OAUTH_SCOPES
-  });
+  return withRetry(
+    async () => {
+      const body = new URLSearchParams({
+        client_id: config.clientId,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        scope: OAUTH_SCOPES
+      });
 
-  logger.info('Refreshing OAuth access token');
+      logger.info('Refreshing OAuth access token');
 
-  const response = await fetch(getTokenEndpoint(config.tenantId), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString()
-  });
+      const response = await fetch(getTokenEndpoint(config.tenantId), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
 
-  if (!response.ok) {
-    throw new Error('Token refresh failed. Please sign in again.');
-  }
+      if (!response.ok) {
+        throw new TokenRefreshError(
+          'Token refresh failed. Please sign in again.',
+          response.status
+        );
+      }
 
-  const data: OAuthTokenResponse = await response.json();
+      const data: OAuthTokenResponse = await response.json();
 
-  return {
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token ?? refreshToken,
-    expiresAt: Date.now() + data.expires_in * 1000,
-    scope: data.scope
-  };
+      return {
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token ?? refreshToken,
+        expiresAt: Date.now() + data.expires_in * 1000,
+        scope: data.scope
+      };
+    },
+    {
+      maxRetries: 3,
+      baseDelayMs: 1000,
+      shouldRetry: (error) => {
+        if (error instanceof TokenRefreshError && error.isPermanent) {
+          logger.info('Token refresh failed with permanent error, skipping retry');
+          return false;
+        }
+        return true;
+      }
+    }
+  );
 }
 
 export function isTokenExpired(tokens: OAuthTokens): boolean {

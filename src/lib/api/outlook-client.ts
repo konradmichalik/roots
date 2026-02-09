@@ -5,10 +5,20 @@ import type {
   MSGraphEvent,
   MSGraphCalendarResponse
 } from '../types';
-import { ensureFreshTokens } from './oauth-manager';
+import { ensureFreshTokens, refreshAccessToken } from './oauth-manager';
 import { logger } from '../utils/logger';
 
 const GRAPH_BASE = 'https://graph.microsoft.com/v1.0';
+const MAX_REQUEST_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableStatus(status: number): boolean {
+  return status === 429 || status >= 500;
+}
 
 export class OutlookClient {
   private config: OutlookConnectionConfig;
@@ -34,20 +44,49 @@ export class OutlookClient {
     return this.tokens.accessToken;
   }
 
-  private async request<T>(endpoint: string): Promise<T> {
-    const token = await this.getAccessToken();
-    const url = `${GRAPH_BASE}${endpoint}`;
-    const timer = logger.time();
+  private async forceTokenRefresh(): Promise<string> {
+    if (!this.tokens.refreshToken) {
+      throw new Error('No refresh token available. Please sign in again.');
+    }
+    const fresh = await refreshAccessToken(this.config, this.tokens.refreshToken);
+    this.tokens = fresh;
+    this.onTokensRefreshed?.(fresh);
+    return fresh.accessToken;
+  }
 
-    logger.apiRequest('GET', `[Outlook] ${endpoint}`);
-
-    const response = await fetch(url, {
+  private async executeRequest(endpoint: string, token: string): Promise<Response> {
+    const url = endpoint.startsWith('http') ? endpoint : `${GRAPH_BASE}${endpoint}`;
+    return fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
         Prefer: 'outlook.timezone="Europe/Berlin"'
       }
     });
+  }
+
+  private async request<T>(endpoint: string): Promise<T> {
+    const timer = logger.time();
+    logger.apiRequest('GET', `[Outlook] ${endpoint}`);
+
+    let token = await this.getAccessToken();
+    let response = await this.executeRequest(endpoint, token);
+
+    // On 401: force token refresh and retry once
+    if (response.status === 401) {
+      logger.info('Outlook request got 401, refreshing token and retrying');
+      token = await this.forceTokenRefresh();
+      response = await this.executeRequest(endpoint, token);
+    }
+
+    // On transient errors (5xx, 429): retry with backoff
+    for (let retry = 0; retry < MAX_REQUEST_RETRIES && !response.ok && isRetryableStatus(response.status); retry++) {
+      const retryAfter = response.headers.get('Retry-After');
+      const delayMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : RETRY_DELAY_MS * Math.pow(2, retry);
+      logger.info(`Outlook request retry ${retry + 1}/${MAX_REQUEST_RETRIES} in ${delayMs}ms (status ${response.status})`);
+      await delay(delayMs);
+      response = await this.executeRequest(endpoint, token);
+    }
 
     const duration = timer();
 

@@ -41,6 +41,7 @@ export interface ServiceConnectionState {
   isConnecting: boolean;
   error: string | null;
   lastConnected: string | null;
+  needsReauth: boolean;
 }
 
 export interface AllConnectionsState {
@@ -55,6 +56,7 @@ export function createInitialServiceState(service: ServiceType): ServiceConnecti
     isConnected: false,
     isConnecting: false,
     error: null,
-    lastConnected: null
+    lastConnected: null,
+    needsReauth: false
   };
 }
