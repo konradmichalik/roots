@@ -21,7 +21,7 @@
   import { trackPairUsage } from '../../stores/recentMocoPairs.svelte';
   import { settingsState } from '../../stores/settings.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import Star from '@lucide/svelte/icons/star';
 
@@ -80,15 +80,20 @@
     taskInactiveWarning = false;
   }
 
-  // Sync open state with defaultOpen prop changes
+  // Sync open state with defaultOpen prop changes (only react to prop changes, not internal open state)
+  let prevDefaultOpen = defaultOpen;
   $effect(() => {
-    if (defaultOpen !== open) {
-      open = defaultOpen;
-      if (defaultOpen) {
-        resetForm();
-        fetchAssignedProjects();
+    const newDefaultOpen = defaultOpen;
+    untrack(() => {
+      if (newDefaultOpen !== prevDefaultOpen) {
+        prevDefaultOpen = newDefaultOpen;
+        open = newDefaultOpen;
+        if (newDefaultOpen) {
+          resetForm();
+          fetchAssignedProjects();
+        }
       }
-    }
+    });
   });
 
   function handleOpen(isOpen: boolean): void {
