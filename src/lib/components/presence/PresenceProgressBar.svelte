@@ -192,7 +192,7 @@
             <div
               class="relative h-1.5 flex-1 rounded-full bg-muted/30 group-hover:bg-muted/50 transition-colors"
             >
-              {#each timeline.segments as segment}
+              {#each timeline.segments as segment (`${segment.type}-${segment.start}`)}
                 {#if segment.type === 'booked'}
                   <!-- Booked time: full intensity -->
                   <div
