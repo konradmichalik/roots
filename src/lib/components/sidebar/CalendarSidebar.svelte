@@ -27,7 +27,18 @@
   let showLegend = $state(false);
   let showOpenDays = $state(true);
   let showBalancedDays = $state(true);
-  let todayStr = $derived(today());
+  let todayStr = $state(today());
+
+  // Refresh todayStr periodically to handle midnight crossover
+  $effect(() => {
+    const interval = setInterval(() => {
+      const now = today();
+      if (now !== todayStr) {
+        todayStr = now;
+      }
+    }, 60_000);
+    return () => clearInterval(interval);
+  });
 
   let selectedAbsence = $derived(getAbsenceForDate(dateNavState.selectedDate));
 

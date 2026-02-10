@@ -19,14 +19,15 @@
   let { children }: { children: Snippet } = $props();
 
   let open = $state(false);
-  let todayStr = $derived(today());
+  let todayStr = $state(today());
 
   // Month navigation state
   let selectedMonth = $state(getMonthStart(dateNavState.selectedDate));
 
-  // Reset to current month when dialog opens
+  // Reset to current month and refresh todayStr when dialog opens
   $effect(() => {
     if (open) {
+      todayStr = today();
       selectedMonth = getMonthStart(dateNavState.selectedDate);
     }
   });
