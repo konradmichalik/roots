@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Unified work time overview across Moco, Jira and Outlook</strong>
+  <strong>Unified work time overview across Moco, Jira, Outlook and Personio</strong>
 </p>
 
 <p align="center">
@@ -15,13 +15,16 @@
 
 ---
 
-Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira and Outlook, then reconciles and displays everything in day, week and month views.
+Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira, Outlook and Personio, then reconciles and displays everything in day, week and month views.
+
+![screenshot.jpg](docs/images/screenshot.jpg)
 
 ## Features
 
-- **Multi-Service Integration** - Connect Moco, Jira (Cloud & Server) and Outlook
+- **Multi-Service Integration** - Connect Moco, Jira (Cloud & Server), Outlook and Personio
 - **Unified Timeline** - Day, week and month views across all services
 - **Reconciliation** - Confidence-based matching and comparison between services
+- **Personio Sync** - Automatic work schedule and absence import
 - **Native Desktop App** - Lightweight Tauri app, no browser CORS issues
 - **Dark Mode** - Light and dark theme support
 
@@ -53,16 +56,17 @@ npm run tauri:dev
 
 - Node.js 18+
 - Rust toolchain (for Tauri builds)
-- One or more of: Moco, Jira, Outlook account
+- One or more of: Moco, Jira, Outlook, Personio account
 
 ## Supported Services
 
-| Service | Auth Method |
-|---------|------------|
-| **Moco** | API Key |
-| **Jira Cloud** | Email + API Token |
-| **Jira Server** | Username/Password or PAT |
-| **Outlook** | OAuth2 |
+| Service | Auth Method | Provides |
+|---------|------------|----------|
+| **Moco** | API Key | Time entries, projects, presences |
+| **Jira Cloud** | Email + API Token | Worklogs |
+| **Jira Server** | Username/Password or PAT | Worklogs |
+| **Outlook** | OAuth2 | Calendar events |
+| **Personio** | Client ID + Secret | Absences, work schedule |
 
 ## Tech Stack
 
@@ -82,6 +86,7 @@ npm run tauri:dev
 | `npm run check` | TypeScript type checking |
 | `npm run lint` | ESLint check |
 | `npm run format` | Prettier formatting |
+| `npm run release` | Bump version, tag and push |
 
 ## License
 
