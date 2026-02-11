@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatHours } from '../../utils/time-format';
-  import type { MonthProjectStats, ProjectStats } from './statsTypes';
+  import type { MonthProjectStats } from './statsTypes';
 
   let { stats }: { stats: MonthProjectStats } = $props();
 

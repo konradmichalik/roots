@@ -2,7 +2,6 @@
   import {
     timerState,
     draftsState,
-    startTimer,
     pauseTimer,
     resumeTimer,
     getElapsedSeconds,

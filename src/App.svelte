@@ -5,7 +5,6 @@
   import AppLoader from './lib/components/common/AppLoader.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import {
-    connectionsState,
     initializeConnections,
     hasAnyServiceConfigured,
     handleOutlookCallback
