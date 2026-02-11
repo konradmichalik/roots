@@ -135,6 +135,11 @@ class Logger {
     console.error(`%c${this.formatMessage(ICONS.error, message)}`, LOG_STYLES.error, error ?? '');
   }
 
+  warn(message: string, data?: unknown): void {
+    if (!this.shouldLog('warn')) return;
+    console.warn(`%c${this.formatMessage('\u26A0\uFE0F', message)}`, 'color: #ebcb8b;', data ?? '');
+  }
+
   info(message: string, data?: unknown): void {
     if (!this.shouldLog('info')) return;
     console.log(`%c${this.formatMessage('\u2139\uFE0F', message)}`, 'color: #5e81ac;', data ?? '');

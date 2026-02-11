@@ -7,6 +7,8 @@ import type {
 } from '../types';
 import { ensureFreshTokens, refreshAccessToken } from './oauth-manager';
 import { logger } from '../utils/logger';
+import { validateResponse } from '../schemas/validate';
+import { msGraphUserSchema, msGraphCalendarResponseSchema } from '../schemas/outlook';
 
 const GRAPH_BASE = 'https://graph.microsoft.com/v1.0';
 const MAX_REQUEST_RETRIES = 2;
@@ -114,7 +116,8 @@ export class OutlookClient {
   async testConnection(): Promise<{ success: boolean; user?: MSGraphUser; error?: string }> {
     try {
       logger.connection('Testing Outlook connection');
-      const user = await this.request<MSGraphUser>('/me');
+      const raw = await this.request<MSGraphUser>('/me');
+      const user = validateResponse(msGraphUserSchema, raw, 'Outlook me');
       logger.connectionSuccess(`Outlook connected as ${user.displayName}`);
       return { success: true, user };
     } catch (error) {
@@ -135,7 +138,8 @@ export class OutlookClient {
       `/me/calendarView?startDateTime=${startDateTime}&endDateTime=${endDateTime}&$select=id,subject,start,end,isAllDay,showAs,responseStatus,organizer,attendees,isOnlineMeeting,webLink&$top=100`;
 
     while (url) {
-      const response: MSGraphCalendarResponse = await this.request<MSGraphCalendarResponse>(url);
+      const raw: MSGraphCalendarResponse = await this.request<MSGraphCalendarResponse>(url);
+      const response = validateResponse(msGraphCalendarResponseSchema, raw, 'Outlook calendar');
       allEvents.push(...response.value);
 
       const nextLink: string | undefined = response['@odata.nextLink'];

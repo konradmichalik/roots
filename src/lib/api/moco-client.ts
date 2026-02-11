@@ -12,6 +12,16 @@ import type {
   MocoProjectReport
 } from '../types';
 import { logger } from '../utils/logger';
+import { validateResponse } from '../schemas/validate';
+import {
+  mocoActivitiesSchema,
+  mocoUserSchema,
+  mocoProjectsAssignedSchema,
+  mocoPresencesSchema,
+  mocoActivitySchema,
+  mocoPresenceSchema,
+  mocoProjectReportSchema
+} from '../schemas/moco';
 
 export interface MocoClientConfig extends ApiClientConfig {
   apiKey: string;
@@ -46,7 +56,8 @@ export class MocoClient extends ApiClient {
   async testConnection(): Promise<{ success: boolean; user?: MocoUser; error?: string }> {
     try {
       logger.connection(`Testing Moco connection to ${this.domain}.mocoapp.com`);
-      const user = await this.request<MocoUser>('GET', '/session');
+      const raw = await this.request<MocoUser>('GET', '/session');
+      const user = validateResponse(mocoUserSchema, raw, 'Moco session');
 
       this.currentUserId = user.id;
       logger.connectionSuccess(
@@ -68,10 +79,11 @@ export class MocoClient extends ApiClient {
     logger.info(
       `Fetching Moco activities: ${from} to ${to} (user: ${this.currentUserId ?? 'all'})`
     );
-    const activities = await this.request<MocoActivity[]>(
+    const raw = await this.request<MocoActivity[]>(
       'GET',
       `/activities?from=${from}&to=${to}${userFilter}`
     );
+    const activities = validateResponse(mocoActivitiesSchema, raw, 'Moco activities');
     logger.info(`Fetched ${activities.length} Moco activities`);
     return activities;
   }
@@ -81,7 +93,8 @@ export class MocoClient extends ApiClient {
    */
   async getAssignedProjects(): Promise<MocoProjectAssigned[]> {
     logger.info('Fetching assigned Moco projects');
-    const projects = await this.request<MocoProjectAssigned[]>('GET', '/projects/assigned');
+    const raw = await this.request<MocoProjectAssigned[]>('GET', '/projects/assigned');
+    const projects = validateResponse(mocoProjectsAssignedSchema, raw, 'Moco assigned projects');
     logger.info(`Fetched ${projects.length} assigned projects`);
     return projects;
   }
@@ -101,7 +114,8 @@ export class MocoClient extends ApiClient {
    */
   async getProjectReport(projectId: number): Promise<MocoProjectReport> {
     logger.info(`Fetching report for project ${projectId}`);
-    const report = await this.request<MocoProjectReport>('GET', `/projects/${projectId}/report`);
+    const raw = await this.request<MocoProjectReport>('GET', `/projects/${projectId}/report`);
+    const report = validateResponse(mocoProjectReportSchema, raw, 'Moco project report');
     logger.info(
       `Fetched report for project ${projectId}: ${report.costs_by_task?.length ?? 0} tasks`
     );
@@ -113,7 +127,8 @@ export class MocoClient extends ApiClient {
    */
   async createActivity(data: MocoCreateActivity): Promise<MocoActivity> {
     logger.info('Creating Moco activity', { date: data.date, projectId: data.project_id });
-    return this.request<MocoActivity>('POST', '/activities', data);
+    const raw = await this.request<MocoActivity>('POST', '/activities', data);
+    return validateResponse(mocoActivitySchema, raw, 'Moco create activity');
   }
 
   /**
@@ -121,7 +136,8 @@ export class MocoClient extends ApiClient {
    */
   async updateActivity(id: number, data: MocoUpdateActivity): Promise<MocoActivity> {
     logger.info(`Updating Moco activity ${id}`);
-    return this.request<MocoActivity>('PUT', `/activities/${id}`, data);
+    const raw = await this.request<MocoActivity>('PUT', `/activities/${id}`, data);
+    return validateResponse(mocoActivitySchema, raw, 'Moco update activity');
   }
 
   /**
@@ -138,10 +154,11 @@ export class MocoClient extends ApiClient {
   async getPresences(from: string, to: string): Promise<MocoPresence[]> {
     const userFilter = this.currentUserId ? `&user_id=${this.currentUserId}` : '';
     logger.info(`Fetching Moco presences: ${from} to ${to}`);
-    const presences = await this.request<MocoPresence[]>(
+    const raw = await this.request<MocoPresence[]>(
       'GET',
       `/users/presences?from=${from}&to=${to}${userFilter}`
     );
+    const presences = validateResponse(mocoPresencesSchema, raw, 'Moco presences');
     logger.info(`Fetched ${presences.length} Moco presences`);
     return presences;
   }
@@ -151,7 +168,8 @@ export class MocoClient extends ApiClient {
    */
   async createPresence(data: MocoCreatePresence): Promise<MocoPresence> {
     logger.info('Creating Moco presence', { date: data.date, from: data.from });
-    return this.request<MocoPresence>('POST', '/users/presences', data);
+    const raw = await this.request<MocoPresence>('POST', '/users/presences', data);
+    return validateResponse(mocoPresenceSchema, raw, 'Moco create presence');
   }
 
   /**
@@ -159,7 +177,8 @@ export class MocoClient extends ApiClient {
    */
   async updatePresence(id: number, data: MocoUpdatePresence): Promise<MocoPresence> {
     logger.info(`Updating Moco presence ${id}`);
-    return this.request<MocoPresence>('PUT', `/users/presences/${id}`, data);
+    const raw = await this.request<MocoPresence>('PUT', `/users/presences/${id}`, data);
+    return validateResponse(mocoPresenceSchema, raw, 'Moco update presence');
   }
 
   /**

@@ -11,6 +11,12 @@ import type {
 import type { AbsenceType } from '../types';
 import { isTauri } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { validateResponse } from '../schemas/validate';
+import {
+  personioAuthResponseSchema,
+  personioEmployeesResponseSchema,
+  personioTimeOffsResponseSchema
+} from '../schemas/personio';
 
 const PERSONIO_API_BASE = 'https://api.personio.de';
 const PROXY_BASE = 'http://localhost:3002/personio';
@@ -89,8 +95,9 @@ export class PersonioClient extends ApiClient {
       throw new Error(message);
     }
 
-    const data = (await response.json()) as Record<string, unknown>;
-    const accessToken = (data.data as Record<string, unknown>)?.token as string;
+    const rawData = await response.json();
+    const validated = validateResponse(personioAuthResponseSchema, rawData, 'Personio auth');
+    const accessToken = validated.data?.token;
 
     if (!accessToken) {
       throw new Error('Personio authentication failed: no token in response');
@@ -151,10 +158,11 @@ export class PersonioClient extends ApiClient {
   }
 
   async findCurrentEmployee(): Promise<PersonioEmployee | null> {
-    const data = await this.request<PersonioResponse<PersonioEmployee[]>>(
+    const raw = await this.request<PersonioResponse<PersonioEmployee[]>>(
       'GET',
       '/v1/company/employees?limit=200'
     );
+    const data = validateResponse(personioEmployeesResponseSchema, raw, 'Personio employees');
 
     const emailLower = this.config_.email.toLowerCase();
     return (
@@ -174,10 +182,11 @@ export class PersonioClient extends ApiClient {
       'employees[]': String(this.config_.employeeId)
     });
 
-    const data = await this.request<PersonioResponse<PersonioTimeOff[]>>(
+    const raw = await this.request<PersonioResponse<PersonioTimeOff[]>>(
       'GET',
       `/v1/company/time-offs?${params}`
     );
+    const data = validateResponse(personioTimeOffsResponseSchema, raw, 'Personio time-offs');
 
     // Only return approved time-offs
     return data.data.filter((t) => t.attributes.status === 'approved');

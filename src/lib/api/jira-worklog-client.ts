@@ -9,6 +9,13 @@ import type {
   JiraUpdateWorklogPayload
 } from '../types';
 import { logger } from '../utils/logger';
+import { validateResponse } from '../schemas/validate';
+import {
+  jiraUserSchema,
+  jiraSearchResponseSchema,
+  jiraWorklogResponseSchema,
+  jiraWorklogSchema
+} from '../schemas/jira';
 
 export interface JiraWorklogClientConfig extends ApiClientConfig {
   instanceType: 'cloud' | 'server';
@@ -39,7 +46,8 @@ export abstract class JiraWorklogClient extends ApiClient {
   async testConnection(): Promise<{ success: boolean; user?: JiraUser; error?: string }> {
     try {
       logger.connection('Testing Jira connection');
-      const user = await this.request<JiraUser>('GET', `/rest/api/${this.apiVersion}/myself`);
+      const raw = await this.request<JiraUser>('GET', `/rest/api/${this.apiVersion}/myself`);
+      const user = validateResponse(jiraUserSchema, raw, 'Jira myself');
       this.storeCurrentUser(user);
       logger.connectionSuccess(`Jira connected as ${user.displayName}`);
       return { success: true, user };
@@ -86,7 +94,7 @@ export abstract class JiraWorklogClient extends ApiClient {
     logger.info(`Searching Jira issues: ${jql}`);
 
     while (true) {
-      const response = await this.request<JiraSearchResponse>(
+      const raw = await this.request<JiraSearchResponse>(
         'POST',
         `/rest/api/${this.apiVersion}/search`,
         {
@@ -96,6 +104,7 @@ export abstract class JiraWorklogClient extends ApiClient {
           fields: ['summary', 'issuetype', 'project', 'worklog']
         }
       );
+      const response = validateResponse(jiraSearchResponseSchema, raw, 'Jira search');
 
       allIssues.push(...response.issues);
 
@@ -123,10 +132,11 @@ export abstract class JiraWorklogClient extends ApiClient {
     const maxResults = 1000;
 
     while (true) {
-      const response = await this.request<JiraWorklogResponse>(
+      const raw = await this.request<JiraWorklogResponse>(
         'GET',
         `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog?startAt=${startAt}&maxResults=${maxResults}`
       );
+      const response = validateResponse(jiraWorklogResponseSchema, raw, `Jira worklogs ${issueKey}`);
 
       allWorklogs.push(...response.worklogs);
 
@@ -164,11 +174,12 @@ export abstract class JiraWorklogClient extends ApiClient {
   async createWorklog(issueKey: string, payload: JiraCreateWorklogPayload): Promise<JiraWorklog> {
     logger.info(`Creating worklog on ${issueKey}`, { seconds: payload.timeSpentSeconds });
     const formattedPayload = this.formatWorklogPayload(payload);
-    return this.request<JiraWorklog>(
+    const raw = await this.request<JiraWorklog>(
       'POST',
       `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog`,
       formattedPayload
     );
+    return validateResponse(jiraWorklogSchema, raw, 'Jira create worklog');
   }
 
   /**
@@ -181,11 +192,12 @@ export abstract class JiraWorklogClient extends ApiClient {
   ): Promise<JiraWorklog> {
     logger.info(`Updating worklog ${worklogId} on ${issueKey}`);
     const formattedPayload = this.formatWorklogPayload(payload);
-    return this.request<JiraWorklog>(
+    const raw = await this.request<JiraWorklog>(
       'PUT',
       `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog/${worklogId}`,
       formattedPayload
     );
+    return validateResponse(jiraWorklogSchema, raw, 'Jira update worklog');
   }
 
   /**
