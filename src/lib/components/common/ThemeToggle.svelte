@@ -11,6 +11,7 @@
       <button
         onclick={toggleTheme}
         class="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        aria-label="Toggle {themeState.resolvedTheme === 'dark' ? 'light' : 'dark'} mode"
       >
         {#if themeState.resolvedTheme === 'dark'}
           <Sun class="size-[18px]" />

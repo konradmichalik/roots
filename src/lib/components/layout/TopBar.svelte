@@ -49,6 +49,7 @@
         ? 'bg-primary/10 text-primary'
         : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}"
       title={sidebarState.leftOpen ? 'Close sidebar' : 'Open sidebar'}
+      aria-label={sidebarState.leftOpen ? 'Close sidebar' : 'Open sidebar'}
     >
       <PanelLeft
         class="size-[18px] transition-transform duration-200 {sidebarState.leftOpen
@@ -102,6 +103,7 @@
           disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150
           focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Refresh data"
+        aria-label="Refresh data"
       >
         <RefreshCw class="size-3.5 {isLoading ? 'animate-spin' : ''}" />
       </button>
@@ -120,6 +122,7 @@
         ? 'bg-primary/10 text-primary'
         : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}"
       title="Favorites"
+      aria-label={sidebarState.rightOpen ? 'Close favorites' : 'Open favorites'}
     >
       <Star class="size-[18px]" />
     </button>
@@ -140,6 +143,7 @@
       <button
         class="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Settings"
+        aria-label="Settings"
       >
         <Settings class="size-[18px]" />
       </button>

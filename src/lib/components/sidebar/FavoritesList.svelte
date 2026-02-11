@@ -173,6 +173,7 @@
       <button
         class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Add favorite"
+        aria-label="Add favorite"
       >
         <Plus class="size-3.5" />
       </button>
@@ -259,6 +260,7 @@
                 type="button"
                 class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                 title="Edit favorite"
+                aria-label="Edit favorite"
               >
                 <Pencil class="size-3" />
               </button>
@@ -286,6 +288,7 @@
                   disabled={!canAddFromEvents}
                   class="rounded p-0.5 text-source-outlook hover:text-source-outlook hover:bg-source-outlook/10
 										disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                  aria-label="Add matching events to Moco"
                 >
                   {#if isAdding}
                     <LoaderCircle class="size-3.5 animate-spin" />
@@ -439,6 +442,7 @@
                 type="button"
                 class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                 title="Edit favorite"
+                aria-label="Edit favorite"
               >
                 <Pencil class="size-3" />
               </button>

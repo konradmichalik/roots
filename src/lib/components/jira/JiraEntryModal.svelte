@@ -282,7 +282,7 @@
         </div>
 
         {#if error}
-          <p class="text-sm text-danger-text">{error}</p>
+          <p id="jira-entry-error" role="alert" class="text-sm text-danger-text">{error}</p>
         {/if}
 
         <!-- Actions -->

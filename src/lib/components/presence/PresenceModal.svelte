@@ -191,6 +191,8 @@
     <div class="space-y-4 py-4">
       {#if error}
         <div
+          id="presence-form-error"
+          role="alert"
           class="rounded-lg border border-danger bg-danger-subtle px-3 py-2 text-sm text-danger-text"
         >
           {error}
@@ -314,6 +316,7 @@
                       onclick={() => startEdit(presence)}
                       class="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                       title="Edit"
+                      aria-label="Edit time slot"
                     >
                       <Pencil class="size-3.5" />
                     </button>
@@ -324,6 +327,7 @@
                       }}
                       class="rounded p-1 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                       title="Delete"
+                      aria-label="Delete time slot"
                     >
                       <Trash2 class="size-3.5" />
                     </button>

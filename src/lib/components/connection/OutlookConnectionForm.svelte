@@ -69,6 +69,9 @@
         type="text"
         bind:value={clientId}
         placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        maxlength={36}
+        pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        aria-describedby={connectionsState.outlook.error ? 'outlook-form-error' : undefined}
         class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
     </div>
@@ -82,6 +85,9 @@
         type="text"
         bind:value={tenantId}
         placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        maxlength={36}
+        pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        aria-describedby={connectionsState.outlook.error ? 'outlook-form-error' : undefined}
         class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
       <p class="mt-1 text-xs text-muted-foreground">
@@ -90,7 +96,7 @@
     </div>
 
     {#if connectionsState.outlook.error}
-      <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.outlook.error}</p>
+      <p id="outlook-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.outlook.error}</p>
     {/if}
 
     <button

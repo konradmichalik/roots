@@ -66,6 +66,8 @@
     value={inputValue}
     oninput={handleInput}
     placeholder="ABC-123"
+    aria-describedby={validationError && inputValue && id ? `${id}-error` : undefined}
+    aria-invalid={validationError && inputValue ? true : undefined}
     class="w-full rounded-lg border border-input bg-background px-3 py-2 pr-16 text-sm text-foreground uppercase
       focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150
       disabled:opacity-50 disabled:cursor-not-allowed
@@ -98,5 +100,5 @@
 </div>
 
 {#if validationError && inputValue}
-  <p class="mt-1 text-xs text-danger-text">{validationError}</p>
+  <p id={id ? `${id}-error` : undefined} class="mt-1 text-xs text-danger-text">{validationError}</p>
 {/if}

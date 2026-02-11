@@ -27,6 +27,9 @@
         type="text"
         bind:value={domain}
         placeholder="company"
+        maxlength={63}
+        pattern="[a-zA-Z0-9][a-zA-Z0-9-]*"
+        aria-describedby={connectionsState.moco.error ? 'moco-form-error' : undefined}
         class="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
       <span class="text-sm text-muted-foreground">.mocoapp.com</span>
@@ -42,13 +45,15 @@
       type="password"
       bind:value={apiKey}
       placeholder="API key from your Moco profile"
+      maxlength={256}
+      aria-describedby={connectionsState.moco.error ? 'moco-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
     <p class="mt-1 text-xs text-muted-foreground">Found under Profile &rarr; Integrations</p>
   </div>
 
   {#if connectionsState.moco.error}
-    <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.moco.error}</p>
+    <p id="moco-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.moco.error}</p>
   {/if}
 
   <button

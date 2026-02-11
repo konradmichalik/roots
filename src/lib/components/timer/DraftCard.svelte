@@ -76,6 +76,7 @@
           <button
             class="rounded p-1.5 text-primary hover:bg-primary/10 active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
             title="Save to Moco"
+            aria-label="Save to Moco"
           >
             <Download class="size-4" />
           </button>
@@ -86,6 +87,7 @@
         onclick={handleDelete}
         class="rounded p-1.5 text-muted-foreground hover:text-danger-text hover:bg-danger-subtle active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Delete draft"
+        aria-label="Delete draft"
       >
         <Trash2 class="size-4" />
       </button>

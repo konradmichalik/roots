@@ -49,6 +49,8 @@
       type="text"
       bind:value={clientId}
       placeholder="Personio API Client ID"
+      maxlength={256}
+      aria-describedby={connectionsState.personio.error ? 'personio-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
@@ -62,6 +64,8 @@
       type="password"
       bind:value={clientSecret}
       placeholder="Personio API Client Secret"
+      maxlength={256}
+      aria-describedby={connectionsState.personio.error ? 'personio-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
@@ -75,6 +79,8 @@
       type="email"
       bind:value={email}
       placeholder="Your email in Personio"
+      maxlength={254}
+      aria-describedby={connectionsState.personio.error ? 'personio-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
     <p class="mt-1 text-xs text-muted-foreground">
@@ -83,7 +89,7 @@
   </div>
 
   {#if connectionsState.personio.error}
-    <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.personio.error}</p>
+    <p id="personio-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.personio.error}</p>
   {/if}
 
   <button

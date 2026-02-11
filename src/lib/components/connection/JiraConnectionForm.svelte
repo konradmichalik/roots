@@ -100,6 +100,8 @@
       bind:value={baseUrl}
       oninput={handleUrlInput}
       placeholder={instanceType === 'cloud' ? 'company.atlassian.net' : 'https://jira.company.com'}
+      maxlength={256}
+      aria-describedby={connectionsState.jira.error ? 'jira-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
@@ -115,6 +117,7 @@
         type="email"
         bind:value={email}
         placeholder="name@company.com"
+        maxlength={254}
         class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
     </div>
@@ -128,6 +131,7 @@
         type="password"
         bind:value={apiToken}
         placeholder="Atlassian API Token"
+        maxlength={512}
         class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
       />
       <p class="mt-1 text-xs text-muted-foreground">
@@ -165,6 +169,7 @@
           type="password"
           bind:value={personalAccessToken}
           placeholder="PAT from Jira profile"
+          maxlength={512}
           class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
@@ -178,6 +183,7 @@
           type="text"
           bind:value={username}
           placeholder="Username"
+          maxlength={256}
           class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
@@ -190,6 +196,7 @@
           type="password"
           bind:value={password}
           placeholder="Password"
+          maxlength={512}
           class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
         />
       </div>
@@ -197,7 +204,7 @@
   {/if}
 
   {#if connectionsState.jira.error}
-    <p class="text-sm text-[var(--ds-text-danger)]">{connectionsState.jira.error}</p>
+    <p id="jira-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.jira.error}</p>
   {/if}
 
   <button

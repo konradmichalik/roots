@@ -13,6 +13,7 @@
     onclick={navigateBackward}
     class="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
     title="Previous day"
+    aria-label="Previous day"
   >
     <ChevronLeft class="size-4" />
   </button>
@@ -25,6 +26,7 @@
     onclick={navigateForward}
     class="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
     title="Next day"
+    aria-label="Next day"
   >
     <ChevronRight class="size-4" />
   </button>
