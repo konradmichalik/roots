@@ -28,6 +28,85 @@ export function clearHoveredGroup(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const byHoursDesc = (a: UnifiedTimeEntry, b: UnifiedTimeEntry) => b.hours - a.hours;
+
+function groupByTicketKey(
+  entries: UnifiedTimeEntry[],
+  source: 'moco' | 'jira'
+): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    const key = getTicketKey(entry, source);
+    if (!key) continue;
+    const group = map.get(key);
+    if (group) {
+      group.push(entry);
+    } else {
+      map.set(key, [entry]);
+    }
+  }
+  return map;
+}
+
+function getTicketKey(entry: UnifiedTimeEntry, source: 'moco' | 'jira'): string | null {
+  if (source === 'moco') {
+    return (entry.metadata as MocoMetadata).remoteTicketKey ?? null;
+  }
+  if (source === 'jira') {
+    return (entry.metadata as JiraMetadata).issueKey ?? null;
+  }
+  return null;
+}
+
+function groupMocoByOutlookId(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    const meta = entry.metadata as MocoMetadata;
+    if (meta.remoteService === 'outlook' && meta.remoteId) {
+      const group = map.get(meta.remoteId);
+      if (group) {
+        group.push(entry);
+      } else {
+        map.set(meta.remoteId, [entry]);
+      }
+    }
+  }
+  return map;
+}
+
+function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    const meta = entry.metadata as OutlookMetadata;
+    const group = map.get(meta.eventId);
+    if (group) {
+      group.push(entry);
+    } else {
+      map.set(meta.eventId, [entry]);
+    }
+  }
+  return map;
+}
+
+function groupOutlookByTitle(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
+  const map = new Map<string, UnifiedTimeEntry[]>();
+  for (const entry of entries) {
+    const title = entry.title?.trim();
+    if (!title) continue;
+    const group = map.get(title);
+    if (group) {
+      group.push(entry);
+    } else {
+      map.set(title, [entry]);
+    }
+  }
+  return map;
+}
+
+// ---------------------------------------------------------------------------
 // Matching algorithm
 // ---------------------------------------------------------------------------
 
@@ -48,15 +127,14 @@ export function buildMatchResult(
   const mocoByTicketKey = groupByTicketKey(mocoEntries, 'moco');
   const jiraByKey = groupByTicketKey(jiraEntries, 'jira');
 
-  const matchedJiraKeys = [...mocoByTicketKey.keys()].filter((k) => jiraByKey.has(k));
-  matchedJiraKeys.sort();
+  const matchedJiraKeys = [...mocoByTicketKey.keys()]
+    .filter((k) => jiraByKey.has(k))
+    .sort();
 
   for (const key of matchedJiraKeys) {
-    const mocoGroup = mocoByTicketKey.get(key)!;
-    const jiraGroup = jiraByKey.get(key)!;
-
-    mocoGroup.sort((a, b) => b.hours - a.hours);
-    jiraGroup.sort((a, b) => b.hours - a.hours);
+    // Spread+sort to avoid mutating Map values
+    const mocoGroup = [...mocoByTicketKey.get(key)!].sort(byHoursDesc);
+    const jiraGroup = [...jiraByKey.get(key)!].sort(byHoursDesc);
 
     for (const entry of mocoGroup) {
       sortedMoco.push(entry);
@@ -74,16 +152,15 @@ export function buildMatchResult(
   const mocoByOutlookId = groupMocoByOutlookId(mocoEntries);
   const outlookById = groupOutlookById(outlookEntries);
 
-  const matchedOutlookIds = [...mocoByOutlookId.keys()].filter((id) => outlookById.has(id));
-  matchedOutlookIds.sort();
+  const matchedOutlookIds = [...mocoByOutlookId.keys()]
+    .filter((id) => outlookById.has(id))
+    .sort();
 
   for (const eventId of matchedOutlookIds) {
-    const mocoGroup = mocoByOutlookId.get(eventId)!;
-    const outlookGroup = outlookById.get(eventId)!;
+    // Spread+sort to avoid mutating Map values
+    const mocoGroup = [...mocoByOutlookId.get(eventId)!].sort(byHoursDesc);
+    const outlookGroup = [...outlookById.get(eventId)!].sort(byHoursDesc);
     const groupKey = `outlook:${eventId}`;
-
-    mocoGroup.sort((a, b) => b.hours - a.hours);
-    outlookGroup.sort((a, b) => b.hours - a.hours);
 
     for (const entry of mocoGroup) {
       if (!usedMocoIds.has(entry.id)) {
@@ -152,82 +229,4 @@ export function buildMatchResult(
   }
 
   return { sortedMoco, sortedJira, sortedOutlook, entryGroupMap };
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function groupByTicketKey(
-  entries: UnifiedTimeEntry[],
-  source: 'moco' | 'jira'
-): Map<string, UnifiedTimeEntry[]> {
-  const map = new Map<string, UnifiedTimeEntry[]>();
-  for (const entry of entries) {
-    const key = getTicketKey(entry, source);
-    if (!key) continue;
-    const group = map.get(key);
-    if (group) {
-      group.push(entry);
-    } else {
-      map.set(key, [entry]);
-    }
-  }
-  return map;
-}
-
-function getTicketKey(entry: UnifiedTimeEntry, source: 'moco' | 'jira'): string | null {
-  if (source === 'moco') {
-    return (entry.metadata as MocoMetadata).remoteTicketKey ?? null;
-  }
-  if (source === 'jira') {
-    return (entry.metadata as JiraMetadata).issueKey ?? null;
-  }
-  return null;
-}
-
-function groupMocoByOutlookId(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
-  const map = new Map<string, UnifiedTimeEntry[]>();
-  for (const entry of entries) {
-    const meta = entry.metadata as MocoMetadata;
-    if (meta.remoteService === 'outlook' && meta.remoteId) {
-      const group = map.get(meta.remoteId);
-      if (group) {
-        group.push(entry);
-      } else {
-        map.set(meta.remoteId, [entry]);
-      }
-    }
-  }
-  return map;
-}
-
-function groupOutlookById(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
-  const map = new Map<string, UnifiedTimeEntry[]>();
-  for (const entry of entries) {
-    const meta = entry.metadata as OutlookMetadata;
-    const group = map.get(meta.eventId);
-    if (group) {
-      group.push(entry);
-    } else {
-      map.set(meta.eventId, [entry]);
-    }
-  }
-  return map;
-}
-
-function groupOutlookByTitle(entries: UnifiedTimeEntry[]): Map<string, UnifiedTimeEntry[]> {
-  const map = new Map<string, UnifiedTimeEntry[]>();
-  for (const entry of entries) {
-    // Outlook event subject is stored in 'title', not 'description'
-    const title = entry.title?.trim();
-    if (!title) continue;
-    const group = map.get(title);
-    if (group) {
-      group.push(entry);
-    } else {
-      map.set(title, [entry]);
-    }
-  }
-  return map;
 }
