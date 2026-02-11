@@ -16,6 +16,7 @@
   import { connectionsState } from '../../stores/connections.svelte';
   import { formatHours, formatBalance } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
+  import ConnectionManager from '../connection/ConnectionManager.svelte';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
   import Calendar from '@lucide/svelte/icons/calendar';
@@ -153,12 +154,15 @@
         entryGroupMap={matchResult.entryGroupMap}
       />
     {:else}
-      <div
-        class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
-      >
-        <Calendar class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
-        <p class="text-xs text-muted-foreground/50">Outlook not connected</p>
-      </div>
+      <ConnectionManager>
+        <button
+          class="w-full rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50
+            hover:opacity-80 hover:border-border hover:bg-accent/30 transition-all duration-150 cursor-pointer"
+        >
+          <Calendar class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
+          <p class="text-xs text-muted-foreground/50">Connect Outlook</p>
+        </button>
+      </ConnectionManager>
     {/if}
 
     <!-- Center: Moco (emphasized) -->
@@ -186,12 +190,15 @@
         {/snippet}
       </SourceColumn>
     {:else}
-      <div
-        class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
-      >
-        <Clock class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
-        <p class="text-xs text-muted-foreground/50">Moco not connected</p>
-      </div>
+      <ConnectionManager>
+        <button
+          class="w-full rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50
+            hover:opacity-80 hover:border-border hover:bg-accent/30 transition-all duration-150 cursor-pointer"
+        >
+          <Clock class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
+          <p class="text-xs text-muted-foreground/50">Connect Moco</p>
+        </button>
+      </ConnectionManager>
     {/if}
 
     <!-- Right: Jira Worklogs -->
@@ -205,12 +212,15 @@
         entryGroupMap={matchResult.entryGroupMap}
       />
     {:else}
-      <div
-        class="rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50"
-      >
-        <FileText class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
-        <p class="text-xs text-muted-foreground/50">Jira not connected</p>
-      </div>
+      <ConnectionManager>
+        <button
+          class="w-full rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50
+            hover:opacity-80 hover:border-border hover:bg-accent/30 transition-all duration-150 cursor-pointer"
+        >
+          <FileText class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
+          <p class="text-xs text-muted-foreground/50">Connect Jira</p>
+        </button>
+      </ConnectionManager>
     {/if}
   </div>
 </div>

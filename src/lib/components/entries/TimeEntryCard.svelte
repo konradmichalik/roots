@@ -292,7 +292,7 @@
 {#snippet cardContent()}
   <div class="flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
-      <span class="text-sm font-medium text-foreground truncate block">
+      <span class="text-sm font-medium text-foreground line-clamp-2">
         {entry.title}
       </span>
       {#if entry.description}
@@ -341,10 +341,49 @@
         </div>
       {/if}
     </div>
-    <div class="flex flex-col items-end flex-shrink-0">
-      <span class="text-sm font-mono font-medium text-foreground">
+    <div class="flex flex-col items-end flex-shrink-0 min-w-8">
+      <span class="text-sm font-mono font-medium text-foreground group-hover:hidden">
         {formatHours(entry.hours)}
       </span>
+      <!-- Hover action: replaces hours display -->
+      {#if mocoMeta && isMocoConnected}
+        <button
+          type="button"
+          onclick={(e) => { e.stopPropagation(); openMocoEdit(); }}
+          class="hidden group-hover:flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          title="Edit entry"
+          aria-label="Edit entry"
+        >
+          <Pencil class="size-3.5" />
+        </button>
+      {:else if jiraMeta && isJiraConnected}
+        <button
+          type="button"
+          onclick={(e) => { e.stopPropagation(); openJiraEdit(); }}
+          class="hidden group-hover:flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          title="Edit worklog"
+          aria-label="Edit worklog"
+        >
+          <Pencil class="size-3.5" />
+        </button>
+      {:else if outlookMeta && isMocoConnected}
+        <button
+          type="button"
+          onclick={(e) => { e.stopPropagation(); openMocoCreate(); }}
+          class="hidden group-hover:flex items-center justify-center rounded-md p-1 text-success hover:text-success-text hover:bg-success/10 transition-colors
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          title="Book in Moco"
+          aria-label="Book in Moco"
+        >
+          <Plus class="size-3.5" />
+        </button>
+      {:else}
+        <span class="text-sm font-mono font-medium text-foreground hidden group-hover:inline">
+          {formatHours(entry.hours)}
+        </span>
+      {/if}
     </div>
   </div>
 {/snippet}

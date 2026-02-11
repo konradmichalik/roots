@@ -229,7 +229,7 @@
                 ? 'opacity-50'
                 : ''}"
             >
-              {formatTime(timeline.endMinutes)}{#if timeline.projectedEndMinutes}?{/if}
+              {#if timeline.projectedEndMinutes}~{/if}{formatTime(timeline.endMinutes)}
             </span>
           </div>
         </Tooltip.Trigger>
