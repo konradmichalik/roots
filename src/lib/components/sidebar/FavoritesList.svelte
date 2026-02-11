@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MocoEntryModal from '../moco/MocoEntryModal.svelte';
+  import FavoriteItem from './FavoriteItem.svelte';
   import FavoriteModal from '../favorites/FavoriteModal.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import {
@@ -11,18 +11,13 @@
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getEntriesForDate, createMocoActivity } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { formatHours } from '../../utils/time-format';
   import { toast } from '../../stores/toast.svelte';
   import type { Favorite } from '../../types';
   import Star from '@lucide/svelte/icons/star';
   import Plus from '@lucide/svelte/icons/plus';
   import Calendar from '@lucide/svelte/icons/calendar';
-  import GripVertical from '@lucide/svelte/icons/grip-vertical';
-  import Pencil from '@lucide/svelte/icons/pencil';
   import LoaderCircle from '@lucide/svelte/icons/loader-circle';
   import CalendarCheck from '@lucide/svelte/icons/calendar-check';
-  import CircleCheck from '@lucide/svelte/icons/circle-check';
-  import XCircle from '@lucide/svelte/icons/x-circle';
 
   let regularFavorites = $derived(getRegularFavorites());
   let eventFavorites = $derived(getEventFavorites());
@@ -49,11 +44,7 @@
     for (const event of outlookEntries) {
       const favorite = findMatchingFavorite(event.title);
       if (favorite) {
-        matches.push({
-          eventTitle: event.title,
-          favorite,
-          hours: event.hours
-        });
+        matches.push({ eventTitle: event.title, favorite, hours: event.hours });
       }
     }
     return matches;
@@ -138,12 +129,10 @@
       return;
     }
 
-    // Remove dragged item and insert at new position
     const newIds = [...currentIds];
     newIds.splice(draggedIndex, 1);
     newIds.splice(targetIndex, 0, draggedId);
 
-    // Combine with the other group's IDs to maintain full ordering
     const otherList = group === 'regular' ? eventFavorites : regularFavorites;
     const otherIds = otherList.map((f) => f.id);
     const allIds = group === 'regular' ? [...newIds, ...otherIds] : [...otherIds, ...newIds];
@@ -160,6 +149,18 @@
     draggedId = null;
     dragOverId = null;
     dragGroup = null;
+  }
+
+  function dragProps(id: string, group: 'regular' | 'event') {
+    return {
+      isDragged: draggedId === id,
+      isDragOver: dragOverId === id,
+      ondragstart: (e: DragEvent) => handleDragStart(e, id, group),
+      ondragover: (e: DragEvent) => handleDragOver(e, id, group),
+      ondragleave: handleDragLeave,
+      ondrop: (e: DragEvent) => handleDrop(e, id, group),
+      ondragend: handleDragEnd
+    };
   }
 </script>
 
@@ -193,80 +194,7 @@
       </div>
 
       {#each regularFavorites as favorite (favorite.id)}
-        <div
-          class="group/fav relative rounded-lg border bg-card transition-all duration-150
-						{draggedId === favorite.id
-            ? 'opacity-50 border-dashed border-primary'
-            : dragOverId === favorite.id
-              ? 'border-primary bg-primary/5'
-              : 'border-border hover:border-border-bold'}"
-          draggable="true"
-          ondragstart={(e) => handleDragStart(e, favorite.id, 'regular')}
-          ondragover={(e) => handleDragOver(e, favorite.id, 'regular')}
-          ondragleave={handleDragLeave}
-          ondrop={(e) => handleDrop(e, favorite.id, 'regular')}
-          ondragend={handleDragEnd}
-          role="listitem"
-        >
-          <!-- Drag Handle -->
-          <div
-            class="absolute left-0 top-0 bottom-0 w-5 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover/fav:opacity-100 transition-opacity"
-          >
-            <GripVertical class="size-3 text-muted-foreground" />
-          </div>
-
-          <MocoEntryModal
-            mode="create"
-            prefill={{
-              date: dateNavState.selectedDate,
-              hours: favorite.defaultHours ?? 0,
-              description: favorite.description ?? '',
-              projectId: favorite.projectId,
-              taskId: favorite.taskId
-            }}
-          >
-            <button class="w-full text-left p-2.5 pl-5 cursor-pointer">
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-sm font-medium text-foreground truncate">{favorite.name}</span
-                    >
-                    {#if favorite.defaultHours}
-                      <span
-                        class="text-xs font-mono text-muted-foreground ml-auto flex-shrink-0 pr-5"
-                      >
-                        {formatHours(favorite.defaultHours)}
-                      </span>
-                    {/if}
-                  </div>
-                  {#if favorite.description}
-                    <p class="text-xs text-foreground/80 truncate">
-                      {favorite.description}
-                    </p>
-                  {/if}
-                  <p class="text-xs text-muted-foreground truncate">
-                    {favorite.customerName} — {favorite.projectName}
-                  </p>
-                </div>
-              </div>
-            </button>
-          </MocoEntryModal>
-
-          <div
-            class="absolute top-1.5 right-1.5 opacity-0 group-hover/fav:opacity-100 flex items-center gap-0.5 transition-opacity duration-150"
-          >
-            <FavoriteModal mode="edit" editFavorite={favorite}>
-              <button
-                type="button"
-                class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-                title="Edit favorite"
-                aria-label="Edit favorite"
-              >
-                <Pencil class="size-3" />
-              </button>
-            </FavoriteModal>
-          </div>
-        </div>
+        <FavoriteItem {favorite} {...dragProps(favorite.id, 'regular')} />
       {/each}
     </div>
   {/if}
@@ -287,7 +215,7 @@
                   onclick={addAllFromEvents}
                   disabled={!canAddFromEvents}
                   class="rounded p-0.5 text-source-outlook hover:text-source-outlook hover:bg-source-outlook/10
-										disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                    disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                   aria-label="Add matching events to Moco"
                 >
                   {#if isAdding}
@@ -298,8 +226,7 @@
                 </button>
               </Tooltip.Trigger>
               <Tooltip.Content side="bottom" sideOffset={4}>
-                Add {matchingEvents.length} matching event{matchingEvents.length !== 1 ? 's' : ''} to
-                Moco
+                Add {matchingEvents.length} matching event{matchingEvents.length !== 1 ? 's' : ''} to Moco
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -307,148 +234,7 @@
       </div>
 
       {#each eventFavorites as favorite (favorite.id)}
-        {@const matched = isMatched(favorite.id)}
-        <div
-          class="group/fav relative rounded-lg border bg-card transition-all duration-150
-						{draggedId === favorite.id
-            ? 'opacity-50 border-dashed border-primary'
-            : dragOverId === favorite.id
-              ? 'border-primary bg-primary/5'
-              : matched
-                ? 'border-border hover:border-border-bold'
-                : 'border-border/50 opacity-50'}"
-          draggable="true"
-          ondragstart={(e) => handleDragStart(e, favorite.id, 'event')}
-          ondragover={(e) => handleDragOver(e, favorite.id, 'event')}
-          ondragleave={handleDragLeave}
-          ondrop={(e) => handleDrop(e, favorite.id, 'event')}
-          ondragend={handleDragEnd}
-          role="listitem"
-        >
-          <!-- Drag Handle -->
-          <div
-            class="absolute left-0 top-0 bottom-0 w-5 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover/fav:opacity-100 transition-opacity"
-          >
-            <GripVertical class="size-3 text-muted-foreground" />
-          </div>
-
-          {#if matched}
-            <!-- Matched: Open MocoEntryModal -->
-            <MocoEntryModal
-              mode="create"
-              prefill={{
-                date: dateNavState.selectedDate,
-                hours: favorite.defaultHours ?? 0,
-                description: favorite.description ?? '',
-                projectId: favorite.projectId,
-                taskId: favorite.taskId
-              }}
-            >
-              <button class="w-full text-left p-2.5 pl-5 cursor-pointer">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-1.5">
-                      <CircleCheck class="size-3 text-success flex-shrink-0" />
-                      <span class="text-sm font-medium text-foreground truncate"
-                        >{favorite.name}</span
-                      >
-                      {#if favorite.defaultHours}
-                        <span
-                          class="text-xs font-mono text-muted-foreground ml-auto flex-shrink-0 pr-5"
-                        >
-                          {formatHours(favorite.defaultHours)}
-                        </span>
-                      {/if}
-                    </div>
-                    {#if favorite.description}
-                      <p class="text-xs text-foreground/80 truncate pl-[18px]">
-                        {favorite.description}
-                      </p>
-                    {/if}
-                    <p class="text-xs text-muted-foreground truncate pl-[18px]">
-                      {favorite.customerName} — {favorite.projectName}
-                    </p>
-                    {#if favorite.eventMatch}
-                      <p class="text-xs text-warning/70 truncate pl-[18px]">
-                        {favorite.eventMatch.matchType === 'exact'
-                          ? '='
-                          : favorite.eventMatch.matchType === 'startsWith'
-                            ? '^'
-                            : '~'}
-                        {favorite.eventMatch.pattern}
-                      </p>
-                    {/if}
-                  </div>
-                </div>
-              </button>
-            </MocoEntryModal>
-          {:else}
-            <!-- Not matched: Open FavoriteModal for editing -->
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger class="w-full">
-                  <FavoriteModal mode="edit" editFavorite={favorite}>
-                    <button class="w-full text-left p-2.5 pl-5 cursor-pointer">
-                      <div class="flex items-start justify-between gap-2">
-                        <div class="flex-1 min-w-0">
-                          <div class="flex items-center gap-1.5">
-                            <XCircle class="size-3 text-muted-foreground flex-shrink-0" />
-                            <span class="text-sm font-medium text-foreground truncate"
-                              >{favorite.name}</span
-                            >
-                            {#if favorite.defaultHours}
-                              <span
-                                class="text-xs font-mono text-muted-foreground ml-auto flex-shrink-0 pr-5"
-                              >
-                                {formatHours(favorite.defaultHours)}
-                              </span>
-                            {/if}
-                          </div>
-                          {#if favorite.description}
-                            <p class="text-xs text-foreground/80 truncate pl-[18px]">
-                              {favorite.description}
-                            </p>
-                          {/if}
-                          <p class="text-xs text-muted-foreground truncate pl-[18px]">
-                            {favorite.customerName} — {favorite.projectName}
-                          </p>
-                          {#if favorite.eventMatch}
-                            <p class="text-xs text-muted-foreground/50 truncate pl-[18px]">
-                              {favorite.eventMatch.matchType === 'exact'
-                                ? '='
-                                : favorite.eventMatch.matchType === 'startsWith'
-                                  ? '^'
-                                  : '~'}
-                              {favorite.eventMatch.pattern}
-                            </p>
-                          {/if}
-                        </div>
-                      </div>
-                    </button>
-                  </FavoriteModal>
-                </Tooltip.Trigger>
-                <Tooltip.Content side="right" sideOffset={4}>
-                  No matching event today — click to edit
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          {/if}
-
-          <div
-            class="absolute top-1.5 right-1.5 opacity-0 group-hover/fav:opacity-100 flex items-center gap-0.5 transition-opacity duration-150"
-          >
-            <FavoriteModal mode="edit" editFavorite={favorite}>
-              <button
-                type="button"
-                class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-                title="Edit favorite"
-                aria-label="Edit favorite"
-              >
-                <Pencil class="size-3" />
-              </button>
-            </FavoriteModal>
-          </div>
-        </div>
+        <FavoriteItem {favorite} matched={isMatched(favorite.id)} {...dragProps(favorite.id, 'event')} />
       {/each}
     </div>
   {/if}
