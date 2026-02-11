@@ -156,6 +156,7 @@ html[data-color-mode='dark'] {
   --color-source-moco: #b8d4be;
   --color-source-jira: #a8c5db;
   --color-source-outlook: #d4b8d0;
+  --color-source-personio: #d4c4a8;
 
   /* Source-specific colors for indicators */
   --color-source-moco-text: var(--ds-text-success);
@@ -163,6 +164,8 @@ html[data-color-mode='dark'] {
   --color-source-outlook-text: #b48ead;
   --color-source-outlook: #b48ead;
   --color-source-outlook-subtle: #b48ead20;
+  --color-source-personio-text: var(--ds-text-warning);
+  --color-source-personio-subtle: var(--ds-background-warning);
 
   /* Semantic colors mapped to Tailwind classes */
   --color-success: var(--ds-background-success-bold);

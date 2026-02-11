@@ -132,6 +132,7 @@
         <ServiceStatusDot service="moco" />
         <ServiceStatusDot service="jira" />
         <ServiceStatusDot service="outlook" />
+        <ServiceStatusDot service="personio" />
       </button>
     </ConnectionManager>
 
