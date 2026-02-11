@@ -4,12 +4,16 @@
   import TimeEntryCard from '../entries/TimeEntryCard.svelte';
   import { formatHours } from '../../utils/time-format';
   import Calendar from '@lucide/svelte/icons/calendar';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 
   let {
     source,
     entries,
     loading = false,
     emphasized = false,
+    error = null,
+    onretry,
     entryGroupMap,
     headerAction
   }: {
@@ -17,6 +21,8 @@
     entries: UnifiedTimeEntry[];
     loading?: boolean;
     emphasized?: boolean;
+    error?: string | null;
+    onretry?: () => void;
     entryGroupMap?: Map<string, string>;
     headerAction?: Snippet;
   } = $props();
@@ -84,8 +90,25 @@
   </div>
 
   <!-- Entry list -->
-  <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
-    {#if loading && entries.length === 0}
+  <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2" aria-live="polite" aria-busy={loading && entries.length === 0}>
+    {#if error && !loading}
+      <div class="flex flex-col items-center gap-2 py-6 text-center">
+        <AlertTriangle class="size-5 text-danger-text/60" strokeWidth={1.5} />
+        <p class="text-xs text-danger-text/80 max-w-[200px]">{error}</p>
+        {#if onretry}
+          <button
+            type="button"
+            onclick={onretry}
+            class="mt-1 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium
+              border border-border text-muted-foreground hover:text-foreground hover:bg-accent
+              transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          >
+            <RefreshCw class="size-3" />
+            Retry
+          </button>
+        {/if}
+      </div>
+    {:else if loading && entries.length === 0}
       {#each { length: 3 } as _, i (i)}
         <div
           class="animate-pulse rounded-xl border border-border {colorClasses.border} border-l-[3px] bg-card p-3 pl-4"

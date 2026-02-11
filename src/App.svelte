@@ -72,15 +72,32 @@
 </script>
 
 <Tooltip.Provider>
-  {#if isInitializing}
-    <AppLoader />
-  {:else if hasAnyServiceConfigured()}
-    <div class="animate-fade-in">
-      <MainLayout />
-    </div>
-  {:else}
-    <div class="animate-fade-in">
-      <SetupScreen />
-    </div>
-  {/if}
+  <svelte:boundary onerror={(error) => logger.error('Unhandled render error', error)}>
+    {#if isInitializing}
+      <AppLoader />
+    {:else if hasAnyServiceConfigured()}
+      <div class="animate-fade-in">
+        <MainLayout />
+      </div>
+    {:else}
+      <div class="animate-fade-in">
+        <SetupScreen />
+      </div>
+    {/if}
+    {#snippet failed(error, reset)}
+      <div class="flex h-screen items-center justify-center bg-background">
+        <div class="text-center space-y-4 max-w-md px-6">
+          <p class="text-lg font-semibold text-foreground">Something went wrong</p>
+          <p class="text-sm text-muted-foreground">{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+          <button
+            type="button"
+            onclick={reset}
+            class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    {/snippet}
+  </svelte:boundary>
 </Tooltip.Provider>

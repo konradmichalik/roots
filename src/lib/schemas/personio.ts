@@ -27,7 +27,7 @@ export const personioAuthResponseSchema = z.object({
   })
 });
 
-export const personioEmployeeSchema = z.object({
+const personioEmployeeSchema = z.object({
   type: z.literal('Employee'),
   attributes: z.object({
     id: personioAttr(z.number()),
@@ -55,7 +55,7 @@ export const personioEmployeesResponseSchema = z.object({
   data: z.array(personioEmployeeSchema)
 });
 
-export const personioTimeOffSchema = z.object({
+const personioTimeOffSchema = z.object({
   type: z.literal('TimeOffPeriod'),
   attributes: z.object({
     id: z.number(),

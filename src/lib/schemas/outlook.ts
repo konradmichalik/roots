@@ -14,7 +14,7 @@ const emailAddressSchema = z.object({
   address: z.string()
 });
 
-export const msGraphAttendeeSchema = z.object({
+const msGraphAttendeeSchema = z.object({
   emailAddress: emailAddressSchema,
   type: z.enum(['required', 'optional', 'resource']),
   status: z.object({
@@ -58,10 +58,3 @@ export const msGraphUserSchema = z.object({
   userPrincipalName: z.string()
 });
 
-export const oauthTokenResponseSchema = z.object({
-  access_token: z.string(),
-  refresh_token: z.string().optional(),
-  expires_in: z.number(),
-  scope: z.string(),
-  token_type: z.string()
-});

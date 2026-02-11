@@ -9,7 +9,8 @@
   import {
     getEntriesForDate,
     getDayOverview,
-    timeEntriesState
+    timeEntriesState,
+    fetchDayEntries
   } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
@@ -26,6 +27,10 @@
   let rawPresences = $derived(getRawPresencesForDate(dateNavState.selectedDate));
   let hasPresence = $derived(rawPresences.length > 0);
   let isLoadingMoco = $derived(timeEntriesState.loading.moco);
+
+  function retryFetch() {
+    fetchDayEntries(dateNavState.selectedDate);
+  }
   let displayBalance = $derived(
     overview.presence ? (overview.presenceBalance ?? 0) : overview.balance
   );
@@ -83,7 +88,7 @@
     </div>
 
     <!-- Right: Hours and balance (visually separated) -->
-    <div class="flex items-center gap-2 shrink-0 pl-2 border-l border-border">
+    <div class="flex items-center gap-2 shrink-0 pl-2 border-l border-border" aria-live="polite" aria-atomic="true">
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
@@ -143,6 +148,8 @@
         source="outlook"
         entries={matchResult.sortedOutlook}
         loading={timeEntriesState.loading.outlook}
+        error={timeEntriesState.errors.outlook}
+        onretry={retryFetch}
         entryGroupMap={matchResult.entryGroupMap}
       />
     {:else}
@@ -160,6 +167,8 @@
         source="moco"
         entries={matchResult.sortedMoco}
         loading={timeEntriesState.loading.moco}
+        error={timeEntriesState.errors.moco}
+        onretry={retryFetch}
         emphasized
         entryGroupMap={matchResult.entryGroupMap}
       >
@@ -169,6 +178,7 @@
               class="rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150
                 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
               title="New Moco entry"
+              aria-label="New Moco entry"
             >
               <Plus class="size-4" />
             </button>
@@ -190,6 +200,8 @@
         source="jira"
         entries={matchResult.sortedJira}
         loading={timeEntriesState.loading.jira}
+        error={timeEntriesState.errors.jira}
+        onretry={retryFetch}
         entryGroupMap={matchResult.entryGroupMap}
       />
     {:else}

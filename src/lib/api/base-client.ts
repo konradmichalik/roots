@@ -117,6 +117,11 @@ export abstract class ApiClient {
       const obj = data as Record<string, unknown>;
       if (typeof obj.message === 'string') return obj.message;
       if (typeof obj.error === 'string') return obj.error;
+      // Nested error object (MS Graph, Personio): { error: { message: "..." } }
+      if (typeof obj.error === 'object' && obj.error !== null) {
+        const nested = obj.error as Record<string, unknown>;
+        if (typeof nested.message === 'string') return nested.message;
+      }
       if (Array.isArray(obj.errorMessages)) return obj.errorMessages.join(', ');
     }
     return null;
