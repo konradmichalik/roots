@@ -14,6 +14,26 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Service-Base-Url', 'X-Atlassian-Token']
 }));
 
+// Domain whitelist — only these hosts may be proxied
+const ALLOWED_DOMAINS = [
+  'mocoapp.com',
+  'atlassian.net',
+  'atlassian.com',
+  'jira.com',
+  'api.personio.de'
+];
+
+function isAllowedUrl(urlString) {
+  try {
+    const { hostname } = new URL(urlString);
+    return ALLOWED_DOMAINS.some(
+      (d) => hostname === d || hostname.endsWith(`.${d}`)
+    );
+  } catch {
+    return false;
+  }
+}
+
 function buildQueryString(query) {
   const params = new URLSearchParams(query).toString();
   return params ? `?${params}` : '';
@@ -33,6 +53,10 @@ app.all('/moco/*', async (req, res) => {
   const path = req.path.replace('/moco', '');
   const qs = buildQueryString(req.query);
   const targetUrl = `https://${domain}.mocoapp.com/api/v1${path}${qs}`;
+
+  if (!isAllowedUrl(targetUrl)) {
+    return res.status(403).json({ error: 'Target host not allowed' });
+  }
 
   console.log(`[Proxy] ${req.method} /moco${path} -> ${targetUrl}`);
 
@@ -75,6 +99,11 @@ app.all('/jira/*', async (req, res) => {
   const baseUrl = req.headers['x-service-base-url'] || process.env.JIRA_BASE_URL;
   if (!baseUrl) {
     return res.status(500).json({ error: 'Jira base URL not configured' });
+  }
+
+  if (!isAllowedUrl(baseUrl)) {
+    console.warn(`[Proxy] Blocked Jira request to disallowed host: ${baseUrl}`);
+    return res.status(403).json({ error: 'Target host not allowed' });
   }
 
   const path = req.path.replace('/jira', '');
