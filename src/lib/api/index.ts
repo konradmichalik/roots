@@ -2,6 +2,8 @@ import type {
   MocoConnectionConfig,
   JiraConnectionConfig,
   OutlookConnectionConfig,
+  PersonioConnectionConfig,
+  PersonioAuthToken,
   OAuthTokens
 } from '../types';
 import { MocoClient, type MocoClientConfig } from './moco-client';
@@ -9,10 +11,12 @@ import { JiraCloudWorklogClient } from './jira-cloud-worklog';
 import { JiraServerWorklogClient } from './jira-server-worklog';
 import type { JiraWorklogClient } from './jira-worklog-client';
 import { OutlookClient } from './outlook-client';
+import { PersonioClient } from './personio-client';
 
 export { MocoClient } from './moco-client';
 export { JiraWorklogClient, type WorklogWithIssue } from './jira-worklog-client';
 export { OutlookClient } from './outlook-client';
+export { PersonioClient } from './personio-client';
 
 const PROXY_BASE = 'http://localhost:3002';
 
@@ -58,4 +62,12 @@ export function createOutlookClient(
   onTokensRefreshed?: (tokens: OAuthTokens) => void
 ): OutlookClient {
   return new OutlookClient(config, tokens, onTokensRefreshed);
+}
+
+export function createPersonioClient(
+  config: PersonioConnectionConfig,
+  storedToken?: PersonioAuthToken,
+  onTokenRefreshed?: (token: PersonioAuthToken) => void
+): PersonioClient {
+  return new PersonioClient(config, storedToken, onTokenRefreshed);
 }
