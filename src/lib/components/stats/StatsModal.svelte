@@ -3,11 +3,13 @@
   import StatsOverviewSlide from './StatsOverviewSlide.svelte';
   import StatsBreakdownSlide from './StatsBreakdownSlide.svelte';
   import StatsProjectsSlide from './StatsProjectsSlide.svelte';
+  import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getCachedDayOverview, monthCacheState } from '../../stores/timeEntries.svelte';
+  import { getCachedDayOverview, monthCacheState, fetchMonthCache } from '../../stores/timeEntries.svelte';
   import {
     getWeekDates,
     getMonthStart,
+    getMonthEnd,
     getMonthWorkingDays,
     today,
     parseDate,
@@ -116,6 +118,17 @@
   });
 
   let showMonthUntilYesterday = $derived(isCurrentMonth && monthTotalsUntilYesterday.daysCount > 0);
+
+  // Auto-fetch uncached months when navigating
+  $effect(() => {
+    if (open && !monthCacheState.cache[selectedMonth]) {
+      fetchMonthCache(selectedMonth, getMonthEnd(selectedMonth));
+    }
+  });
+
+  let isMonthLoading = $derived(
+    monthCacheState.loading && !monthCacheState.cache[selectedMonth]
+  );
 
   // Month project+task distribution from cache
   let monthProjectStats = $derived.by((): MonthProjectStats => {
@@ -229,7 +242,25 @@
     <div class="py-4">
       <!-- Slide Container - Fixed Height -->
       <div class="h-[420px] overflow-y-auto">
-        {#if activeSlide === 'overview'}
+        {#if isMonthLoading}
+          <!-- Skeleton mimicking overview layout -->
+          <div class="space-y-4 animate-pulse">
+            {#each { length: 2 } as _, i (i)}
+              <div class="rounded-xl border border-border bg-card p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <Skeleton class="h-4 w-24" />
+                  <Skeleton class="h-6 w-16" />
+                </div>
+                <div class="flex items-center justify-between">
+                  <Skeleton class="h-3 w-28" />
+                  <Skeleton class="h-3 w-28" />
+                </div>
+                <Skeleton class="h-2 w-full rounded-full" />
+                <Skeleton class="h-3 w-40" />
+              </div>
+            {/each}
+          </div>
+        {:else if activeSlide === 'overview'}
           <StatsOverviewSlide
             {weekTotals}
             {weekTotalsUntilYesterday}

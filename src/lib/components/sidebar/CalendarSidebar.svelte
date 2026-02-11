@@ -2,11 +2,12 @@
   import MiniCalendar from './MiniCalendar.svelte';
   import StatsModal from '../stats/StatsModal.svelte';
   import AbsenceModal from '../absences/AbsenceModal.svelte';
+  import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { getCachedDayOverview, hasCachedDataForDate } from '../../stores/timeEntries.svelte';
+  import { getCachedDayOverview, hasCachedDataForDate, monthCacheState } from '../../stores/timeEntries.svelte';
   import { getPresenceForDate } from '../../stores/presences.svelte';
   import {
     formatDateShort,
@@ -118,6 +119,10 @@
         );
       })
       .sort((a, b) => a.overview.balance - b.overview.balance) // Ascending: largest minus first
+  );
+
+  let isStatsLoading = $derived(
+    monthCacheState.loading && !monthCacheState.cache[monthStart]
   );
 
   function formatRange(start: string, end: string): string {
@@ -261,71 +266,84 @@
     </div>
 
     <!-- Week/Month Balance Summary -->
-    <div class="flex items-center gap-3 text-xs">
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <div
-              class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
-            >
-              <span class="text-muted-foreground">Week</span>
-              <span class="font-mono font-medium {getBalanceClass(weekBalance)}"
-                >{formatBalance(weekBalance)}</span
+    {#if isStatsLoading}
+      <div class="flex items-center gap-3">
+        <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
+          <Skeleton class="h-3 w-10" />
+          <Skeleton class="h-3 w-12" />
+        </div>
+        <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
+          <Skeleton class="h-3 w-10" />
+          <Skeleton class="h-3 w-12" />
+        </div>
+      </div>
+    {:else}
+      <div class="flex items-center gap-3 text-xs">
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <div
+                class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
               >
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" sideOffset={4}>
-            <div class="text-xs space-y-1">
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Booked:</span>
-                <span class="font-mono font-medium">{formatHours(weekActual)}</span>
+                <span class="text-muted-foreground">Week</span>
+                <span class="font-mono font-medium {getBalanceClass(weekBalance)}"
+                  >{formatBalance(weekBalance)}</span
+                >
               </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Target:</span>
-                <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom" sideOffset={4}>
+              <div class="text-xs space-y-1">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-muted-foreground">Booked:</span>
+                  <span class="font-mono font-medium">{formatHours(weekActual)}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-muted-foreground">Target:</span>
+                  <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
+                </div>
+                <div class="text-muted-foreground pt-1 border-t border-border/50">
+                  {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1
+                    ? 's'
+                    : ''} (excl. today)
+                </div>
               </div>
-              <div class="text-muted-foreground pt-1 border-t border-border/50">
-                {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1
-                  ? 's'
-                  : ''} (excl. today)
-              </div>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <div
-              class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
-            >
-              <span class="text-muted-foreground">Month</span>
-              <span class="font-mono font-medium {getBalanceClass(monthBalance)}"
-                >{formatBalance(monthBalance)}</span
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <div
+                class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
               >
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" sideOffset={4}>
-            <div class="text-xs space-y-1">
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Booked:</span>
-                <span class="font-mono font-medium">{formatHours(monthActual)}</span>
+                <span class="text-muted-foreground">Month</span>
+                <span class="font-mono font-medium {getBalanceClass(monthBalance)}"
+                  >{formatBalance(monthBalance)}</span
+                >
               </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Target:</span>
-                <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom" sideOffset={4}>
+              <div class="text-xs space-y-1">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-muted-foreground">Booked:</span>
+                  <span class="font-mono font-medium">{formatHours(monthActual)}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-muted-foreground">Target:</span>
+                  <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
+                </div>
+                <div class="text-muted-foreground pt-1 border-t border-border/50">
+                  {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !==
+                  1
+                    ? 's'
+                    : ''} (excl. today)
+                </div>
               </div>
-              <div class="text-muted-foreground pt-1 border-t border-border/50">
-                {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !==
-                1
-                  ? 's'
-                  : ''} (excl. today)
-              </div>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      </div>
+    {/if}
 
     <!-- Open Hours Accordion -->
     {#if openDays.length > 0}
