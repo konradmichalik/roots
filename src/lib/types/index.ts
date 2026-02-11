@@ -68,4 +68,15 @@ export type { Favorite, FavoriteEventMatch } from './favorites';
 
 export type { RecentMocoPair } from './recentPairs';
 
+export type {
+  PersonioAuthToken,
+  PersonioEmployee,
+  PersonioEmployeeAttribute,
+  PersonioWorkScheduleDay,
+  PersonioTimeOff,
+  PersonioResponse,
+  PersonioAbsence,
+  PersonioConnectionConfig
+} from './personio';
+
 export type { TimerStatus, TimerMocoBooking, TimerState, DraftEntry } from './timer';

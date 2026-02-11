@@ -1,4 +1,4 @@
-export type ServiceType = 'moco' | 'jira' | 'outlook';
+export type ServiceType = 'moco' | 'jira' | 'outlook' | 'personio';
 
 export interface MocoConnectionConfig {
   domain: string;
@@ -48,6 +48,7 @@ export interface AllConnectionsState {
   moco: ServiceConnectionState;
   jira: ServiceConnectionState;
   outlook: ServiceConnectionState;
+  personio: ServiceConnectionState;
 }
 
 export function createInitialServiceState(service: ServiceType): ServiceConnectionState {

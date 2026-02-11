@@ -1,4 +1,5 @@
 import type { ServiceType } from './connections';
+import type { PersonioAbsence } from './personio';
 
 export interface UnifiedTimeEntry {
   id: string;
@@ -92,7 +93,7 @@ export interface DayOverview {
   isToday: boolean;
   requiredHours: number;
   presence?: DayPresence;
-  manualAbsence?: ManualAbsence;
+  manualAbsence?: ManualAbsence | PersonioAbsence;
   entries: {
     moco: UnifiedTimeEntry[];
     jira: UnifiedTimeEntry[];

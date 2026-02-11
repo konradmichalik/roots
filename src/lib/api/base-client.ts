@@ -3,7 +3,7 @@ import { isTauri } from '../utils/storage';
 
 let platformFetch: typeof fetch | null = null;
 
-async function getPlatformFetch(): Promise<typeof fetch> {
+export async function getPlatformFetch(): Promise<typeof fetch> {
   if (!platformFetch) {
     platformFetch = isTauri() ? (await import('@tauri-apps/plugin-http')).fetch : fetch;
   }
