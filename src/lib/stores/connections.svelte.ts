@@ -3,6 +3,8 @@ import type {
   MocoConnectionConfig,
   JiraConnectionConfig,
   OutlookConnectionConfig,
+  PersonioConnectionConfig,
+  PersonioAuthToken,
   OAuthTokens
 } from '../types';
 import { createInitialServiceState } from '../types';
@@ -12,7 +14,9 @@ import {
   createJiraWorklogClient,
   type JiraWorklogClient,
   createOutlookClient,
-  OutlookClient
+  OutlookClient,
+  createPersonioClient,
+  type PersonioClient
 } from '../api';
 import { exchangeCodeForTokens, getStoredOAuthConfig, startOAuthFlow } from '../api/oauth-manager';
 import {
@@ -23,11 +27,13 @@ import {
 } from '../utils/storage';
 import { logger } from '../utils/logger';
 import { withRetry } from '../utils/retry';
+import { updateSettings } from './settings.svelte';
 
 export const connectionsState = $state<AllConnectionsState>({
   moco: createInitialServiceState('moco'),
   jira: createInitialServiceState('jira'),
-  outlook: createInitialServiceState('outlook')
+  outlook: createInitialServiceState('outlook'),
+  personio: createInitialServiceState('personio')
 });
 
 // Track if user has ever configured any service (persisted configs exist)
@@ -37,6 +43,7 @@ let mocoClient: MocoClient | null = null;
 let jiraClient: JiraWorklogClient | null = null;
 let jiraConfig: JiraConnectionConfig | null = null;
 let outlookClient: OutlookClient | null = null;
+let personioClient: PersonioClient | null = null;
 
 export async function initializeConnections(): Promise<void> {
   const restores: Promise<void>[] = [];
@@ -63,6 +70,16 @@ export async function initializeConnections(): Promise<void> {
     hasConfiguredServices = true;
     logger.connection('Restoring Outlook connection from storage');
     restores.push(restoreOutlook(outlookConfig, outlookTokens).then(() => {}));
+  }
+
+  const personioConfig = await getStorageItemAsync<PersonioConnectionConfig>(
+    STORAGE_KEYS.PERSONIO_CONFIG
+  );
+  if (personioConfig) {
+    hasConfiguredServices = true;
+    logger.connection('Restoring Personio connection from storage');
+    const storedToken = await getStorageItemAsync<PersonioAuthToken>(STORAGE_KEYS.PERSONIO_TOKEN);
+    restores.push(restorePersonio(personioConfig, storedToken ?? undefined).then(() => {}));
   }
 
   // Note: hasConfiguredServices is also set in connect functions for new connections
@@ -257,11 +274,95 @@ export function getJiraBaseUrl(): string | null {
   return jiraConfig?.baseUrl ?? null;
 }
 
+export async function connectPersonio(config: PersonioConnectionConfig): Promise<boolean> {
+  connectionsState.personio.isConnecting = true;
+  connectionsState.personio.error = null;
+
+  try {
+    personioClient = createPersonioClient(config, undefined, async (token) => {
+      await setStorageItemAsync(STORAGE_KEYS.PERSONIO_TOKEN, token);
+    });
+
+    const result = await personioClient.testConnection();
+    if (!result.success) {
+      throw new Error(result.error || 'Personio connection failed');
+    }
+
+    // Apply work schedule from employee data returned by testConnection
+    if (result.employee) {
+      const workSchedule = personioClient.getWorkSchedule(result.employee);
+      updateSettings({ weekdayHours: workSchedule });
+      logger.store('settings', 'Updated weekdayHours from Personio', { workSchedule });
+    }
+
+    connectionsState.personio.isConnected = true;
+    connectionsState.personio.isConnecting = false;
+    connectionsState.personio.error = null;
+    connectionsState.personio.lastConnected = new Date().toISOString();
+
+    await setStorageItemAsync(STORAGE_KEYS.PERSONIO_CONFIG, config);
+    if (personioClient.getToken()) {
+      await setStorageItemAsync(STORAGE_KEYS.PERSONIO_TOKEN, personioClient.getToken()!);
+    }
+    hasConfiguredServices = true;
+    logger.connectionSuccess(`Personio connected as ${result.employeeName}`);
+    return true;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Connection failed';
+    connectionsState.personio.isConnected = false;
+    connectionsState.personio.isConnecting = false;
+    connectionsState.personio.error = message;
+    connectionsState.personio.lastConnected = null;
+    personioClient = null;
+    logger.error('Personio connection failed', error);
+    return false;
+  }
+}
+
+export async function disconnectPersonio(): Promise<void> {
+  connectionsState.personio = createInitialServiceState('personio');
+  personioClient = null;
+  await removeStorageItemAsync(STORAGE_KEYS.PERSONIO_CONFIG);
+  await removeStorageItemAsync(STORAGE_KEYS.PERSONIO_TOKEN);
+  logger.connection('Personio disconnected');
+}
+
+async function restorePersonio(
+  config: PersonioConnectionConfig,
+  storedToken?: PersonioAuthToken
+): Promise<void> {
+  try {
+    personioClient = createPersonioClient(config, storedToken, async (token) => {
+      await setStorageItemAsync(STORAGE_KEYS.PERSONIO_TOKEN, token);
+    });
+
+    const result = await personioClient.testConnection();
+    if (!result.success) {
+      throw new Error(result.error || 'Personio restore failed');
+    }
+
+    connectionsState.personio.isConnected = true;
+    connectionsState.personio.lastConnected = new Date().toISOString();
+    logger.connectionSuccess(`Personio restored as ${result.employeeName}`);
+  } catch (error) {
+    personioClient = null;
+    const message = error instanceof Error ? error.message : 'Personio restore failed';
+    connectionsState.personio.isConnected = false;
+    connectionsState.personio.error = message;
+    logger.error('Personio restore failed', error);
+  }
+}
+
+export function getPersonioClient(): PersonioClient | null {
+  return personioClient;
+}
+
 export function isAnyServiceConnected(): boolean {
   return (
     connectionsState.moco.isConnected ||
     connectionsState.jira.isConnected ||
-    connectionsState.outlook.isConnected
+    connectionsState.outlook.isConnected ||
+    connectionsState.personio.isConnected
   );
 }
 

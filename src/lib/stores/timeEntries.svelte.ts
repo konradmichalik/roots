@@ -16,7 +16,7 @@ import type { WorklogWithIssue, JiraWorklogClient } from '../api';
 import { getMocoClient, getJiraClient, getOutlookClient } from './connections.svelte';
 import { connectionsState } from './connections.svelte';
 import { settingsState } from './settings.svelte';
-import { getAbsenceForDate } from './absences.svelte';
+import { getAbsenceForDate, fetchPersonioAbsences } from './absences.svelte';
 import { fetchPresences, getPresenceForDate } from './presences.svelte';
 import {
   isWeekend,
@@ -134,6 +134,11 @@ export async function fetchMonthCache(from: string, to: string): Promise<void> {
       logger.error('Failed to fetch presences', error);
     });
   }
+
+  // Fetch Personio absences for this month (fire-and-forget)
+  fetchPersonioAbsences(from, to).catch((error) => {
+    logger.error('Failed to fetch Personio absences', error);
+  });
 
   const monthKey = from;
   const cached = monthCacheState.cache[monthKey];
