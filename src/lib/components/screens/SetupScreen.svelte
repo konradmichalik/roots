@@ -11,8 +11,7 @@
       <div class="text-center">
         <h1 class="text-3xl font-bold text-foreground tracking-tight">roots</h1>
         <p class="mt-1.5 text-sm text-muted-foreground">
-          Connect Moco to get started. You can add Jira, Outlook and Personio later in the
-          settings.
+          Connect Moco to get started. You can add Jira, Outlook and Personio later in the settings.
         </p>
       </div>
     </div>
