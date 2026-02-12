@@ -44,6 +44,11 @@ export interface MocoUser {
   lastname: string;
 }
 
+export interface MocoProjectContract {
+  user_id: number;
+  active: boolean;
+}
+
 export interface MocoProjectAssigned {
   id: number;
   identifier: string; // Project number, e.g. "P26011"
@@ -52,6 +57,7 @@ export interface MocoProjectAssigned {
   active?: boolean; // Projects can be deactivated in Moco
   customer: MocoCustomer;
   tasks: MocoTask[];
+  contract?: MocoProjectContract;
 }
 
 export interface MocoCreateActivity {

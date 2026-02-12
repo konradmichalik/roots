@@ -39,8 +39,12 @@ export async function fetchAssignedProjects(): Promise<void> {
 }
 
 export function getActiveProjects(): MocoProjectAssigned[] {
-  // Filter out inactive projects (active defaults to true if not present)
-  return mocoProjectsState.projects.filter((p) => p.active !== false);
+  return mocoProjectsState.projects.filter(
+    (p) =>
+      p.active !== false &&
+      p.contract?.active !== false &&
+      p.tasks.some((t) => t.active !== false)
+  );
 }
 
 export function getProjectById(id: number): MocoProjectAssigned | undefined {

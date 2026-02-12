@@ -70,6 +70,11 @@ export const mocoPresenceSchema = z.object({
 
 export const mocoPresencesSchema = z.array(mocoPresenceSchema);
 
+export const mocoProjectContractSchema = z.object({
+  user_id: z.number(),
+  active: z.boolean()
+});
+
 export const mocoProjectAssignedSchema = z.object({
   id: z.number(),
   identifier: z.string(),
@@ -77,7 +82,8 @@ export const mocoProjectAssignedSchema = z.object({
   billable: z.boolean(),
   active: z.boolean().optional(),
   customer: mocoCustomerSchema,
-  tasks: z.array(mocoTaskSchema)
+  tasks: z.array(mocoTaskSchema),
+  contract: mocoProjectContractSchema.optional()
 });
 
 export const mocoProjectsAssignedSchema = z.array(mocoProjectAssignedSchema);
