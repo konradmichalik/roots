@@ -47,6 +47,10 @@
                 role="button"
                 tabindex="-1"
                 onclick={(e) => handleRemove(e, pair.projectId, pair.taskId)}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ')
+                    handleRemove(e, pair.projectId, pair.taskId);
+                }}
                 class="ml-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-danger-subtle hover:text-danger-text transition-all"
               >
                 <X class="size-3" />

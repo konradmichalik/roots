@@ -55,7 +55,7 @@
     defaultOpen?: boolean;
   } = $props();
 
-  let open = $state(defaultOpen);
+  let open = $state(false);
   let saving = $state(false);
   let error = $state<string | null>(null);
   let savedAsFavorite = $state(false);
@@ -84,7 +84,7 @@
     if (!task) return null;
     const loggedHours = getTaskLoggedHours(task.id);
     const hasBudget = !!(task.budget && task.hourly_rate && task.hourly_rate > 0);
-    const budgetHours = hasBudget ? task.budget! / task.hourly_rate! : 0;
+    const budgetHours = hasBudget ? (task.budget ?? 0) / (task.hourly_rate ?? 1) : 0;
     const remaining = hasBudget ? budgetHours - loggedHours : 0;
     return { loggedHours, budgetHours, remaining, hasBudget };
   });
@@ -135,13 +135,13 @@
   }
 
   // Sync open state with defaultOpen prop changes (only react to prop changes, not internal open state)
-  let prevDefaultOpen = defaultOpen;
+  let prevDefaultOpen: boolean | undefined;
   $effect(() => {
     const newDefaultOpen = defaultOpen;
     untrack(() => {
       if (newDefaultOpen !== prevDefaultOpen) {
         prevDefaultOpen = newDefaultOpen;
-        open = newDefaultOpen;
+        open = newDefaultOpen ?? false;
         if (newDefaultOpen) {
           initModal();
         }

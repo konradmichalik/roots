@@ -9,7 +9,7 @@
   } from '../../stores/timeEntries.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getJiraBaseUrl } from '../../stores/connections.svelte';
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import ExternalLink from '@lucide/svelte/icons/external-link';
 
@@ -35,7 +35,7 @@
     defaultOpen?: boolean;
   } = $props();
 
-  let open = $state(defaultOpen);
+  let open = $state(false);
   let saving = $state(false);
   let error = $state<string | null>(null);
   let showDeleteConfirm = $state(false);
@@ -58,13 +58,16 @@
   }
 
   // Sync open state with defaultOpen prop changes
+  let prevDefaultOpen: boolean | undefined;
   $effect(() => {
-    if (defaultOpen !== open) {
-      open = defaultOpen;
-      if (defaultOpen) {
-        resetForm();
+    const newDefaultOpen = defaultOpen;
+    untrack(() => {
+      if (newDefaultOpen !== prevDefaultOpen) {
+        prevDefaultOpen = newDefaultOpen;
+        open = newDefaultOpen ?? false;
+        if (newDefaultOpen) resetForm();
       }
-    }
+    });
   });
 
   function handleOpen(isOpen: boolean): void {

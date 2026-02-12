@@ -71,7 +71,7 @@
       } else {
         toast.error('Failed to save entry');
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to save entry');
     } finally {
       saving = false;

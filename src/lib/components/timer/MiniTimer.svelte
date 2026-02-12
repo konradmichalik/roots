@@ -55,7 +55,6 @@
   });
 
   const draftsCount = $derived(draftsState.drafts.length);
-  const hasBooking = $derived(timerState.mocoBooking !== null);
   const bookingLabel = $derived(
     timerState.mocoBooking
       ? `${timerState.mocoBooking.customerName} — ${timerState.mocoBooking.projectName}`

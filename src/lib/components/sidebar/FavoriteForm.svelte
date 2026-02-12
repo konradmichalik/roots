@@ -21,31 +21,29 @@
     editFavorite?: Favorite;
   } = $props();
 
-  // Initialize form state - using function to avoid svelte reactivity tracking
-  function getInitialValues(fav: Favorite | undefined) {
-    return {
-      name: fav?.name ?? '',
-      projectValue: fav ? String(fav.projectId) : '',
-      taskValue: fav ? String(fav.taskId) : '',
-      selectedProjectId: fav?.projectId ?? null,
-      defaultHours: fav?.defaultHours ?? 0,
-      description: fav?.description ?? '',
-      enableEventMatch: !!fav?.eventMatch,
-      matchPattern: fav?.eventMatch?.pattern ?? '',
-      matchType: (fav?.eventMatch?.matchType ?? 'contains') as FavoriteEventMatch['matchType']
-    };
-  }
-  const initial = getInitialValues(editFavorite);
+  let name = $state('');
+  let projectValue = $state('');
+  let taskValue = $state('');
+  let selectedProjectId = $state<number | null>(null);
+  let defaultHours = $state(0);
+  let description = $state('');
+  let enableEventMatch = $state(false);
+  let matchPattern = $state('');
+  let matchType = $state<FavoriteEventMatch['matchType']>('contains');
 
-  let name = $state(initial.name);
-  let projectValue = $state(initial.projectValue);
-  let taskValue = $state(initial.taskValue);
-  let selectedProjectId = $state<number | null>(initial.selectedProjectId);
-  let defaultHours = $state(initial.defaultHours);
-  let description = $state(initial.description);
-  let enableEventMatch = $state(initial.enableEventMatch);
-  let matchPattern = $state(initial.matchPattern);
-  let matchType = $state<FavoriteEventMatch['matchType']>(initial.matchType);
+  // Initialize form state from editFavorite prop
+  $effect.pre(() => {
+    const fav = editFavorite;
+    name = fav?.name ?? '';
+    projectValue = fav ? String(fav.projectId) : '';
+    taskValue = fav ? String(fav.taskId) : '';
+    selectedProjectId = fav?.projectId ?? null;
+    defaultHours = fav?.defaultHours ?? 0;
+    description = fav?.description ?? '';
+    enableEventMatch = !!fav?.eventMatch;
+    matchPattern = fav?.eventMatch?.pattern ?? '';
+    matchType = (fav?.eventMatch?.matchType ?? 'contains') as FavoriteEventMatch['matchType'];
+  });
 
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
 

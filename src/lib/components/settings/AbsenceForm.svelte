@@ -12,17 +12,18 @@
     prefillDate?: string;
   } = $props();
 
-  // Initialize form state - using function to avoid svelte reactivity tracking
-  function getInitialDate(date: string | undefined) {
-    return date ?? '';
-  }
-  const initialDate = getInitialDate(prefillDate);
-
   let type = $state<AbsenceType>('vacation');
-  let startDate = $state(initialDate);
-  let endDate = $state(initialDate);
+  let startDate = $state('');
+  let endDate = $state('');
   let halfDay = $state(false);
   let note = $state('');
+
+  // Initialize dates from prefillDate prop
+  $effect.pre(() => {
+    const date = prefillDate ?? '';
+    startDate = date;
+    endDate = date;
+  });
 
   const ABSENCE_LABELS: Record<AbsenceType, string> = {
     vacation: 'Vacation',

@@ -92,7 +92,7 @@
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content side="bottom" sideOffset={4}>
-                {formatDateTime(timeEntriesState.lastFetched!)}
+                {formatDateTime(timeEntriesState.lastFetched ?? '')}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
