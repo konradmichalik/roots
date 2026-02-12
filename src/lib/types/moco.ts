@@ -46,6 +46,7 @@ export interface MocoUser {
 
 export interface MocoProjectAssigned {
   id: number;
+  identifier: string; // Project number, e.g. "P26011"
   name: string;
   billable: boolean;
   active?: boolean; // Projects can be deactivated in Moco

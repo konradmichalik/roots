@@ -72,6 +72,7 @@ export const mocoPresencesSchema = z.array(mocoPresenceSchema);
 
 export const mocoProjectAssignedSchema = z.object({
   id: z.number(),
+  identifier: z.string(),
   name: z.string(),
   billable: z.boolean(),
   active: z.boolean().optional(),

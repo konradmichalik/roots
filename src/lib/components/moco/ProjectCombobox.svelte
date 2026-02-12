@@ -15,13 +15,14 @@
   let items = $derived(
     getActiveProjects().map((p) => ({
       value: String(p.id),
-      label: `${p.customer.name} — ${p.name}`
+      label: `${p.customer.name} — ${p.name}`,
+      searchText: `${p.identifier} ${p.customer.name} ${p.name}`.toLowerCase()
     }))
   );
 
   let filtered = $derived(
     searchValue.trim()
-      ? items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()))
+      ? items.filter((item) => item.searchText.includes(searchValue.toLowerCase()))
       : items
   );
 
