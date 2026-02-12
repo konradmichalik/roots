@@ -9,3 +9,5 @@ src-tauri/gen/
 .env
 .env.local
 IMPROVEMENTS.md
+.vercel
+.env*.local
