@@ -4,7 +4,7 @@
 <div class="flex h-screen items-center justify-center bg-background">
   <div class="flex flex-col items-center gap-6 animate-fade-in">
     <div class="animate-spin-slow">
-      <img src="/docs/images/roots-logo-sm.svg" alt="roots" class="h-16 w-16" />
+      <img src="/images/roots-logo-sm.svg" alt="roots" class="h-16 w-16" />
     </div>
     <div class="text-center">
       <h1 class="text-2xl font-bold text-foreground tracking-tight">roots</h1>

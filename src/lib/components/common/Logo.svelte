@@ -23,10 +23,10 @@
 </script>
 
 {#if variant === 'full'}
-  <img src="/docs/images/roots-logo.svg" alt="roots" class="{fullSizeClasses[size]} w-auto" />
+  <img src="/images/roots-logo.svg" alt="roots" class="{fullSizeClasses[size]} w-auto" />
 {:else}
   <img
-    src="/docs/images/roots-logo-sm.svg"
+    src="/images/roots-logo-sm.svg"
     alt="roots"
     class="{iconSizeClasses[size]} {animate ? 'logo-spin' : ''}"
   />
