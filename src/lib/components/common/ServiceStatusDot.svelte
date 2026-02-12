@@ -20,21 +20,28 @@
     personio: 'text-source-personio-text'
   };
 
+  // Subtle background tints per service (for connected state)
+  const serviceBg: Record<ServiceType, string> = {
+    moco: 'bg-source-moco-text/10',
+    jira: 'bg-source-jira-text/10',
+    outlook: 'bg-source-outlook-text/10',
+    personio: 'bg-source-personio-text/10'
+  };
+
   let isConnected = $derived(connectionsState[service].isConnected);
-  let colorClass = $derived(isConnected ? serviceColors[service] : 'text-muted-foreground');
 </script>
 
 <Tooltip.Provider delayDuration={200}>
   <Tooltip.Root>
     <Tooltip.Trigger>
       <div
-        class="flex items-center justify-center size-6 transition-all duration-200
-          {colorClass} {isConnected ? '' : 'grayscale'}"
+        class="flex items-center justify-center size-5 rounded-full transition-all duration-200
+          {isConnected ? `${serviceBg[service]} ${serviceColors[service]}` : 'text-muted-foreground/40'}"
       >
         {#if service === 'moco'}
           <!-- Moco Logo -->
           <svg
-            class="size-4"
+            class="size-2.5"
             viewBox="0 0 76 76"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
@@ -56,7 +63,7 @@
         {:else if service === 'jira'}
           <!-- Jira Logo -->
           <svg
-            class="size-4"
+            class="size-2.5"
             viewBox="0 0 24 24"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +75,7 @@
         {:else if service === 'outlook'}
           <!-- Outlook Logo -->
           <svg
-            class="size-4"
+            class="size-2.5"
             viewBox="0 0 50 50"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +87,7 @@
         {:else if service === 'personio'}
           <!-- Personio Logo -->
           <svg
-            class="size-4"
+            class="size-2.5"
             viewBox="0 0 210 212"
             fill="currentColor"
             xmlns="http://www.w3.org/2000/svg"
