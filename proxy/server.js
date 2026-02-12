@@ -20,6 +20,7 @@ const ALLOWED_DOMAINS = [
   'atlassian.net',
   'atlassian.com',
   'jira.com',
+  'move-elevator.de',
   'api.personio.de'
 ];
 
