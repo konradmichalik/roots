@@ -89,7 +89,11 @@
     </div>
 
     <!-- Right: Hours and balance (visually separated) -->
-    <div class="flex items-center gap-2 shrink-0 pl-2 border-l border-border" aria-live="polite" aria-atomic="true">
+    <div
+      class="flex items-center gap-2 shrink-0 pl-2 border-l border-border"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>

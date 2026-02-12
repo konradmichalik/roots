@@ -26,12 +26,8 @@
       >
         {#if hasBudget}
           <span class="inline-flex items-center gap-1">
-            <Hourglass
-              class="size-3 {remaining > 0 ? 'text-success-text' : 'text-danger-text'}"
-            />
-            <span
-              class="font-semibold {remaining > 0 ? 'text-success-text' : 'text-danger-text'}"
-            >
+            <Hourglass class="size-3 {remaining > 0 ? 'text-success-text' : 'text-danger-text'}" />
+            <span class="font-semibold {remaining > 0 ? 'text-success-text' : 'text-danger-text'}">
               {remaining < 0 ? '-' : ''}{formatPT(remaining)} PT
             </span>
             <span>({formatHours(remaining)})</span>

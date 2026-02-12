@@ -121,9 +121,12 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-1.5">
                     <XCircle class="size-3 text-muted-foreground flex-shrink-0" />
-                    <span class="text-sm font-medium text-foreground truncate">{favorite.name}</span>
+                    <span class="text-sm font-medium text-foreground truncate">{favorite.name}</span
+                    >
                     {#if favorite.defaultHours}
-                      <span class="text-xs font-mono text-muted-foreground ml-auto flex-shrink-0 pr-5">
+                      <span
+                        class="text-xs font-mono text-muted-foreground ml-auto flex-shrink-0 pr-5"
+                      >
                         {formatHours(favorite.defaultHours)}
                       </span>
                     {/if}

@@ -226,7 +226,8 @@
                 </button>
               </Tooltip.Trigger>
               <Tooltip.Content side="bottom" sideOffset={4}>
-                Add {matchingEvents.length} matching event{matchingEvents.length !== 1 ? 's' : ''} to Moco
+                Add {matchingEvents.length} matching event{matchingEvents.length !== 1 ? 's' : ''} to
+                Moco
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -234,7 +235,11 @@
       </div>
 
       {#each eventFavorites as favorite (favorite.id)}
-        <FavoriteItem {favorite} matched={isMatched(favorite.id)} {...dragProps(favorite.id, 'event')} />
+        <FavoriteItem
+          {favorite}
+          matched={isMatched(favorite.id)}
+          {...dragProps(favorite.id, 'event')}
+        />
       {/each}
     </div>
   {/if}

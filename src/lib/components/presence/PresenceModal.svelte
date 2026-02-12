@@ -346,19 +346,11 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label for="new-from-time" class="text-xs text-muted-foreground">From</label>
-              <ClockTimeInput
-                id="new-from-time"
-                bind:value={newFromTime}
-                placeholder="08:00"
-              />
+              <ClockTimeInput id="new-from-time" bind:value={newFromTime} placeholder="08:00" />
             </div>
             <div>
               <label for="new-to-time" class="text-xs text-muted-foreground">To (optional)</label>
-              <ClockTimeInput
-                id="new-to-time"
-                bind:value={newToTime}
-                placeholder="17:00"
-              />
+              <ClockTimeInput id="new-to-time" bind:value={newToTime} placeholder="17:00" />
             </div>
           </div>
           <button

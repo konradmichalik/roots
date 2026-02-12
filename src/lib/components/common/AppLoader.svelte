@@ -8,7 +8,9 @@
     </div>
     <div class="text-center">
       <h1 class="text-2xl font-bold text-foreground tracking-tight">roots</h1>
-      <p class="mt-2 text-sm text-muted-foreground animate-pulse" role="status" aria-live="polite">Loading...</p>
+      <p class="mt-2 text-sm text-muted-foreground animate-pulse" role="status" aria-live="polite">
+        Loading...
+      </p>
     </div>
   </div>
 </div>

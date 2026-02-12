@@ -7,7 +7,12 @@
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { formatDateShort, today } from '../../utils/date-helpers';
-  import { ABSENCE_LABELS, ABSENCE_COLORS, type ManualAbsence, type PersonioAbsence } from '../../types';
+  import {
+    ABSENCE_LABELS,
+    ABSENCE_COLORS,
+    type ManualAbsence,
+    type PersonioAbsence
+  } from '../../types';
   import Calendar from '@lucide/svelte/icons/calendar';
   import CalendarOff from '@lucide/svelte/icons/calendar-off';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -92,15 +97,21 @@
   {#snippet absenceDetail(absence: ManualAbsence | PersonioAbsence, trailing: string | 'pencil')}
     <div class="flex items-center gap-2">
       <span
-        class="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium {ABSENCE_COLORS[absence.type]}"
+        class="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium {ABSENCE_COLORS[
+          absence.type
+        ]}"
       >
         {ABSENCE_LABELS[absence.type]}
       </span>
       <span class="flex-1 text-xs text-foreground truncate">
-        {formatRange(absence.startDate, absence.endDate)}{#if absence.halfDay}<span class="text-muted-foreground ml-1">(½)</span>{/if}
+        {formatRange(absence.startDate, absence.endDate)}{#if absence.halfDay}<span
+            class="text-muted-foreground ml-1">(½)</span
+          >{/if}
       </span>
       {#if trailing === 'pencil'}
-        <Pencil class="size-3 text-muted-foreground shrink-0 transition-colors group-hover:text-foreground" />
+        <Pencil
+          class="size-3 text-muted-foreground shrink-0 transition-colors group-hover:text-foreground"
+        />
       {:else}
         <span class="text-[10px] text-muted-foreground shrink-0">{trailing}</span>
       {/if}
@@ -113,11 +124,15 @@
   <!-- Absence detail for selected date -->
   {#if selectedAbsence}
     {#if isPersonioAbsence}
-      <div class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2">
+      <div
+        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2"
+      >
         {@render absenceDetail(selectedAbsence, 'Personio')}
       </div>
     {:else if connectionsState.personio.isConnected}
-      <div class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2">
+      <div
+        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2"
+      >
         {@render absenceDetail(selectedAbsence, 'Manual')}
       </div>
     {:else}
@@ -134,7 +149,9 @@
   <!-- Legend (collapsible) -->
   <div class="border-t border-border pt-3">
     <button
-      onclick={() => { showLegend = !showLegend; }}
+      onclick={() => {
+        showLegend = !showLegend;
+      }}
       class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
     >
       <span class="text-xs font-medium text-muted-foreground">Legend</span>

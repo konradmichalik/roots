@@ -136,7 +136,11 @@ export abstract class JiraWorklogClient extends ApiClient {
         'GET',
         `/rest/api/${this.apiVersion}/issue/${issueKey}/worklog?startAt=${startAt}&maxResults=${maxResults}`
       );
-      const response = validateResponse(jiraWorklogResponseSchema, raw, `Jira worklogs ${issueKey}`);
+      const response = validateResponse(
+        jiraWorklogResponseSchema,
+        raw,
+        `Jira worklogs ${issueKey}`
+      );
 
       allWorklogs.push(...response.worklogs);
 

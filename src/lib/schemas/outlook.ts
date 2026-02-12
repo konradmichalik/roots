@@ -57,4 +57,3 @@ export const msGraphUserSchema = z.object({
   mail: z.string(),
   userPrincipalName: z.string()
 });
-

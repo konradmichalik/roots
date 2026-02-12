@@ -20,9 +20,7 @@
 {#if connectionsState.personio.isConnected}
   <div class="flex items-start gap-2 rounded-lg bg-source-personio-subtle px-3 py-2 mb-3">
     <Info class="size-3.5 text-source-personio-text shrink-0 mt-0.5" />
-    <p class="text-xs text-muted-foreground">
-      Synced from Personio. Disconnect to edit manually.
-    </p>
+    <p class="text-xs text-muted-foreground">Synced from Personio. Disconnect to edit manually.</p>
   </div>
 {/if}
 

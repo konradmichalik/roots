@@ -87,7 +87,9 @@
       <div class="flex h-screen items-center justify-center bg-background">
         <div class="text-center space-y-4 max-w-md px-6">
           <p class="text-lg font-semibold text-foreground">Something went wrong</p>
-          <p class="text-sm text-muted-foreground">{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+          <p class="text-sm text-muted-foreground">
+            {error instanceof Error ? error.message : 'An unexpected error occurred'}
+          </p>
           <button
             type="button"
             onclick={reset}

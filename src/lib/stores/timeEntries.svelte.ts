@@ -13,7 +13,12 @@ import { connectionsState } from './connections.svelte';
 import { hoursToSeconds } from '../utils/time-format';
 import { logger } from '../utils/logger';
 import { toast } from './toast.svelte';
-import { mapMocoActivity, mapJiraWorklog, mapOutlookEvent, buildJiraTimestamp } from './timeEntriesMappers';
+import {
+  mapMocoActivity,
+  mapJiraWorklog,
+  mapOutlookEvent,
+  buildJiraTimestamp
+} from './timeEntriesMappers';
 import {
   monthCacheState,
   updateMonthCacheForDay,

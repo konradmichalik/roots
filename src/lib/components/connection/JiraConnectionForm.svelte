@@ -204,7 +204,9 @@
   {/if}
 
   {#if connectionsState.jira.error}
-    <p id="jira-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.jira.error}</p>
+    <p id="jira-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">
+      {connectionsState.jira.error}
+    </p>
   {/if}
 
   <button

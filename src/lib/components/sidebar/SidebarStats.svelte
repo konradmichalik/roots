@@ -80,9 +80,7 @@
       .sort((a, b) => a.date.localeCompare(b.date))
   );
 
-  let isStatsLoading = $derived(
-    monthCacheState.loading && !monthCacheState.cache[monthStart]
-  );
+  let isStatsLoading = $derived(monthCacheState.loading && !monthCacheState.cache[monthStart]);
 </script>
 
 <div class="border-t border-border pt-3 space-y-3">
@@ -94,11 +92,15 @@
   <!-- Week/Month Balance Summary -->
   {#if isStatsLoading}
     <div class="flex items-center gap-3">
-      <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
+      <div
+        class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5"
+      >
         <Skeleton class="h-3 w-10" />
         <Skeleton class="h-3 w-12" />
       </div>
-      <div class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5">
+      <div
+        class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5"
+      >
         <Skeleton class="h-3 w-10" />
         <Skeleton class="h-3 w-12" />
       </div>
@@ -175,7 +177,9 @@
   {#if openDays.length > 0}
     <div>
       <button
-        onclick={() => { showOpenDays = !showOpenDays; }}
+        onclick={() => {
+          showOpenDays = !showOpenDays;
+        }}
         class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
       >
         <div class="flex items-center gap-1.5">
@@ -217,7 +221,9 @@
   {#if balancedDays.length > 0}
     <div>
       <button
-        onclick={() => { showBalancedDays = !showBalancedDays; }}
+        onclick={() => {
+          showBalancedDays = !showBalancedDays;
+        }}
         class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
       >
         <div class="flex items-center gap-1.5">

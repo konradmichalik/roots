@@ -69,7 +69,9 @@
 
     <!-- Close Button -->
     <Dialog.Footer class="border-t border-border px-6 py-3">
-      <Dialog.Close class="w-full rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-150">
+      <Dialog.Close
+        class="w-full rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-150"
+      >
         Close
       </Dialog.Close>
     </Dialog.Footer>

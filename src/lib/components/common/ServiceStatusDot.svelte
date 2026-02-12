@@ -36,7 +36,9 @@
     <Tooltip.Trigger>
       <div
         class="flex items-center justify-center size-5 rounded-full transition-all duration-200
-          {isConnected ? `${serviceBg[service]} ${serviceColors[service]}` : 'text-muted-foreground/40'}"
+          {isConnected
+          ? `${serviceBg[service]} ${serviceColors[service]}`
+          : 'text-muted-foreground/40'}"
       >
         {#if service === 'moco'}
           <!-- Moco Logo -->

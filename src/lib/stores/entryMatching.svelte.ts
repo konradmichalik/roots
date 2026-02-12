@@ -127,9 +127,7 @@ export function buildMatchResult(
   const mocoByTicketKey = groupByTicketKey(mocoEntries, 'moco');
   const jiraByKey = groupByTicketKey(jiraEntries, 'jira');
 
-  const matchedJiraKeys = [...mocoByTicketKey.keys()]
-    .filter((k) => jiraByKey.has(k))
-    .sort();
+  const matchedJiraKeys = [...mocoByTicketKey.keys()].filter((k) => jiraByKey.has(k)).sort();
 
   for (const key of matchedJiraKeys) {
     // Spread+sort to avoid mutating Map values
@@ -152,9 +150,7 @@ export function buildMatchResult(
   const mocoByOutlookId = groupMocoByOutlookId(mocoEntries);
   const outlookById = groupOutlookById(outlookEntries);
 
-  const matchedOutlookIds = [...mocoByOutlookId.keys()]
-    .filter((id) => outlookById.has(id))
-    .sort();
+  const matchedOutlookIds = [...mocoByOutlookId.keys()].filter((id) => outlookById.has(id)).sort();
 
   for (const eventId of matchedOutlookIds) {
     // Spread+sort to avoid mutating Map values

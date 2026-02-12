@@ -83,18 +83,21 @@
       aria-describedby={connectionsState.personio.error ? 'personio-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
-    <p class="mt-1 text-xs text-muted-foreground">
-      Must match your Personio employee email
-    </p>
+    <p class="mt-1 text-xs text-muted-foreground">Must match your Personio employee email</p>
   </div>
 
   {#if connectionsState.personio.error}
-    <p id="personio-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.personio.error}</p>
+    <p id="personio-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">
+      {connectionsState.personio.error}
+    </p>
   {/if}
 
   <button
     type="submit"
-    disabled={connectionsState.personio.isConnecting || !clientId.trim() || !clientSecret.trim() || !email.trim()}
+    disabled={connectionsState.personio.isConnecting ||
+      !clientId.trim() ||
+      !clientSecret.trim() ||
+      !email.trim()}
     class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
   >
     {connectionsState.personio.isConnecting ? 'Connecting...' : 'Connect'}

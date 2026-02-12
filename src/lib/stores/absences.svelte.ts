@@ -81,9 +81,7 @@ export async function fetchPersonioAbsences(from: string, to: string): Promise<v
   }
 }
 
-export function getAbsenceForDate(
-  date: string
-): ManualAbsence | PersonioAbsence | undefined {
+export function getAbsenceForDate(date: string): ManualAbsence | PersonioAbsence | undefined {
   // Personio absences take precedence
   const personio = absencesState.personioAbsences.find(
     (a) => date >= a.startDate && date <= a.endDate
@@ -93,10 +91,7 @@ export function getAbsenceForDate(
   return absencesState.absences.find((a) => date >= a.startDate && date <= a.endDate);
 }
 
-export function getAbsencesInRange(
-  from: string,
-  to: string
-): (ManualAbsence | PersonioAbsence)[] {
+export function getAbsencesInRange(from: string, to: string): (ManualAbsence | PersonioAbsence)[] {
   const personioMatches = absencesState.personioAbsences.filter(
     (a) => a.startDate <= to && a.endDate >= from
   );

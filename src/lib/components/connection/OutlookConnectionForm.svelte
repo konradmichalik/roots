@@ -96,7 +96,9 @@
     </div>
 
     {#if connectionsState.outlook.error}
-      <p id="outlook-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.outlook.error}</p>
+      <p id="outlook-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">
+        {connectionsState.outlook.error}
+      </p>
     {/if}
 
     <button

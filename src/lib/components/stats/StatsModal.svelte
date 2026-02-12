@@ -5,7 +5,11 @@
   import StatsProjectsSlide from './StatsProjectsSlide.svelte';
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getCachedDayOverview, monthCacheState, fetchMonthCache } from '../../stores/timeEntries.svelte';
+  import {
+    getCachedDayOverview,
+    monthCacheState,
+    fetchMonthCache
+  } from '../../stores/timeEntries.svelte';
   import {
     getWeekDates,
     getMonthStart,
@@ -126,9 +130,7 @@
     }
   });
 
-  let isMonthLoading = $derived(
-    monthCacheState.loading && !monthCacheState.cache[selectedMonth]
-  );
+  let isMonthLoading = $derived(monthCacheState.loading && !monthCacheState.cache[selectedMonth]);
 
   // Month project+task distribution from cache
   let monthProjectStats = $derived.by((): MonthProjectStats => {

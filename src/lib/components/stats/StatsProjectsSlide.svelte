@@ -100,9 +100,7 @@
           <circle cx="50" cy="50" r="32" fill="var(--background)" />
         </svg>
         <!-- Center text -->
-        <div
-          class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-        >
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           {#if hoveredSegment !== null}
             <span class="text-base font-mono font-semibold text-foreground">
               {Math.round(pieSegments[hoveredSegment].percent)}%
@@ -129,19 +127,14 @@
             </span>
           </div>
         {:else}
-          <span class="text-xs text-muted-foreground">
-            Hover über Segmente für Details
-          </span>
+          <span class="text-xs text-muted-foreground"> Hover über Segmente für Details </span>
         {/if}
       </div>
     </div>
 
     <!-- Project List -->
     {#each stats.projects as project, i (project.projectId)}
-      <div
-        role="listitem"
-        class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm"
-      >
+      <div role="listitem" class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm">
         <!-- Project Header -->
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -181,10 +174,7 @@
         <div class="pl-5 space-y-1 pt-1">
           {#each project.tasks as task, taskIndex (`${project.projectId}-${taskIndex}`)}
             <div class="flex items-center justify-between text-xs gap-2">
-              <span
-                class="text-muted-foreground truncate min-w-0 flex-1"
-                title={task.taskName}
-              >
+              <span class="text-muted-foreground truncate min-w-0 flex-1" title={task.taskName}>
                 {task.taskName}
               </span>
               <span class="text-muted-foreground/70 flex-shrink-0 w-8 text-right">

@@ -13,7 +13,7 @@ export const mocoProjectsState = $state({
   // Full project reports: projectId -> report
   projectReportsCache: {} as Record<string, MocoProjectReport>,
   // Track which projects have had detailed tasks loaded
-  loadedTaskDetails: new Set<number>(),
+  loadedTaskDetails: new Set<number>()
 });
 
 export async function fetchAssignedProjects(): Promise<void> {
@@ -41,9 +41,7 @@ export async function fetchAssignedProjects(): Promise<void> {
 export function getActiveProjects(): MocoProjectAssigned[] {
   return mocoProjectsState.projects.filter(
     (p) =>
-      p.active !== false &&
-      p.contract?.active !== false &&
-      p.tasks.some((t) => t.active !== false)
+      p.active !== false && p.contract?.active !== false && p.tasks.some((t) => t.active !== false)
   );
 }
 
@@ -121,5 +119,3 @@ export async function fetchProjectReport(projectId: number): Promise<void> {
 export function getTaskLoggedHours(taskId: number): number {
   return mocoProjectsState.taskHoursCache.get(taskId) ?? 0;
 }
-
-

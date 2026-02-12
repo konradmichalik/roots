@@ -90,7 +90,11 @@
   </div>
 
   <!-- Entry list -->
-  <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2" aria-live="polite" aria-busy={loading && entries.length === 0}>
+  <div
+    class="flex-1 overflow-y-auto p-3 flex flex-col gap-2"
+    aria-live="polite"
+    aria-busy={loading && entries.length === 0}
+  >
     {#if error && !loading}
       <div class="flex flex-col items-center gap-2 py-6 text-center">
         <AlertTriangle class="size-5 text-danger-text/60" strokeWidth={1.5} />
@@ -134,5 +138,4 @@
       {/if}
     {/if}
   </div>
-
 </div>

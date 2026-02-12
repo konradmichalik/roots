@@ -349,7 +349,10 @@
       {#if mocoMeta && isMocoConnected}
         <button
           type="button"
-          onclick={(e) => { e.stopPropagation(); openMocoEdit(); }}
+          onclick={(e) => {
+            e.stopPropagation();
+            openMocoEdit();
+          }}
           class="hidden group-hover:flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
             focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           title="Edit entry"
@@ -360,7 +363,10 @@
       {:else if jiraMeta && isJiraConnected}
         <button
           type="button"
-          onclick={(e) => { e.stopPropagation(); openJiraEdit(); }}
+          onclick={(e) => {
+            e.stopPropagation();
+            openJiraEdit();
+          }}
           class="hidden group-hover:flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
             focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           title="Edit worklog"
@@ -371,7 +377,10 @@
       {:else if outlookMeta && isMocoConnected}
         <button
           type="button"
-          onclick={(e) => { e.stopPropagation(); openMocoCreate(); }}
+          onclick={(e) => {
+            e.stopPropagation();
+            openMocoCreate();
+          }}
           class="hidden group-hover:flex items-center justify-center rounded-md p-1 text-success hover:text-success-text hover:bg-success/10 transition-colors
             focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
           title="Book in Moco"

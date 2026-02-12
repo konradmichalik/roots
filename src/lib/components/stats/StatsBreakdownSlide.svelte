@@ -14,9 +14,7 @@
       <div class="space-y-3">
         <div class="flex items-center justify-between text-sm">
           <span class="text-muted-foreground">Billable</span>
-          <span class="font-mono font-medium text-success-text"
-            >{formatHours(stats.billable)}</span
-          >
+          <span class="font-mono font-medium text-success-text">{formatHours(stats.billable)}</span>
         </div>
         <div class="flex items-center justify-between text-sm">
           <span class="text-muted-foreground">Non-billable</span>

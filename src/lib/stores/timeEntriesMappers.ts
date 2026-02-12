@@ -1,9 +1,4 @@
-import type {
-  UnifiedTimeEntry,
-  MocoMetadata,
-  JiraMetadata,
-  OutlookMetadata
-} from '../types';
+import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../types';
 import type { MocoActivity, MSGraphEvent } from '../types';
 import type { WorklogWithIssue, JiraWorklogClient } from '../api';
 import { settingsState } from './settings.svelte';
@@ -43,7 +38,10 @@ export function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
 // ---------------------------------------------------------------------------
 // Jira
 // ---------------------------------------------------------------------------
-export function mapJiraWorklog(item: WorklogWithIssue, client: JiraWorklogClient): UnifiedTimeEntry {
+export function mapJiraWorklog(
+  item: WorklogWithIssue,
+  client: JiraWorklogClient
+): UnifiedTimeEntry {
   const { worklog, issueKey, issueSummary, issueType, projectKey } = item;
 
   const metadata: JiraMetadata = {

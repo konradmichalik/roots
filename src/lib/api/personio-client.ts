@@ -165,9 +165,7 @@ export class PersonioClient extends ApiClient {
     const data = validateResponse(personioEmployeesResponseSchema, raw, 'Personio employees');
 
     const emailLower = this.config_.email.toLowerCase();
-    return (
-      data.data.find((emp) => emp.attributes.email.value.toLowerCase() === emailLower) ?? null
-    );
+    return data.data.find((emp) => emp.attributes.email.value.toLowerCase() === emailLower) ?? null;
   }
 
   async getTimeOffs(from: string, to: string): Promise<PersonioTimeOff[]> {

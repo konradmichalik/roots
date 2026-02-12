@@ -69,9 +69,7 @@
           <span class="text-muted-foreground"
             >Until yesterday ({weekTotalsUntilYesterday.daysCount} days):</span
           >
-          <span
-            class="font-mono font-medium {getBalanceClass(weekTotalsUntilYesterday.balance)}"
-          >
+          <span class="font-mono font-medium {getBalanceClass(weekTotalsUntilYesterday.balance)}">
             {formatBalance(weekTotalsUntilYesterday.balance)}
           </span>
         </div>
@@ -123,9 +121,7 @@
           <span class="text-muted-foreground"
             >Until yesterday ({monthTotalsUntilYesterday.daysCount} days):</span
           >
-          <span
-            class="font-mono font-medium {getBalanceClass(monthTotalsUntilYesterday.balance)}"
-          >
+          <span class="font-mono font-medium {getBalanceClass(monthTotalsUntilYesterday.balance)}">
             {formatBalance(monthTotalsUntilYesterday.balance)}
           </span>
         </div>

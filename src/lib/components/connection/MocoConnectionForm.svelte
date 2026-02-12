@@ -53,7 +53,9 @@
   </div>
 
   {#if connectionsState.moco.error}
-    <p id="moco-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">{connectionsState.moco.error}</p>
+    <p id="moco-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">
+      {connectionsState.moco.error}
+    </p>
   {/if}
 
   <button
