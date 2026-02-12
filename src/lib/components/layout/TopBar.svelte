@@ -3,6 +3,7 @@
   import ServiceStatusDot from '../common/ServiceStatusDot.svelte';
   import ConnectionManager from '../connection/ConnectionManager.svelte';
   import SettingsModal from '../settings/SettingsModal.svelte';
+  import AboutModal from '../common/AboutModal.svelte';
   import Logo from '../common/Logo.svelte';
   import MiniTimer from '../timer/MiniTimer.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
@@ -17,6 +18,7 @@
   import PanelLeft from '@lucide/svelte/icons/panel-left';
   import Star from '@lucide/svelte/icons/star';
   import Settings from '@lucide/svelte/icons/settings';
+  import CircleHelp from '@lucide/svelte/icons/circle-help';
   import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 
   let isLoading = $derived(isAnyLoading());
@@ -127,9 +129,11 @@
       <Star class="size-[18px]" />
     </button>
 
+    <div class="h-5 w-px bg-border"></div>
+
     <ConnectionManager>
       <button
-        class="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 hover:bg-accent transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        class="flex items-center gap-1.5 rounded-lg bg-muted/50 px-2.5 py-1.5 hover:bg-muted transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Manage connections"
       >
         <ServiceStatusDot service="moco" />
@@ -138,6 +142,16 @@
         <ServiceStatusDot service="personio" />
       </button>
     </ConnectionManager>
+
+    <AboutModal>
+      <button
+        class="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-95 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        title="About Roots"
+        aria-label="About Roots"
+      >
+        <CircleHelp class="size-[18px]" />
+      </button>
+    </AboutModal>
 
     <SettingsModal>
       <button
