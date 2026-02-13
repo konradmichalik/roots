@@ -76,6 +76,7 @@ export type {
   PersonioTimeOff,
   PersonioResponse,
   PersonioAbsence,
+  PersonioAbsenceBalance,
   PersonioConnectionConfig
 } from './personio';
 

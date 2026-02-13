@@ -6,6 +6,7 @@ import type {
   PersonioEmployee,
   PersonioTimeOff,
   PersonioAbsence,
+  PersonioAbsenceBalance,
   WeekdayHours
 } from '../types';
 import type { AbsenceType } from '../types';
@@ -15,7 +16,8 @@ import { validateResponse } from '../schemas/validate';
 import {
   personioAuthResponseSchema,
   personioEmployeesResponseSchema,
-  personioTimeOffsResponseSchema
+  personioTimeOffsResponseSchema,
+  personioAbsenceBalanceResponseSchema
 } from '../schemas/personio';
 
 const PERSONIO_API_BASE = 'https://api.personio.de';
@@ -190,6 +192,24 @@ export class PersonioClient extends ApiClient {
     return data.data.filter((t) => t.attributes.status === 'approved');
   }
 
+  async getAbsenceBalance(): Promise<PersonioAbsenceBalance[]> {
+    if (!this.config_.employeeId) {
+      logger.error('Personio: employeeId not set, cannot fetch absence balance');
+      return [];
+    }
+
+    const raw = await this.request<PersonioResponse<PersonioAbsenceBalance[]>>(
+      'GET',
+      `/v1/company/employees/${this.config_.employeeId}/absences/balance`
+    );
+    const data = validateResponse(
+      personioAbsenceBalanceResponseSchema,
+      raw,
+      'Personio absence balance'
+    );
+    return data.data;
+  }
+
   getWorkSchedule(employee: PersonioEmployee): WeekdayHours | null {
     const schedule = employee.attributes.work_schedule?.value;
     if (!schedule) return null;
@@ -224,20 +244,20 @@ function parseDuration(duration: string | number): number {
 
 export function mapPersonioAbsenceType(typeName: string): AbsenceType {
   const lower = typeName.toLowerCase();
-  if (lower.includes('urlaub') || lower.includes('vacation') || lower.includes('holiday')) {
-    return 'vacation';
+  // Check specific types before general ones (e.g. "sonderurlaub" contains "urlaub")
+  if (lower.includes('feiertag') || lower.includes('public holiday')) {
+    return 'public_holiday';
+  }
+  if (lower.includes('sonderurlaub') || lower.includes('child sick')) {
+    return 'personal';
   }
   if (lower.includes('krank') || lower.includes('sick') || lower.includes('illness')) {
     return 'sick';
   }
-  if (lower.includes('feiertag') || lower.includes('public holiday')) {
-    return 'public_holiday';
+  if (lower.includes('urlaub') || lower.includes('vacation') || lower.includes('holiday')) {
+    return 'vacation';
   }
-  if (
-    lower.includes('sonderurlaub') ||
-    lower.includes('personal') ||
-    lower.includes('child sick')
-  ) {
+  if (lower.includes('personal')) {
     return 'personal';
   }
   return 'other';
@@ -259,6 +279,7 @@ export function mapTimeOffToAbsence(timeOff: PersonioTimeOff): PersonioAbsence {
     type: mapPersonioAbsenceType(typeName),
     startDate: normalizeDate(attrs.start_date),
     endDate: normalizeDate(attrs.end_date),
+    daysCount: attrs.days_count,
     halfDay: attrs.half_day_start || attrs.half_day_end,
     personioId: attrs.id,
     status: attrs.status,

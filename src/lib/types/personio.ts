@@ -81,11 +81,20 @@ export interface PersonioAbsence {
   type: AbsenceType;
   startDate: string;
   endDate: string;
+  daysCount: number;
   halfDay: boolean;
   note?: string;
   personioId: number;
   status: string;
   typeName: string;
+}
+
+// Absence balance (vacation days remaining, etc.)
+export interface PersonioAbsenceBalance {
+  id: number;
+  name: string;
+  category: string | null;
+  balance: number;
 }
 
 // Connection config

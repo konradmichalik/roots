@@ -88,3 +88,15 @@ export const personioTimeOffsResponseSchema = z.object({
   success: z.boolean(),
   data: z.array(personioTimeOffSchema)
 });
+
+export const personioAbsenceBalanceResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      category: z.string().nullable(),
+      balance: z.number()
+    })
+  )
+});
