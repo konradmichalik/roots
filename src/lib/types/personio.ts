@@ -30,7 +30,7 @@ export interface PersonioEmployee {
     first_name: PersonioEmployeeAttribute<string>;
     last_name: PersonioEmployeeAttribute<string>;
     email: PersonioEmployeeAttribute<string>;
-    work_schedule: PersonioEmployeeAttribute<{
+    work_schedule?: PersonioEmployeeAttribute<{
       id: number;
       name: string;
       monday: PersonioWorkScheduleDay;

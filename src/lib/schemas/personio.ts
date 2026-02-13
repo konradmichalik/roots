@@ -46,7 +46,7 @@ const personioEmployeeSchema = z.object({
         saturday: workScheduleDaySchema,
         sunday: workScheduleDaySchema
       })
-    )
+    ).optional()
   })
 });
 

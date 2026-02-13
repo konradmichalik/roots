@@ -190,8 +190,9 @@ export class PersonioClient extends ApiClient {
     return data.data.filter((t) => t.attributes.status === 'approved');
   }
 
-  getWorkSchedule(employee: PersonioEmployee): WeekdayHours {
-    const schedule = employee.attributes.work_schedule.value;
+  getWorkSchedule(employee: PersonioEmployee): WeekdayHours | null {
+    const schedule = employee.attributes.work_schedule?.value;
+    if (!schedule) return null;
     return [
       parseDuration(schedule.monday.duration),
       parseDuration(schedule.tuesday.duration),

@@ -291,8 +291,10 @@ export async function connectPersonio(config: PersonioConnectionConfig): Promise
     // Apply work schedule from employee data returned by testConnection
     if (result.employee) {
       const workSchedule = personioClient.getWorkSchedule(result.employee);
-      updateSettings({ weekdayHours: workSchedule });
-      logger.store('settings', 'Updated weekdayHours from Personio', { workSchedule });
+      if (workSchedule) {
+        updateSettings({ weekdayHours: workSchedule });
+        logger.store('settings', 'Updated weekdayHours from Personio', { workSchedule });
+      }
     }
 
     connectionsState.personio.isConnected = true;
