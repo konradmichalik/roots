@@ -18,7 +18,7 @@
     const config: OutlookConnectionConfig = {
       clientId: clientId.trim(),
       tenantId: tenantId.trim(),
-      redirectUri: window.location.origin
+      redirectUri: '' // Set by startOAuthFlow based on platform
     };
 
     startOAuthFlow(config);

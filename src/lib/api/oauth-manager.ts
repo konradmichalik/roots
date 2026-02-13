@@ -1,12 +1,41 @@
 import type { OutlookConnectionConfig, OAuthTokens, OAuthTokenResponse } from '../types';
 import { logger } from '../utils/logger';
 import { withRetry } from '../utils/retry';
+import { isTauri } from '../utils/storage';
 
 const OAUTH_SCOPES =
   'https://graph.microsoft.com/Calendars.Read https://graph.microsoft.com/User.Read offline_access';
-const SESSION_KEY_VERIFIER = 'roots:oauth:code_verifier';
-const SESSION_KEY_CONFIG = 'roots:oauth:config';
+
+// PKCE state in localStorage (survives full-page navigation and deep-link round-trips)
+const PKCE_KEY_VERIFIER = 'roots:oauth:code_verifier';
+const PKCE_KEY_CONFIG = 'roots:oauth:config';
+
 const TOKEN_EXPIRY_BUFFER_MS = 5 * 60 * 1000;
+const DEEP_LINK_REDIRECT_URI = 'roots://oauth/callback';
+
+/** POST form data to a token endpoint. In Tauri uses a Rust command (no Origin header). */
+async function postTokenRequest(url: string, body: string): Promise<OAuthTokenResponse> {
+  if (isTauri()) {
+    const { invoke } = await import('@tauri-apps/api/core');
+    const text = await invoke<string>('http_post_form', { url, body });
+    return JSON.parse(text);
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const message =
+      (errorData as Record<string, string>).error_description || 'Token request failed';
+    throw new Error(message);
+  }
+
+  return response.json();
+}
 
 function getAuthorizeEndpoint(tenantId: string): string {
   return `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize`;
@@ -41,26 +70,42 @@ export async function startOAuthFlow(config: OutlookConnectionConfig): Promise<v
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
-  sessionStorage.setItem(SESSION_KEY_VERIFIER, codeVerifier);
-  sessionStorage.setItem(SESSION_KEY_CONFIG, JSON.stringify(config));
+  // Always determine redirect URI from current platform (not from stored config)
+  const effectiveConfig: OutlookConnectionConfig = {
+    ...config,
+    redirectUri: isTauri() ? DEEP_LINK_REDIRECT_URI : window.location.origin
+  };
+
+  // Store PKCE state in localStorage (survives navigation, unlike sessionStorage in WKWebView)
+  localStorage.setItem(PKCE_KEY_VERIFIER, codeVerifier);
+  localStorage.setItem(PKCE_KEY_CONFIG, JSON.stringify(effectiveConfig));
 
   const params = new URLSearchParams({
-    client_id: config.clientId,
+    client_id: effectiveConfig.clientId,
     response_type: 'code',
-    redirect_uri: config.redirectUri,
+    redirect_uri: effectiveConfig.redirectUri,
     scope: OAUTH_SCOPES,
     state: 'outlook',
     code_challenge: codeChallenge,
     code_challenge_method: 'S256'
   });
 
-  const authorizeUrl = `${getAuthorizeEndpoint(config.tenantId)}?${params}`;
-  logger.info(`Starting OAuth flow, redirecting to Microsoft login`);
-  window.location.href = authorizeUrl;
+  const authorizeUrl = `${getAuthorizeEndpoint(effectiveConfig.tenantId)}?${params}`;
+
+  if (isTauri()) {
+    // Open in system browser — deep link callback will return the code
+    const { open } = await import('@tauri-apps/plugin-shell');
+    await open(authorizeUrl);
+    logger.info('Opened OAuth flow in system browser');
+  } else {
+    // Browser mode: navigate in place (development)
+    logger.info('Starting OAuth flow, redirecting to Microsoft login');
+    window.location.href = authorizeUrl;
+  }
 }
 
 export function getStoredOAuthConfig(): OutlookConnectionConfig | null {
-  const raw = sessionStorage.getItem(SESSION_KEY_CONFIG);
+  const raw = localStorage.getItem(PKCE_KEY_CONFIG);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -73,7 +118,7 @@ export async function exchangeCodeForTokens(
   config: OutlookConnectionConfig,
   code: string
 ): Promise<OAuthTokens> {
-  const codeVerifier = sessionStorage.getItem(SESSION_KEY_VERIFIER);
+  const codeVerifier = localStorage.getItem(PKCE_KEY_VERIFIER);
   if (!codeVerifier) {
     throw new Error('PKCE code_verifier not found. Please restart the login process.');
   }
@@ -88,23 +133,11 @@ export async function exchangeCodeForTokens(
 
   logger.info('Exchanging OAuth code for tokens');
 
-  const response = await fetch(getTokenEndpoint(config.tenantId), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString()
-  });
+  const data = await postTokenRequest(getTokenEndpoint(config.tenantId), body.toString());
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const message =
-      (errorData as Record<string, string>).error_description || 'Token exchange failed';
-    throw new Error(message);
-  }
-
-  const data: OAuthTokenResponse = await response.json();
-
-  sessionStorage.removeItem(SESSION_KEY_VERIFIER);
-  sessionStorage.removeItem(SESSION_KEY_CONFIG);
+  // Clear PKCE state after successful exchange
+  localStorage.removeItem(PKCE_KEY_VERIFIER);
+  localStorage.removeItem(PKCE_KEY_CONFIG);
 
   return {
     accessToken: data.access_token,
@@ -143,17 +176,12 @@ export async function refreshAccessToken(
 
       logger.info('Refreshing OAuth access token');
 
-      const response = await fetch(getTokenEndpoint(config.tenantId), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString()
-      });
-
-      if (!response.ok) {
-        throw new TokenRefreshError('Token refresh failed. Please sign in again.', response.status);
+      let data: OAuthTokenResponse;
+      try {
+        data = await postTokenRequest(getTokenEndpoint(config.tenantId), body.toString());
+      } catch {
+        throw new TokenRefreshError('Token refresh failed. Please sign in again.', 400);
       }
-
-      const data: OAuthTokenResponse = await response.json();
 
       return {
         accessToken: data.access_token,
@@ -195,6 +223,7 @@ export async function ensureFreshTokens(
   return refreshAccessToken(config, tokens.refreshToken);
 }
 
+/** Browser-mode only: detect OAuth callback from URL query params */
 export function detectOAuthCallback(): { code: string; state: string } | null {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
@@ -207,6 +236,7 @@ export function detectOAuthCallback(): { code: string; state: string } | null {
   return null;
 }
 
+/** Browser-mode only: clean OAuth params from URL bar */
 export function clearOAuthCallbackFromUrl(): void {
   const url = new URL(window.location.href);
   url.searchParams.delete('code');

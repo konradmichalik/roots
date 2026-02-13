@@ -21,6 +21,7 @@
   import { initializeSidebar } from './lib/stores/sidebar.svelte';
   import { initializeTimer } from './lib/stores/timer.svelte';
   import { detectOAuthCallback, clearOAuthCallbackFromUrl } from './lib/api/oauth-manager';
+  import { isTauri } from './lib/utils/storage';
   import { logger } from './lib/utils/logger';
   import { onMount } from 'svelte';
 
@@ -46,12 +47,45 @@
         await initializePresences();
         await initializeTimeEntries();
 
-        // Check for OAuth callback before restoring connections
-        const oauthCallback = detectOAuthCallback();
-        if (oauthCallback) {
-          logger.info('OAuth callback detected, exchanging code for tokens');
-          clearOAuthCallbackFromUrl();
-          await handleOutlookCallback(oauthCallback.code);
+        // OAuth callback handling — platform-dependent
+        if (isTauri()) {
+          // Tauri: listen for deep-link callbacks (roots://oauth/callback?code=...&state=outlook)
+          const { getCurrent, onOpenUrl } = await import('@tauri-apps/plugin-deep-link');
+
+          const handleDeepLinks = async (urls: string[]) => {
+            for (const url of urls) {
+              try {
+                const parsed = new URL(url);
+                if (parsed.protocol !== 'roots:') continue;
+                const code = parsed.searchParams.get('code');
+                const state = parsed.searchParams.get('state');
+                if (code && state === 'outlook') {
+                  logger.info('OAuth callback received via deep link');
+                  await handleOutlookCallback(code);
+                  return;
+                }
+              } catch {
+                logger.error('Failed to parse deep link URL', url);
+              }
+            }
+          };
+
+          // Cold start: app was launched by deep link
+          const startUrls = await getCurrent();
+          if (startUrls && startUrls.length > 0) {
+            await handleDeepLinks(startUrls);
+          }
+
+          // Runtime: app already running, receives deep link
+          await onOpenUrl(handleDeepLinks);
+        } else {
+          // Browser mode: detect OAuth callback from URL query params
+          const oauthCallback = detectOAuthCallback();
+          if (oauthCallback) {
+            logger.info('OAuth callback detected from URL params');
+            clearOAuthCallbackFromUrl();
+            await handleOutlookCallback(oauthCallback.code);
+          }
         }
 
         await initializeConnections();
