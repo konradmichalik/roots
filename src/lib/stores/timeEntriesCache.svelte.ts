@@ -106,6 +106,30 @@ export async function fetchMonthCache(from: string, to: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Moco-only month fetch (no presences/absences side effects)
+// Used by yearStats to backfill past months without triggering unrelated fetches.
+// ---------------------------------------------------------------------------
+export async function fetchMonthMocoOnly(monthStart: string): Promise<void> {
+  if (monthCacheState.cache[monthStart]) return;
+  if (!connectionsState.moco.isConnected) return;
+
+  const client = getMocoClient();
+  if (!client) return;
+
+  const monthEnd = getMonthEnd(monthStart);
+  try {
+    const activities = await client.getActivities(monthStart, monthEnd);
+    monthCacheState.cache = {
+      ...monthCacheState.cache,
+      [monthStart]: { mocoEntries: activities.map(mapMocoActivity), lastFetched: Date.now() }
+    };
+    persistMonthCache();
+  } catch (error) {
+    logger.error(`Month cache (moco-only): Failed to fetch ${monthStart}`, error);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Cache invalidation
 // ---------------------------------------------------------------------------
 export function invalidateMonthCache(monthStart: string): void {
