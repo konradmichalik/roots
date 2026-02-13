@@ -19,6 +19,7 @@ export interface AppSettings {
   };
   weekdayHours: WeekdayHours;
   showQuickSelection: boolean;
+  billableTarget: number;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -37,7 +38,8 @@ const DEFAULT_SETTINGS: AppSettings = {
     showCancelled: false
   },
   weekdayHours: [8, 8, 8, 8, 8, 0, 0],
-  showQuickSelection: true
+  showQuickSelection: true,
+  billableTarget: 80
 };
 
 export const settingsState = $state<AppSettings>({ ...DEFAULT_SETTINGS });

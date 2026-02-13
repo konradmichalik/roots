@@ -210,6 +210,33 @@
             onCheckedChange={handleQuickSelectionToggle}
           />
         </div>
+
+        <div class="border-t border-border"></div>
+
+        <!-- Billable Target -->
+        <div>
+          <h3 class="text-sm font-semibold text-foreground mb-1">Billable Target</h3>
+          <p class="text-xs text-muted-foreground mb-3">
+            Minimum billable percentage to show as positive (green) in statistics.
+          </p>
+          <div class="flex items-center gap-2">
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={settingsState.billableTarget}
+              onchange={(e) => {
+                const val = parseInt(e.currentTarget.value, 10);
+                if (!isNaN(val) && val >= 0 && val <= 100) {
+                  updateSettings({ billableTarget: val });
+                }
+              }}
+              class="w-20 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-mono
+                focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            />
+            <span class="text-xs text-muted-foreground">%</span>
+          </div>
+        </div>
       </Tabs.Content>
 
       <!-- Data Tab -->
