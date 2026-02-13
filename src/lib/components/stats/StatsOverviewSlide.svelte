@@ -79,7 +79,7 @@
               weekTotalsUntilYesterday.required
             )}</span
           >
-          <span>{weekTotalsUntilYesterday.balance >= 0 ? 'ahead' : 'behind'}</span>
+          <span>{weekTotalsUntilYesterday.balance >= 0 ? 'overtime' : 'undertime'}</span>
         </div>
       </div>
     {/if}
@@ -131,7 +131,7 @@
               monthTotalsUntilYesterday.required
             )}</span
           >
-          <span>{monthTotalsUntilYesterday.balance >= 0 ? 'ahead' : 'behind'}</span>
+          <span>{monthTotalsUntilYesterday.balance >= 0 ? 'overtime' : 'undertime'}</span>
         </div>
       </div>
     {/if}

@@ -16,10 +16,13 @@
     getMonthWorkingDays
   } from '../../utils/date-helpers';
   import { formatBalance, formatHours, getBalanceClass } from '../../utils/time-format';
+  import { getVacationSummary } from '../../stores/absences.svelte';
+  import { connectionsState } from '../../stores/connections.svelte';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import AlertCircle from '@lucide/svelte/icons/alert-circle';
   import Scale from '@lucide/svelte/icons/scale';
+  import TreePalm from '@lucide/svelte/icons/tree-palm';
 
   let { todayStr }: { todayStr: string } = $props();
 
@@ -81,6 +84,12 @@
   );
 
   let isStatsLoading = $derived(monthCacheState.loading && !monthCacheState.cache[monthStart]);
+
+  // Vacation balance from Personio
+  let vacationSummary = $derived(getVacationSummary());
+  let showVacation = $derived(
+    connectionsState.personio.isConnected && vacationSummary !== undefined
+  );
 </script>
 
 <div class="border-t border-border pt-3 space-y-3">
@@ -134,6 +143,9 @@
                   ? 's'
                   : ''} (excl. today)
               </div>
+              <div class="text-muted-foreground text-[10px]">
+                {weekBalance >= 0 ? 'Overtime' : 'Undertime'} this week
+              </div>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
@@ -166,11 +178,49 @@
                   ? 's'
                   : ''} (excl. today)
               </div>
+              <div class="text-muted-foreground text-[10px]">
+                {monthBalance >= 0 ? 'Overtime' : 'Undertime'} this month
+              </div>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
       </Tooltip.Provider>
     </div>
+  {/if}
+
+  <!-- Vacation Balance (Personio) -->
+  {#if showVacation && vacationSummary}
+    <Tooltip.Provider delayDuration={200}>
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <div
+            class="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-xs cursor-default"
+          >
+            <TreePalm class="size-3.5 text-success-text shrink-0" />
+            <span class="text-muted-foreground">Vacation</span>
+            <span class="ml-auto font-mono font-medium text-foreground">
+              {vacationSummary.remaining} / {vacationSummary.entitlement} days
+            </span>
+          </div>
+        </Tooltip.Trigger>
+        <Tooltip.Content side="bottom" sideOffset={4}>
+          <div class="text-xs space-y-1">
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Entitlement:</span>
+              <span class="font-mono font-medium">{vacationSummary.entitlement} days</span>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Taken:</span>
+              <span class="font-mono font-medium">{vacationSummary.taken} days</span>
+            </div>
+            <div class="flex items-center justify-between gap-4 pt-1 border-t border-border/50">
+              <span class="text-muted-foreground">Remaining:</span>
+              <span class="font-mono font-medium">{vacationSummary.remaining} days</span>
+            </div>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   {/if}
 
   <!-- Open Hours Accordion -->
