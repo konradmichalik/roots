@@ -57,11 +57,11 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: ${{ github.ref_name }}
           releaseBody: |
-            Download Canopy ${{ github.ref_name }}
+            Download Roots ${{ github.ref_name }}
 
             **macOS** (app is unsigned): Right-click the app → "Open" on first launch, or run:
             ```
-            xattr -cr /Applications/Canopy.app
+            xattr -cr /Applications/Roots.app
             ```
           releaseDraft: false
           prerelease: false
