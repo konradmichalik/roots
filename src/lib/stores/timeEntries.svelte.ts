@@ -263,7 +263,8 @@ export async function updateJiraWorklog(
   issueKey: string,
   worklogId: string,
   data: JiraUpdateWorklog,
-  date: string
+  date: string,
+  originalDate?: string
 ): Promise<boolean> {
   const client = getJiraClient();
   if (!client) {
@@ -279,6 +280,8 @@ export async function updateJiraWorklog(
     }
     if (data.startTime !== undefined) {
       payload.started = buildJiraTimestamp(date, data.startTime);
+    } else if (originalDate && date !== originalDate) {
+      payload.started = buildJiraTimestamp(date);
     }
     if (data.comment !== undefined) {
       payload.comment = data.comment;
@@ -288,6 +291,9 @@ export async function updateJiraWorklog(
     logger.store('timeEntries', `Updated Jira worklog ${worklogId}`);
 
     await refreshDayEntries(date);
+    if (originalDate && date !== originalDate) {
+      await refreshDayEntries(originalDate);
+    }
     toast.success('Jira worklog updated');
     return true;
   } catch (error) {

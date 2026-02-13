@@ -99,7 +99,8 @@
             hours,
             comment: comment.trim() || undefined
           },
-          date
+          date,
+          prefill.date
         );
         if (!success) {
           error = 'Failed to update worklog.';
