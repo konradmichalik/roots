@@ -25,19 +25,24 @@
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
-  let { children }: { children: Snippet } = $props();
+  type SlideId = 'overview' | 'breakdown' | 'projects';
 
-  let open = $state(false);
+  let { children, open = $bindable(false), initialSlide }: { children: Snippet; open?: boolean; initialSlide?: SlideId } = $props();
+
   let todayStr = $state(today());
 
   // Month navigation state
   let selectedMonth = $state(getMonthStart(dateNavState.selectedDate));
 
-  // Reset to current month and refresh todayStr when dialog opens
+  // Slider state
+  let activeSlide = $state<SlideId>('overview');
+
+  // Reset state when dialog opens
   $effect(() => {
     if (open) {
       todayStr = today();
       selectedMonth = getMonthStart(dateNavState.selectedDate);
+      activeSlide = initialSlide ?? 'overview';
     }
   });
 
@@ -61,10 +66,6 @@
   });
 
   let isCurrentMonth = $derived(selectedMonth === getMonthStart(today()));
-
-  // Slider state
-  type SlideId = 'overview' | 'breakdown' | 'projects';
-  let activeSlide = $state<SlideId>('overview');
 
   const slides: { id: SlideId; label: string }[] = [
     { id: 'overview', label: 'Overview' },

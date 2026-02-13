@@ -1,33 +1,22 @@
 <script lang="ts">
   import StatsModal from '../stats/StatsModal.svelte';
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-  import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
+  import SidebarStatsWeek from './SidebarStatsWeek.svelte';
+  import SidebarStatsMonth from './SidebarStatsMonth.svelte';
+  import SidebarStatsTotal from './SidebarStatsTotal.svelte';
+  import SidebarStatsOpenHours from './SidebarStatsOpenHours.svelte';
+  import { dateNavState } from '../../stores/dateNavigation.svelte';
   import {
     getCachedDayOverview,
     hasCachedDataForDate,
     monthCacheState
   } from '../../stores/timeEntries.svelte';
   import { getPresenceForDate } from '../../stores/presences.svelte';
-  import {
-    formatDateShort,
-    getWeekDates,
-    getMonthStart,
-    getMonthWorkingDays
-  } from '../../utils/date-helpers';
-  import { formatBalance, formatHours, getBalanceClass } from '../../utils/time-format';
-  import { getVacationSummary } from '../../stores/absences.svelte';
-  import { connectionsState } from '../../stores/connections.svelte';
+  import { getWeekDates, getMonthStart, getMonthWorkingDays } from '../../utils/date-helpers';
+  import type { MocoMetadata } from '../../types';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-  import ChevronDown from '@lucide/svelte/icons/chevron-down';
-  import AlertCircle from '@lucide/svelte/icons/alert-circle';
-  import Scale from '@lucide/svelte/icons/scale';
-  import TreePalm from '@lucide/svelte/icons/tree-palm';
 
   let { todayStr }: { todayStr: string } = $props();
-
-  let showOpenDays = $state(true);
-  let showBalancedDays = $state(true);
 
   // Week balance (for selected date's week, up to yesterday)
   let weekDates = $derived(getWeekDates(dateNavState.selectedDate));
@@ -50,6 +39,24 @@
   let monthBalance = $derived(monthOverviews.reduce((sum, d) => sum + d.balance, 0));
   let monthActual = $derived(monthOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
   let monthTarget = $derived(monthOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
+
+  // Billable percentage from month cache
+  let billablePercent = $derived.by(() => {
+    const cached = monthCacheState.cache[monthStart];
+    if (!cached) return 0;
+    let billable = 0;
+    let total = 0;
+    for (const entry of cached.mocoEntries) {
+      const meta = entry.metadata as MocoMetadata;
+      if (meta.billable) billable += entry.hours;
+      total += entry.hours;
+    }
+    return total > 0 ? Math.round((billable / total) * 100) : 0;
+  });
+
+  // StatsModal state (for programmatic open)
+  let statsModalOpen = $state(false);
+  let statsModalSlide = $state<'overview' | 'breakdown' | 'projects'>('overview');
 
   // Days with open hours (negative presenceBalance = not all presence time booked)
   let openDays = $derived(
@@ -84,236 +91,50 @@
   );
 
   let isStatsLoading = $derived(monthCacheState.loading && !monthCacheState.cache[monthStart]);
-
-  // Vacation balance from Personio
-  let vacationSummary = $derived(getVacationSummary());
-  let showVacation = $derived(
-    connectionsState.personio.isConnected && vacationSummary !== undefined
-  );
 </script>
 
-<div class="border-t border-border pt-3 space-y-3">
+<div class="border-t border-border pt-3 space-y-2">
   <div class="flex items-center gap-2">
     <BarChart3 class="size-4 text-muted-foreground" />
     <h3 class="text-sm font-semibold text-foreground">Statistics</h3>
   </div>
 
-  <!-- Week/Month Balance Summary -->
   {#if isStatsLoading}
-    <div class="flex items-center gap-3">
-      <div
-        class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5"
-      >
-        <Skeleton class="h-3 w-10" />
-        <Skeleton class="h-3 w-12" />
-      </div>
-      <div
-        class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5"
-      >
-        <Skeleton class="h-3 w-10" />
-        <Skeleton class="h-3 w-12" />
-      </div>
+    <div class="space-y-2">
+      {#each { length: 3 } as _, i (i)}
+        <div class="rounded-lg border border-border px-2.5 py-2 flex items-center justify-between">
+          <Skeleton class="h-3 w-14" />
+          <Skeleton class="h-3 w-16" />
+        </div>
+      {/each}
     </div>
   {:else}
-    <div class="flex items-center gap-3 text-xs">
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <div
-              class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
-            >
-              <span class="text-muted-foreground">Week</span>
-              <span class="font-mono font-medium {getBalanceClass(weekBalance)}"
-                >{formatBalance(weekBalance)}</span
-              >
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" sideOffset={4}>
-            <div class="text-xs space-y-1">
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Booked:</span>
-                <span class="font-mono font-medium">{formatHours(weekActual)}</span>
-              </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Target:</span>
-                <span class="font-mono font-medium">{formatHours(weekTarget)}</span>
-              </div>
-              <div class="text-muted-foreground pt-1 border-t border-border/50">
-                {weekDatesUntilYesterday.length} working day{weekDatesUntilYesterday.length !== 1
-                  ? 's'
-                  : ''} (excl. today)
-              </div>
-              <div class="text-muted-foreground text-[10px]">
-                {weekBalance >= 0 ? 'Overtime' : 'Undertime'} this week
-              </div>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-      <Tooltip.Provider delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <div
-              class="flex-1 flex items-center justify-between rounded-lg border border-border px-2.5 py-1.5 cursor-default"
-            >
-              <span class="text-muted-foreground">Month</span>
-              <span class="font-mono font-medium {getBalanceClass(monthBalance)}"
-                >{formatBalance(monthBalance)}</span
-              >
-            </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" sideOffset={4}>
-            <div class="text-xs space-y-1">
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Booked:</span>
-                <span class="font-mono font-medium">{formatHours(monthActual)}</span>
-              </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Target:</span>
-                <span class="font-mono font-medium">{formatHours(monthTarget)}</span>
-              </div>
-              <div class="text-muted-foreground pt-1 border-t border-border/50">
-                {monthWorkingDaysUntilYesterday.length} working day{monthWorkingDaysUntilYesterday.length !==
-                1
-                  ? 's'
-                  : ''} (excl. today)
-              </div>
-              <div class="text-muted-foreground text-[10px]">
-                {monthBalance >= 0 ? 'Overtime' : 'Undertime'} this month
-              </div>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Root>
-      </Tooltip.Provider>
-    </div>
+    {#if openDays.length > 0}
+      <SidebarStatsOpenHours {openDays} />
+    {/if}
+    <SidebarStatsWeek
+      {weekBalance}
+      {weekActual}
+      {weekTarget}
+      daysCount={weekDatesUntilYesterday.length}
+    />
+    <SidebarStatsMonth
+      {monthBalance}
+      {monthActual}
+      {monthTarget}
+      {billablePercent}
+      {balancedDays}
+      onBillableClick={() => {
+        statsModalSlide = 'breakdown';
+        statsModalOpen = true;
+      }}
+    />
+    <SidebarStatsTotal {todayStr} />
   {/if}
 
-  <!-- Vacation Balance (Personio) -->
-  {#if showVacation && vacationSummary}
-    <Tooltip.Provider delayDuration={200}>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <div
-            class="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-xs cursor-default"
-          >
-            <TreePalm class="size-3.5 text-success-text shrink-0" />
-            <span class="text-muted-foreground">Vacation</span>
-            <span class="ml-auto font-mono font-medium text-foreground">
-              {vacationSummary.remaining} / {vacationSummary.entitlement} days
-            </span>
-          </div>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="bottom" sideOffset={4}>
-          <div class="text-xs space-y-1">
-            <div class="flex items-center justify-between gap-4">
-              <span class="text-muted-foreground">Entitlement:</span>
-              <span class="font-mono font-medium">{vacationSummary.entitlement} days</span>
-            </div>
-            <div class="flex items-center justify-between gap-4">
-              <span class="text-muted-foreground">Taken:</span>
-              <span class="font-mono font-medium">{vacationSummary.taken} days</span>
-            </div>
-            <div class="flex items-center justify-between gap-4 pt-1 border-t border-border/50">
-              <span class="text-muted-foreground">Remaining:</span>
-              <span class="font-mono font-medium">{vacationSummary.remaining} days</span>
-            </div>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  {/if}
-
-  <!-- Open Hours Accordion -->
-  {#if openDays.length > 0}
-    <div>
-      <button
-        onclick={() => {
-          showOpenDays = !showOpenDays;
-        }}
-        class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
-      >
-        <div class="flex items-center gap-1.5">
-          <AlertCircle class="size-3.5 text-warning-text" />
-          <span class="text-xs font-medium text-foreground">Open Hours</span>
-          <span
-            class="inline-flex items-center justify-center rounded-full bg-warning/20 text-warning-text text-[10px] font-medium px-1.5 min-w-[18px]"
-          >
-            {openDays.length}
-          </span>
-        </div>
-        <ChevronDown
-          class="size-3.5 text-muted-foreground transition-transform duration-200 {showOpenDays
-            ? 'rotate-180'
-            : ''}"
-        />
-      </button>
-      {#if showOpenDays}
-        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
-          {#each openDays as { date, overview } (date)}
-            <button
-              onclick={() => setDate(date)}
-              class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
-                hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
-            >
-              <span class="text-muted-foreground">{formatDateShort(date)}</span>
-              <span class="font-mono text-danger-text"
-                >{formatBalance(overview.presenceBalance ?? 0)}</span
-              >
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
-
-  <!-- Hour Balances Accordion -->
-  {#if balancedDays.length > 0}
-    <div>
-      <button
-        onclick={() => {
-          showBalancedDays = !showBalancedDays;
-        }}
-        class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
-      >
-        <div class="flex items-center gap-1.5">
-          <Scale class="size-3.5 text-muted-foreground" />
-          <span class="text-xs font-medium text-foreground">Hour Balances</span>
-          <span
-            class="inline-flex items-center justify-center rounded-full bg-muted text-muted-foreground text-[10px] font-medium px-1.5 min-w-[18px]"
-          >
-            {balancedDays.length}
-          </span>
-        </div>
-        <ChevronDown
-          class="size-3.5 text-muted-foreground transition-transform duration-200 {showBalancedDays
-            ? 'rotate-180'
-            : ''}"
-        />
-      </button>
-      {#if showBalancedDays}
-        <div class="mt-2 space-y-1 max-h-40 overflow-y-auto">
-          {#each balancedDays as { date, overview } (date)}
-            <button
-              onclick={() => setDate(date)}
-              class="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-xs
-                hover:bg-accent transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
-            >
-              <span class="text-muted-foreground">{formatDateShort(date)}</span>
-              <span class="font-mono {getBalanceClass(overview.balance)}"
-                >{formatBalance(overview.balance)}</span
-              >
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
-
-  <!-- More Statistics Button -->
-  <StatsModal>
+  <StatsModal bind:open={statsModalOpen} initialSlide={statsModalSlide}>
     <button
+      onclick={() => { statsModalSlide = 'overview'; }}
       class="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
         hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       title="View detailed statistics"
