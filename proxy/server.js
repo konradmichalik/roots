@@ -35,9 +35,9 @@ function isAllowedUrl(urlString) {
   }
 }
 
-function buildQueryString(query) {
-  const params = new URLSearchParams(query).toString();
-  return params ? `?${params}` : '';
+function buildQueryString(originalUrl) {
+  const idx = originalUrl.indexOf('?');
+  return idx >= 0 ? originalUrl.substring(idx) : '';
 }
 
 app.get('/health', (req, res) => {
@@ -52,7 +52,7 @@ app.all('/moco/*', async (req, res) => {
   }
 
   const path = req.path.replace('/moco', '');
-  const qs = buildQueryString(req.query);
+  const qs = buildQueryString(req.originalUrl);
   const targetUrl = `https://${domain}.mocoapp.com/api/v1${path}${qs}`;
 
   if (!isAllowedUrl(targetUrl)) {
@@ -108,7 +108,7 @@ app.all('/jira/*', async (req, res) => {
   }
 
   const path = req.path.replace('/jira', '');
-  const qs = buildQueryString(req.query);
+  const qs = buildQueryString(req.originalUrl);
   const targetUrl = `${baseUrl}${path}${qs}`;
 
   console.log(`[Proxy] ${req.method} /jira${path} -> ${targetUrl}`);
@@ -149,7 +149,7 @@ app.all('/jira/*', async (req, res) => {
 // Personio proxy
 app.all('/personio/*', async (req, res) => {
   const path = req.path.replace('/personio', '');
-  const qs = buildQueryString(req.query);
+  const qs = buildQueryString(req.originalUrl);
   const targetUrl = `https://api.personio.de${path}${qs}`;
 
   console.log(`[Proxy] ${req.method} /personio${path} -> ${targetUrl}`);
