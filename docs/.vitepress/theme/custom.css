@@ -1,0 +1,22 @@
+:root {
+  --vp-c-brand-1: #5e81ac;
+  --vp-c-brand-2: #81a1c1;
+  --vp-c-brand-3: #88c0d0;
+}
+
+.dark {
+  --vp-c-brand-1: #88c0d0;
+  --vp-c-brand-2: #81a1c1;
+  --vp-c-brand-3: #5e81ac;
+}
+
+.VPNavBarTitle .logo {
+  height: 36px;
+  width: auto;
+}
+
+@media (min-width: 960px) {
+  .VPNavBarTitle .logo {
+    height: 42px;
+  }
+}
