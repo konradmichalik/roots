@@ -115,10 +115,7 @@ export async function fetchAbsenceBalances(): Promise<void> {
     const vacationAbsences = yearAbsences.filter(
       (a) => a.type === 'vacation' && a.startDate.startsWith(yearPrefix)
     );
-    absencesState.yearVacationDaysTaken = vacationAbsences.reduce(
-      (sum, a) => sum + a.daysCount,
-      0
-    );
+    absencesState.yearVacationDaysTaken = vacationAbsences.reduce((sum, a) => sum + a.daysCount, 0);
     logger.store('absences', 'Counted vacation days taken this year', {
       taken: absencesState.yearVacationDaysTaken
     });

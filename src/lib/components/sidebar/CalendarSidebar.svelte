@@ -55,7 +55,9 @@
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
-            <Info class="size-3.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-help" />
+            <Info
+              class="size-3.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-help"
+            />
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom" sideOffset={4} class="space-y-1.5 p-2.5">
             <div class="flex items-center gap-2">

@@ -78,8 +78,16 @@
             >
           </div>
           <div class="flex items-center justify-between text-muted-foreground">
-            <span>Booked: <span class="font-mono font-medium text-foreground">{formatHours(yearData.yearActual)}</span></span>
-            <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(yearData.yearTarget)}</span></span>
+            <span
+              >Booked: <span class="font-mono font-medium text-foreground"
+                >{formatHours(yearData.yearActual)}</span
+              ></span
+            >
+            <span
+              >Target: <span class="font-mono font-medium text-foreground"
+                >{formatHours(yearData.yearTarget)}</span
+              ></span
+            >
           </div>
         </div>
       {/if}
@@ -97,7 +105,11 @@
             </span>
           </div>
           <div class="flex items-center justify-between text-muted-foreground pl-5">
-            <span>Taken: <span class="font-mono font-medium text-foreground">{vacationSummary.taken} days</span></span>
+            <span
+              >Taken: <span class="font-mono font-medium text-foreground"
+                >{vacationSummary.taken} days</span
+              ></span
+            >
           </div>
         </div>
       {/if}

@@ -45,8 +45,16 @@
   {#if isOpen}
     <div class="px-2.5 pb-2.5 space-y-1 text-xs">
       <div class="flex items-center justify-between text-muted-foreground">
-        <span>Booked: <span class="font-mono font-medium text-foreground">{formatHours(weekActual)}</span></span>
-        <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(weekTarget)}</span></span>
+        <span
+          >Booked: <span class="font-mono font-medium text-foreground"
+            >{formatHours(weekActual)}</span
+          ></span
+        >
+        <span
+          >Target: <span class="font-mono font-medium text-foreground"
+            >{formatHours(weekTarget)}</span
+          ></span
+        >
       </div>
       <p class="text-[10px] text-muted-foreground">
         {daysCount} working day{daysCount !== 1 ? 's' : ''} (excl. today)

@@ -56,8 +56,16 @@
     <div class="px-2.5 pb-2.5 space-y-3 text-xs">
       <!-- Booked / Target -->
       <div class="flex items-center justify-between text-muted-foreground">
-        <span>Booked: <span class="font-mono font-medium text-foreground">{formatHours(monthActual)}</span></span>
-        <span>Target: <span class="font-mono font-medium text-foreground">{formatHours(monthTarget)}</span></span>
+        <span
+          >Booked: <span class="font-mono font-medium text-foreground"
+            >{formatHours(monthActual)}</span
+          ></span
+        >
+        <span
+          >Target: <span class="font-mono font-medium text-foreground"
+            >{formatHours(monthTarget)}</span
+          ></span
+        >
       </div>
 
       <!-- Billable % -->
@@ -68,7 +76,11 @@
           focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         <span>Billable</span>
-        <span class="font-mono font-medium {billablePercent >= settingsState.billableTarget ? 'text-success-text' : 'text-warning-text'}">{billablePercent}%</span>
+        <span
+          class="font-mono font-medium {billablePercent >= settingsState.billableTarget
+            ? 'text-success-text'
+            : 'text-warning-text'}">{billablePercent}%</span
+        >
       </button>
 
       <!-- Hour Balances Sub-Accordion -->

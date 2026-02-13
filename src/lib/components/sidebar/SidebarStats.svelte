@@ -134,7 +134,9 @@
 
   <StatsModal bind:open={statsModalOpen} initialSlide={statsModalSlide}>
     <button
-      onclick={() => { statsModalSlide = 'overview'; }}
+      onclick={() => {
+        statsModalSlide = 'overview';
+      }}
       class="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
         hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       title="View detailed statistics"

@@ -1,4 +1,8 @@
-import { fetchMonthMocoOnly, getCachedDayOverview, monthCacheState } from './timeEntriesCache.svelte';
+import {
+  fetchMonthMocoOnly,
+  getCachedDayOverview,
+  monthCacheState
+} from './timeEntriesCache.svelte';
 import { getMonthStart, getMonthWorkingDays, toDateString } from '../utils/date-helpers';
 import { logger } from '../utils/logger';
 

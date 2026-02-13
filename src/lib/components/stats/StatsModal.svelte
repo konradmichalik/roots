@@ -27,7 +27,11 @@
 
   type SlideId = 'overview' | 'breakdown' | 'projects';
 
-  let { children, open = $bindable(false), initialSlide }: { children: Snippet; open?: boolean; initialSlide?: SlideId } = $props();
+  let {
+    children,
+    open = $bindable(false),
+    initialSlide
+  }: { children: Snippet; open?: boolean; initialSlide?: SlideId } = $props();
 
   let todayStr = $state(today());
 
