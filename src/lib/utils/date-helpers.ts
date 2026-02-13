@@ -118,7 +118,9 @@ export function getDayOfWeekIndex(dateStr: string): number {
  * Format date for display (e.g., "Jan 15")
  */
 export function formatDateShort(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  const date = parseDate(dateStr);
+  if (isNaN(date.getTime())) return dateStr || '–';
+  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
 }
 
 /**

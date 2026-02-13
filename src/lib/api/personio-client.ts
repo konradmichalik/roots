@@ -243,6 +243,13 @@ export function mapPersonioAbsenceType(typeName: string): AbsenceType {
   return 'other';
 }
 
+/** Extract YYYY-MM-DD from a date string that may include a time component. */
+function normalizeDate(raw: string): string {
+  if (!raw) return '';
+  // Handle ISO datetime strings like "2024-01-15T00:00:00+01:00"
+  return raw.slice(0, 10);
+}
+
 export function mapTimeOffToAbsence(timeOff: PersonioTimeOff): PersonioAbsence {
   const attrs = timeOff.attributes;
   const typeName = attrs.time_off_type.attributes.name;
@@ -250,8 +257,8 @@ export function mapTimeOffToAbsence(timeOff: PersonioTimeOff): PersonioAbsence {
     id: `personio-${attrs.id}`,
     source: 'personio',
     type: mapPersonioAbsenceType(typeName),
-    startDate: attrs.start_date,
-    endDate: attrs.end_date,
+    startDate: normalizeDate(attrs.start_date),
+    endDate: normalizeDate(attrs.end_date),
     halfDay: attrs.half_day_start || attrs.half_day_end,
     personioId: attrs.id,
     status: attrs.status,
