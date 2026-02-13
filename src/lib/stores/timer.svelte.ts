@@ -2,6 +2,7 @@ import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage
 import { logger } from '../utils/logger';
 import { today } from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';
+import { setDockBadge, clearDockBadge, formatBadgeTime } from '../utils/dock-badge';
 import type { TimerState, TimerMocoBooking, DraftEntry } from '../types';
 
 // ============ Initial State ============
@@ -54,6 +55,12 @@ export async function initializeTimer(): Promise<void> {
   if (storedTimer) {
     Object.assign(timerState, storedTimer);
     logger.store('timer', 'Restored timer state', { status: timerState.status });
+
+    // Restore dock badge if timer was running or paused
+    if (storedTimer.status !== 'idle') {
+      const seconds = getElapsedSeconds();
+      setDockBadge(formatBadgeTime(seconds));
+    }
   }
 
   // Restore drafts
@@ -92,6 +99,7 @@ export function startTimer(booking?: TimerMocoBooking): void {
   timerState.note = booking?.description ?? '';
 
   persistTimer();
+  setDockBadge(formatBadgeTime(0));
   logger.store('timer', 'Started', {
     hasBooking: !!booking,
     project: booking?.projectName
@@ -112,6 +120,7 @@ export function pauseTimer(): void {
   timerState.startedAt = null;
 
   persistTimer();
+  setDockBadge(formatBadgeTime(timerState.accumulatedSeconds));
   logger.store('timer', 'Paused', { accumulated: timerState.accumulatedSeconds });
 }
 
@@ -126,6 +135,7 @@ export function resumeTimer(): void {
   timerState.pausedAt = null;
 
   persistTimer();
+  setDockBadge(formatBadgeTime(timerState.accumulatedSeconds));
   logger.store('timer', 'Resumed');
 }
 
@@ -142,6 +152,7 @@ export function stopTimer(): number {
   timerState.accumulatedSeconds = 0;
 
   persistTimer();
+  clearDockBadge();
   logger.store('timer', 'Stopped', { totalSeconds });
 
   return totalSeconds;
@@ -153,6 +164,7 @@ export function stopTimer(): number {
 export function resetTimer(): void {
   Object.assign(timerState, { ...initialTimerState });
   persistTimer();
+  clearDockBadge();
   logger.store('timer', 'Reset');
 }
 

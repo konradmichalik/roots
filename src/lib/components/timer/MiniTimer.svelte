@@ -9,6 +9,7 @@
     pendingMocoModal,
     closePendingMocoModal
   } from '../../stores/timer.svelte';
+  import { setDockBadge, formatBadgeTime } from '../../utils/dock-badge';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import TimerStartModal from './TimerStartModal.svelte';
   import TimerStopModal from './TimerStopModal.svelte';
@@ -21,37 +22,26 @@
 
   // Update display every second when running
   let displayTime = $state('00:00:00');
-  let intervalId: ReturnType<typeof setInterval> | null = null;
 
   $effect(() => {
     if (timerState.status === 'running') {
-      // Update immediately
       displayTime = formatElapsedTime(getElapsedSeconds());
-      // Then update every second
-      intervalId = setInterval(() => {
-        displayTime = formatElapsedTime(getElapsedSeconds());
+      let badgeTicks = 0;
+      const id = setInterval(() => {
+        const elapsed = getElapsedSeconds();
+        displayTime = formatElapsedTime(elapsed);
+        badgeTicks++;
+        if (badgeTicks >= 60) {
+          badgeTicks = 0;
+          setDockBadge(formatBadgeTime(elapsed));
+        }
       }, 1000);
+      return () => clearInterval(id);
     } else if (timerState.status === 'paused') {
-      // Show paused time
       displayTime = formatElapsedTime(getElapsedSeconds());
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
     } else {
-      // Idle
       displayTime = '00:00:00';
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
     }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
   });
 
   const draftsCount = $derived(draftsState.drafts.length);
