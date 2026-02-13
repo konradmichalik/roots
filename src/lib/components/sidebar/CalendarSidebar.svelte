@@ -15,10 +15,9 @@
   } from '../../types';
   import Calendar from '@lucide/svelte/icons/calendar';
   import CalendarOff from '@lucide/svelte/icons/calendar-off';
-  import ChevronDown from '@lucide/svelte/icons/chevron-down';
+  import Info from '@lucide/svelte/icons/info';
   import Pencil from '@lucide/svelte/icons/pencil';
 
-  let showLegend = $state(false);
   let todayStr = $state(today());
 
   // Refresh todayStr periodically to handle midnight crossover
@@ -53,6 +52,31 @@
     <div class="flex items-center gap-2">
       <Calendar class="size-4 text-muted-foreground" />
       <h3 class="text-sm font-semibold text-foreground">Calendar</h3>
+      <Tooltip.Provider delayDuration={200}>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <Info class="size-3.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-help" />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom" sideOffset={4} class="space-y-1.5 p-2.5">
+            <div class="flex items-center gap-2">
+              <div class="size-2 rounded-full bg-success"></div>
+              <span class="text-xs">≥95% of presence booked</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="size-2 rounded-full bg-warning"></div>
+              <span class="text-xs">&lt;95% of presence booked</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="size-2 rounded-full bg-danger"></div>
+              <span class="text-xs">Not booked</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="size-2 rounded-full bg-brand"></div>
+              <span class="text-xs">Absence</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>
     </div>
     <div class="flex items-center gap-1">
       <button
@@ -145,43 +169,6 @@
       </AbsenceModal>
     {/if}
   {/if}
-
-  <!-- Legend (collapsible) -->
-  <div class="border-t border-border pt-3">
-    <button
-      onclick={() => {
-        showLegend = !showLegend;
-      }}
-      class="flex items-center justify-between w-full text-left focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none rounded"
-    >
-      <span class="text-xs font-medium text-muted-foreground">Legend</span>
-      <ChevronDown
-        class="size-3.5 text-muted-foreground transition-transform duration-200 {showLegend
-          ? 'rotate-180'
-          : ''}"
-      />
-    </button>
-    {#if showLegend}
-      <div class="mt-2 space-y-1.5">
-        <div class="flex items-center gap-2">
-          <div class="size-2 rounded-full bg-success"></div>
-          <span class="text-xs text-muted-foreground">≥95% of presence booked</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="size-2 rounded-full bg-warning"></div>
-          <span class="text-xs text-muted-foreground">&lt;95% of presence booked</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="size-2 rounded-full bg-danger"></div>
-          <span class="text-xs text-muted-foreground">Not booked</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="size-2 rounded-full bg-brand"></div>
-          <span class="text-xs text-muted-foreground">Absence</span>
-        </div>
-      </div>
-    {/if}
-  </div>
 
   <!-- Statistics Section (extracted) -->
   <SidebarStats {todayStr} />
