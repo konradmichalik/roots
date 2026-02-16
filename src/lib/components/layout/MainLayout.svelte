@@ -4,6 +4,7 @@
   import CalendarSidebar from '../sidebar/CalendarSidebar.svelte';
   import FavoritesSidebar from '../sidebar/FavoritesSidebar.svelte';
   import ToastContainer from '../common/ToastContainer.svelte';
+  import MorningModal from '../common/MorningModal.svelte';
   import { sidebarState } from '../../stores/sidebar.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { getDateRange } from '../../stores/dateNavigation.svelte';
@@ -12,14 +13,16 @@
     refreshDayEntries,
     fetchMonthCache
   } from '../../stores/timeEntries.svelte';
+  import { connectionsState } from '../../stores/connections.svelte';
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
+  import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
+  import { today } from '../../utils/date-helpers';
+  import { hasUnbookedMatchableEvents } from '../../utils/matchable-events';
   import { onMount } from 'svelte';
 
   let lastMonthKey = '';
-
-  function fetchDay() {
-    fetchDayEntries(dateNavState.selectedDate);
-  }
+  let showMorningModal = $state(false);
+  let morningCheckDone = false;
 
   function fetchMonth() {
     const range = getDateRange();
@@ -30,14 +33,36 @@
     }
   }
 
+  async function checkMorningGreeting(): Promise<void> {
+    if (morningCheckDone) return;
+    morningCheckDone = true;
+
+    if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
+
+    const todayStr = today();
+    const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
+    if (lastShown === todayStr) return;
+
+    if (hasUnbookedMatchableEvents(todayStr)) {
+      showMorningModal = true;
+    }
+  }
+
+  function handleMorningClose(): void {
+    showMorningModal = false;
+    saveStorage(STORAGE_KEYS.MORNING_GREETING, today());
+  }
+
   onMount(() => {
-    fetchDay();
+    const dayPromise = fetchDayEntries(dateNavState.selectedDate);
     fetchMonth();
     initializeAutoRefresh();
 
+    // Check morning greeting after initial data is loaded
+    dayPromise.then(() => checkMorningGreeting());
+
     function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return;
-      // Refresh current day (updates month cache automatically)
       refreshDayEntries(dateNavState.selectedDate);
     }
 
@@ -51,7 +76,7 @@
   // Re-fetch day data on every date change; month cache only on month change
   $effect(() => {
     const _date = dateNavState.selectedDate;
-    fetchDay();
+    fetchDayEntries(dateNavState.selectedDate);
     fetchMonth();
   });
 </script>
@@ -84,4 +109,5 @@
   </div>
 
   <ToastContainer />
+  <MorningModal bind:open={showMorningModal} onClose={handleMorningClose} />
 </div>
