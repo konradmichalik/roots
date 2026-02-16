@@ -39,6 +39,9 @@ export const connectionsState = $state<AllConnectionsState>({
 // Track if user has ever configured any service (persisted configs exist)
 let hasConfiguredServices = $state(false);
 
+// Moco user first name (populated on connection, not persisted)
+export let mocoUserName = $state<{ value: string | null }>({ value: null });
+
 let mocoClient: MocoClient | null = null;
 let jiraClient: JiraWorklogClient | null = null;
 let jiraConfig: JiraConnectionConfig | null = null;
@@ -104,6 +107,7 @@ export async function connectMoco(config: MocoConnectionConfig): Promise<boolean
     connectionsState.moco.isConnecting = false;
     connectionsState.moco.error = null;
     connectionsState.moco.lastConnected = new Date().toISOString();
+    mocoUserName.value = result.user?.firstname ?? null;
 
     await setStorageItemAsync(STORAGE_KEYS.MOCO_CONFIG, config);
     hasConfiguredServices = true;
@@ -124,6 +128,7 @@ export async function connectMoco(config: MocoConnectionConfig): Promise<boolean
 export async function disconnectMoco(): Promise<void> {
   connectionsState.moco = createInitialServiceState('moco');
   mocoClient = null;
+  mocoUserName.value = null;
   await removeStorageItemAsync(STORAGE_KEYS.MOCO_CONFIG);
   logger.connection('Moco disconnected');
 }
