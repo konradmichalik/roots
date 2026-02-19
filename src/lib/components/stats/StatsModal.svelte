@@ -204,43 +204,43 @@
       </div>
     {/snippet}
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-2xl">
-    <Dialog.Header>
-      <Dialog.Title>Statistics</Dialog.Title>
-      <Dialog.Description>Overview of your time bookings for week and month.</Dialog.Description>
-    </Dialog.Header>
+  <Dialog.Content class="sm:max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+    <!-- Header: Title + Month Nav on one line -->
+    <div class="flex items-center justify-between pr-8">
+      <Dialog.Header class="p-0 space-y-0">
+        <Dialog.Title>Statistics</Dialog.Title>
+        <Dialog.Description class="sr-only">Overview of your time bookings for week and month.</Dialog.Description>
+      </Dialog.Header>
 
-    <!-- Month Navigation -->
-    <div class="flex items-center justify-between py-2">
-      <button
-        onclick={prevMonth}
-        class="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
-          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-        aria-label="Previous month"
-      >
-        <ChevronLeft class="size-4" />
-      </button>
-
-      <span class="text-sm font-medium text-foreground">{monthLabel}</span>
-
-      <button
-        onclick={nextMonth}
-        disabled={isCurrentMonth}
-        class="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
-          disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent
-          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-        aria-label="Next month"
-      >
-        <ChevronRight class="size-4" />
-      </button>
+      <div class="flex items-center gap-1">
+        <button
+          onclick={prevMonth}
+          class="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          aria-label="Previous month"
+        >
+          <ChevronLeft class="size-4" />
+        </button>
+        <span class="text-sm font-medium text-foreground min-w-[120px] text-center">{monthLabel}</span>
+        <button
+          onclick={nextMonth}
+          disabled={isCurrentMonth}
+          class="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
+            disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent
+            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          aria-label="Next month"
+        >
+          <ChevronRight class="size-4" />
+        </button>
+      </div>
     </div>
 
     <!-- Slide Tabs -->
-    <div class="flex items-center gap-1 border-b border-border -mx-6 px-6 pb-3">
+    <div class="flex items-center gap-1 border-b border-border -mx-6 px-6 pb-2 pt-1">
       {#each slides as slide (slide.id)}
         <button
           onclick={() => goToSlide(slide.id)}
-          class="px-3 py-1.5 text-sm rounded-md transition-colors
+          class="px-3 py-1 text-sm rounded-md transition-colors
             {activeSlide === slide.id
             ? 'bg-primary text-primary-foreground font-medium'
             : 'text-muted-foreground hover:text-foreground hover:bg-accent'}"
@@ -250,9 +250,9 @@
       {/each}
     </div>
 
-    <div class="py-4">
-      <!-- Slide Container - Fixed Height -->
-      <div class="h-[420px] overflow-y-auto">
+    <div class="pt-3 flex-1 min-h-0">
+      <!-- Slide Container - fills remaining space, scrolls internally -->
+      <div class="h-full overflow-y-auto">
         {#if isMonthLoading}
           <!-- Skeleton mimicking overview layout -->
           <div class="space-y-4 animate-pulse">

@@ -98,9 +98,9 @@
 <div class="space-y-3 animate-in fade-in duration-200" bind:this={listRef}>
   {#if stats.projects.length > 0}
     <!-- Pie Chart with Tooltip -->
-    <div class="flex flex-col items-center gap-2 py-2">
+    <div class="flex flex-col items-center gap-3 py-4">
       <div class="relative">
-        <svg width="100" height="100" viewBox="0 0 100 100">
+        <svg width="200" height="200" viewBox="0 0 100 100">
           {#each pieSegments as segment, i (segment.project.projectId)}
             <path
               role="img"
@@ -115,17 +115,17 @@
             />
           {/each}
           <!-- Center hole for donut effect -->
-          <circle cx="50" cy="50" r="32" fill="var(--background)" />
+          <circle cx="50" cy="50" r="30" fill="var(--background)" />
         </svg>
         <!-- Center text -->
         <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           {#if hoveredSegment !== null}
-            <span class="text-base font-mono font-semibold text-foreground">
+            <span class="text-2xl font-mono font-semibold text-foreground">
               {Math.round(pieSegments[hoveredSegment].percent)}%
             </span>
           {:else}
-            <span class="text-[10px] text-muted-foreground">Total</span>
-            <span class="text-xs font-mono font-medium text-foreground">
+            <span class="text-xs text-muted-foreground">Total</span>
+            <span class="text-base font-mono font-semibold text-foreground">
               {formatHours(stats.total)}
             </span>
           {/if}
@@ -133,7 +133,7 @@
       </div>
 
       <!-- Hover Tooltip -->
-      <div class="h-12 flex items-center justify-center text-center px-4">
+      <div class="h-10 flex items-center justify-center text-center px-4">
         {#if hoveredSegment !== null}
           {@const hovered = pieSegments[hoveredSegment].project}
           <div class="flex flex-col items-center gap-0.5">
