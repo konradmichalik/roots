@@ -7,6 +7,8 @@ description: Weekly, monthly and project statistics
 
 The Statistics modal provides an overview of your booked hours across different time periods and projects. Open it by clicking the sidebar stats cards or the statistics button in the toolbar.
 
+![Statistics modal — Tasks tab with donut chart and project breakdown](/images/roots-task-statistics.jpg)
+
 ## Slides
 
 The modal has three tabs (slides) that you can switch between:

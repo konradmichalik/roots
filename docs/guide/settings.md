@@ -1,6 +1,6 @@
 ---
 title: Settings
-description: Configure Roots to your preferences
+description: Configure roots to your preferences
 ---
 
 # Settings
@@ -28,12 +28,14 @@ When Personio is connected, absences are imported automatically and manual editi
 
 ## Presence Management
 
-When Moco is connected, Roots tracks your working time (clock-in/clock-out) via the [Presence Bar](/guide/timeline#presence-bar) in the timeline header. Click the bar to open the Presence Modal where you can:
+When Moco is connected, roots tracks your working time (clock-in/clock-out) via the [Presence Bar](/guide/timeline#presence-bar) in the timeline header. Click the bar to open the Presence Modal where you can:
 
 - **Add time slots** — enter start and end times for a working period
 - **Edit time slots** — adjust start/end times of existing entries
 - **Delete time slots** — remove individual presence entries
 - **Toggle Home Office** — mark the day as home office or office
+
+![Presence modal with time slots and Home Office toggle](/images/roots-prescence-modal.jpg)
 
 Presence data is cached for 5 minutes with the same TTL as time entries.
 
@@ -52,7 +54,11 @@ Auto-refresh reloads the current day's entries from all connected services. It s
 
 ## Theme
 
-Roots supports light and dark themes. The theme follows your system preference by default and can be overridden in settings.
+roots supports light and dark themes. The theme follows your system preference by default and can be overridden in settings.
+
+| Light | Dark |
+|-------|------|
+| ![Light Mode](/images/roots-light.jpg) | ![Dark Mode](/images/roots-dark.jpg) |
 
 ## Data Storage
 
@@ -71,4 +77,4 @@ Storage keys are prefixed with `roots:` to avoid conflicts.
 
 ## Clearing Data
 
-To reset Roots to its initial state, disconnect all services and clear the browser storage (or delete `settings.json` from the Tauri data directory).
+To reset roots to its initial state, disconnect all services and clear the browser storage (or delete `settings.json` from the Tauri data directory).

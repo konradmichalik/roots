@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'Roots',
+  title: 'roots',
   description: 'Work Time Overview — Moco, Jira, Outlook & Personio in one app',
 
   base: '/roots/',
@@ -11,9 +11,9 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/roots/logo-sm.svg' }],
     ['meta', { name: 'theme-color', content: '#88c0d0' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'Roots Documentation' }],
+    ['meta', { property: 'og:title', content: 'roots Documentation' }],
     ['meta', { property: 'og:description', content: 'Work Time Overview — Moco, Jira, Outlook & Personio' }],
-    ['meta', { property: 'og:image', content: '/roots/images/screenshot.jpg' }]
+    ['meta', { property: 'og:image', content: '/roots/images/roots-light.jpg' }]
   ],
 
   markdown: {
@@ -21,10 +21,15 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: '/logo-sm.svg',
+    logo: {
+      light: '/logo.svg',
+      dark: '/logo-dark.svg'
+    },
+    siteTitle: false,
 
     nav: [
-      { text: 'Guide', link: '/getting-started/' },
+      { text: 'Getting Started', link: '/getting-started/' },
+      { text: 'Features', link: '/guide/' },
       { text: 'Connections', link: '/connections/' },
       { text: 'Desktop App', link: '/desktop/' },
       {

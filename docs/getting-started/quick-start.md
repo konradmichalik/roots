@@ -5,9 +5,9 @@ description: Get up and running in 5 minutes
 
 # Quick Start
 
-After installation, three steps are needed to start using Roots productively.
+After installation, three steps are needed to start using roots productively.
 
-## 1. Launch Roots
+## 1. Launch roots
 
 Start the desktop app or the dev server (`npm run tauri:dev`).
 
@@ -31,7 +31,7 @@ Step-by-step instructions for each service are available under [Connections](/co
 
 ## 3. Use the Timeline
 
-After a successful connection Roots automatically loads data for the current day. Navigate through days using the arrow buttons or the calendar sidebar.
+After a successful connection roots automatically loads data for the current day. Navigate through days using the arrow buttons or the calendar sidebar.
 
 - **Click an entry** to open the context menu (edit, delete)
 - **Hover over an entry** to highlight matched entries in other columns

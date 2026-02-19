@@ -5,7 +5,7 @@ description: Svelte 5 rune-based state management
 
 # Stores
 
-Roots uses Svelte 5 rune-based stores instead of the legacy `writable`/`readable` pattern. All stores follow the same structure.
+roots uses Svelte 5 rune-based stores instead of the legacy `writable`/`readable` pattern. All stores follow the same structure.
 
 ## Store Pattern
 

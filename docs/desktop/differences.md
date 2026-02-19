@@ -5,7 +5,7 @@ description: Feature differences between browser and desktop mode
 
 # Browser vs. Desktop
 
-Roots can run in the browser (via `npm run dev`) or as a native desktop app (via `npm run tauri:dev`). Here's how they compare.
+roots can run in the browser (via `npm run dev`) or as a native desktop app (via `npm run tauri:dev`). Here's how they compare.
 
 ## Feature Comparison
 

@@ -1,11 +1,11 @@
 ---
 title: Jira
-description: Connect Roots to Jira Cloud or Jira Server
+description: Connect roots to Jira Cloud or Jira Server
 ---
 
 # Jira
 
-Roots supports both **Jira Cloud** and **Jira Server / Data Center**. It imports worklogs — the time you've logged on Jira issues.
+roots supports both **Jira Cloud** and **Jira Server / Data Center**. It imports worklogs — the time you've logged on Jira issues.
 
 ## Jira Cloud
 
@@ -21,14 +21,14 @@ Roots supports both **Jira Cloud** and **Jira Server / Data Center**. It imports
 
 1. Go to [Atlassian API Tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Click **Create API token**
-3. Enter a label (e.g. "Roots")
+3. Enter a label (e.g. "roots")
 4. Copy the generated token
 
 ::: warning
 The token is shown only once. Store it securely before closing the dialog.
 :::
 
-### Connect in Roots
+### Connect in roots
 
 1. Open the Connection Manager
 2. Select the **Jira** tab
@@ -64,7 +64,7 @@ Use your Jira username and password. This method is less secure and may not work
 PAT authentication is recommended over username/password for better security and compatibility.
 :::
 
-### Connect in Roots
+### Connect in roots
 
 1. Open the Connection Manager
 2. Select the **Jira** tab
@@ -75,19 +75,19 @@ PAT authentication is recommended over username/password for better security and
 
 ---
 
-## What Roots Fetches
+## What roots Fetches
 
 | Data | Description |
 |------|-------------|
 | Worklogs | Time logged by you on any issue within the selected date range |
 | Issue metadata | Issue key, summary, type and project (for display context) |
 
-Roots uses JQL to find issues with worklogs in the selected date range, then filters for your entries.
+roots uses JQL to find issues with worklogs in the selected date range, then filters for your entries.
 
 ## Features
 
 - **View** worklogs with issue key, summary and time spent
-- **Create, edit and delete** worklogs directly from Roots
+- **Create, edit and delete** worklogs directly from roots
 - **Issue link** — click an issue key to open it in Jira
 
 ## Troubleshooting
@@ -99,10 +99,10 @@ Roots uses JQL to find issues with worklogs in the selected date range, then fil
 
 ### "No worklogs found"
 
-- Roots only shows worklogs authored by **you**. Entries from other users are filtered out.
-- Check that you have worklogs for the selected date — Roots searches by `worklogDate`, not issue creation date.
+- roots only shows worklogs authored by **you**. Entries from other users are filtered out.
+- Check that you have worklogs for the selected date — roots searches by `worklogDate`, not issue creation date.
 
 ### Rate limiting (429)
 
-- Jira Cloud has API rate limits. Roots retries automatically with exponential backoff.
+- Jira Cloud has API rate limits. roots retries automatically with exponential backoff.
 - If persistent, reduce the date range or wait a few minutes.

@@ -1,11 +1,13 @@
 ---
 title: Features Overview
-description: What Roots can do
+description: What roots can do
 ---
 
 # Features
 
-Roots combines work time data from multiple services into a single interface. Here's what you can do with it.
+roots combines work time data from multiple services into a single interface. Here's what you can do with it.
+
+![roots Overview](/images/roots-overview.jpg)
 
 ## Core Features
 
@@ -15,7 +17,7 @@ The main view shows time entries from all connected services in parallel columns
 
 ### Cross-Source Matching
 
-Roots automatically detects entries that likely refer to the same work across different services. When you hover over an entry, matched entries in other columns are highlighted. Matching uses confidence scores based on time overlap and description similarity.
+roots automatically detects entries that likely refer to the same work across different services. When you hover over an entry, matched entries in other columns are highlighted. Matching uses confidence scores based on time overlap and description similarity.
 
 ### Target/Actual Comparison
 
@@ -27,7 +29,7 @@ Pin frequently used project/task combinations as favorites for one-click booking
 
 ### Timer
 
-Start a timer to track work in real-time. When you stop the timer, Roots creates a Moco time entry or saves it as a draft for later booking.
+Start a timer to track work in real-time. When you stop the timer, roots creates a Moco time entry or saves it as a draft for later booking.
 
 ### Drafts
 
@@ -35,7 +37,7 @@ Save timer results as drafts when you're not ready to book yet. Drafts persist a
 
 ### Presence Tracking
 
-When Moco is connected, Roots shows a presence progress bar for each day. It visualizes clock-in/clock-out times, breaks and booked vs. unbooked time. You can create, edit and delete presence entries directly.
+When Moco is connected, roots shows a presence progress bar for each day. It visualizes clock-in/clock-out times, breaks and booked vs. unbooked time. You can create, edit and delete presence entries directly.
 
 ### Statistics
 
@@ -55,4 +57,4 @@ Configure automatic data refresh at 5-minute, 30-minute or 1-hour intervals to k
 | **Outlook** | Calendar events | No | No | No |
 | **Personio** | Absences | No | No | No |
 
-Outlook events and Personio absences are read-only — they provide context but cannot be modified from Roots.
+Outlook events and Personio absences are read-only — they provide context but cannot be modified from roots.

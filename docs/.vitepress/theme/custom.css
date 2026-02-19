@@ -1,13 +1,29 @@
+/* Roots brand colors derived from the logo's green dot (#a3be8c) */
 :root {
-  --vp-c-brand-1: #5e81ac;
-  --vp-c-brand-2: #81a1c1;
-  --vp-c-brand-3: #88c0d0;
+  --vp-c-brand-1: #5c8a4a;
+  --vp-c-brand-2: #7b9e64;
+  --vp-c-brand-3: #a3be8c;
+  --vp-c-brand-soft: rgba(163, 190, 140, 0.14);
+
+  /* Tip boxes use logo green */
+  --vp-custom-block-tip-border: var(--vp-c-brand-2);
+  --vp-custom-block-tip-text: var(--vp-c-brand-1);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
+  --vp-custom-block-tip-code-bg: rgba(163, 190, 140, 0.08);
 }
 
 .dark {
-  --vp-c-brand-1: #88c0d0;
-  --vp-c-brand-2: #81a1c1;
-  --vp-c-brand-3: #5e81ac;
+  --vp-c-brand-1: #a3be8c;
+  --vp-c-brand-2: #8bae74;
+  --vp-c-brand-3: #6a8f55;
+  --vp-c-brand-soft: rgba(163, 190, 140, 0.14);
+}
+
+/* Screenshot images in doc pages — elevated with shadow */
+.vp-doc img {
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--vp-c-border);
 }
 
 .VPNavBarTitle .logo {

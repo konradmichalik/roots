@@ -1,6 +1,6 @@
 ---
 title: Personio
-description: Connect Roots to Personio for absences and work schedule
+description: Connect roots to Personio for absences and work schedule
 ---
 
 # Personio
@@ -35,7 +35,7 @@ API credentials are managed by your Personio administrator. If you don't have ac
 The Client Secret is shown only once. Store it securely.
 :::
 
-### 2. Connect in Roots
+### 2. Connect in roots
 
 1. Open the Connection Manager
 2. Select the **Personio** tab
@@ -43,9 +43,9 @@ The Client Secret is shown only once. Store it securely.
 4. Enter **your employee email** — this must match the email in your Personio profile exactly
 5. Click **Connect**
 
-Roots authenticates with the Personio API, looks up your employee record by email, and reads your work schedule.
+roots authenticates with the Personio API, looks up your employee record by email, and reads your work schedule.
 
-## What Roots Fetches
+## What roots Fetches
 
 | Data | Description |
 |------|-------------|
@@ -55,7 +55,7 @@ Roots authenticates with the Personio API, looks up your employee record by emai
 
 ## Automatic Settings Sync
 
-When Personio is connected, Roots automatically:
+When Personio is connected, roots automatically:
 
 - **Updates weekly hours** from your work schedule (e.g. 8h Mon–Fri, 0h Sat–Sun)
 - **Marks absence days** in the calendar and timeline
@@ -67,7 +67,7 @@ If you disconnect Personio, manual editing of hours and absences is re-enabled.
 
 ## Absence Types
 
-Roots maps Personio absence types to visual indicators:
+roots maps Personio absence types to visual indicators:
 
 | Type | Display |
 |------|---------|

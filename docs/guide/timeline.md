@@ -5,7 +5,9 @@ description: The day view explained
 
 # Timeline
 
-The timeline is Roots' main interface. It shows your work time across all connected services in a day view with parallel columns.
+The timeline is roots' main interface. It shows your work time across all connected services in a day view with parallel columns.
+
+![Day View with Outlook, Moco and Jira columns](/images/roots-overview.jpg)
 
 ## Day View
 
@@ -19,7 +21,9 @@ The day view displays entries in columns — one per connected service. Each car
 ### Interactions
 
 - **Click** an entry to open the context menu (edit, delete, view in source)
-- **Hover** to highlight matched entries across columns
+- **Hover** to highlight matched entries across columns — entries with the same ticket key or overlapping time are connected visually
+
+![Cross-source matching between Moco and Jira](/images/roots-highlight.jpg)
 - **Right-click** for quick actions
 
 ### Entry Cards
@@ -34,6 +38,8 @@ Cards are color-coded by service and show action icons on hover:
 
 When Moco is connected, a presence progress bar appears below the header. It visualizes your working time for the day:
 
+![Presence bar with tooltip showing time slots and gaps](/images/roots-prescence-bar.jpg)
+
 - **Green segments** — time covered by booked entries
 - **Red segments** — presence time not yet booked
 - **Gray segments** — breaks/gaps between presence slots
@@ -46,6 +52,8 @@ The bar also shows a projected end time when your presence is still open (clock-
 :::
 
 ## Sidebar Stats
+
+![Sidebar with calendar and statistics](/images/roots-sidebar.jpg)
 
 The sidebar shows summary statistics for the current week and month:
 

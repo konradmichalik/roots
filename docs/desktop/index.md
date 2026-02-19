@@ -1,11 +1,11 @@
 ---
 title: Desktop App
-description: Roots as a native macOS application
+description: roots as a native macOS application
 ---
 
 # Desktop App
 
-Roots is built with [Tauri 2](https://tauri.app/) and runs as a native macOS application. The desktop version is the recommended way to use Roots.
+roots is built with [Tauri 2](https://tauri.app/) and runs as a native macOS application. The desktop version is the recommended way to use roots.
 
 ## Why Desktop?
 
@@ -33,7 +33,7 @@ Update with `brew upgrade --cask roots`.
 3. First launch: right-click → "Open" to bypass Gatekeeper
 
 ::: warning macOS Gatekeeper
-Since Roots is not notarized through Apple, macOS will warn you on first launch. Right-click the app and select "Open" to allow it.
+Since roots is not notarized through Apple, macOS will warn you on first launch. Right-click the app and select "Open" to allow it.
 :::
 
 ## Building from Source

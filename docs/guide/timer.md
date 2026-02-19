@@ -5,7 +5,7 @@ description: Track time, create entries, and manage drafts
 
 # Timer & Booking
 
-Roots offers several ways to log time.
+roots offers several ways to log time.
 
 ## Timer
 
@@ -18,10 +18,14 @@ Start a timer to track work in real-time:
 
 While running, the timer shows elapsed time in the toolbar and as a dock badge on macOS. You can **pause** and **resume** the timer at any time.
 
+![Timer running in the toolbar](/images/roots-timer.jpg)
+
 When you stop the timer, you can either:
 
 - **Book directly** — creates a Moco time entry immediately
 - **Save as draft** — saves the entry for later booking
+
+![Stop Timer modal with booking options](/images/roots-timer-modal.jpg)
 
 ## Drafts
 

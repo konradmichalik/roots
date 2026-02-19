@@ -1,11 +1,11 @@
 ---
 title: Connections Overview
-description: How to connect Roots to your services
+description: How to connect roots to your services
 ---
 
 # Connections
 
-Roots supports four services. Each one is optional — connect whichever ones you use.
+roots supports four services. Each one is optional — connect whichever ones you use.
 
 ## Supported Services
 
@@ -20,7 +20,9 @@ Roots supports four services. Each one is optional — connect whichever ones yo
 
 Open the Connection Manager via the settings icon in the top bar or by clicking the **Connect** button in an empty source column.
 
-Each service has its own form. After entering credentials Roots tests the connection immediately — a green checkmark confirms success.
+![Connection Manager showing all services connected](/images/roots-connection-modal.jpg)
+
+Each service has its own form. After entering credentials roots tests the connection immediately — a green checkmark confirms success.
 
 ## Credential Storage
 
@@ -30,7 +32,7 @@ All credentials are stored locally on your device:
 - **Browser mode**: Stored in `localStorage`
 
 ::: info
-Credentials never leave your machine. Roots communicates directly with each service API — there is no intermediary server.
+Credentials never leave your machine. roots communicates directly with each service API — there is no intermediary server.
 :::
 
 ## Disconnecting

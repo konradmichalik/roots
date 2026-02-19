@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install and set up Roots
+description: Install and set up roots
 ---
 
 # Installation
@@ -9,7 +9,7 @@ description: Install and set up Roots
 
 ### Homebrew
 
-The easiest way to install and keep Roots up to date:
+The easiest way to install and keep roots up to date:
 
 ```bash
 brew tap konradmichalik/tap
@@ -21,7 +21,7 @@ Update with `brew upgrade --cask roots`.
 ### Manual Download
 
 1. Download the latest version from [GitHub Releases](https://github.com/konradmichalik/roots/releases/latest)
-2. Open the `.dmg` file and drag Roots into your Applications folder
+2. Open the `.dmg` file and drag roots into your Applications folder
 3. On first launch: right-click the app and select "Open" (macOS Gatekeeper)
 
 ::: tip

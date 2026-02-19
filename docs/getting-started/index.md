@@ -1,11 +1,11 @@
 ---
 title: Introduction
-description: What is Roots and what problem does it solve?
+description: What is roots and what problem does it solve?
 ---
 
 # Introduction
 
-Roots is a desktop application that aggregates work time from multiple tools into a single, unified overview. Instead of switching between Moco, Jira, Outlook and Personio, Roots displays all entries side by side in a timeline.
+roots is a desktop application that aggregates work time from multiple tools into a single, unified overview. Instead of switching between Moco, Jira, Outlook and Personio, roots displays all entries side by side in a timeline.
 
 ## The Problem
 
@@ -20,13 +20,13 @@ Without a central tool it's hard to tell whether all hours have been recorded co
 
 ## The Solution
 
-Roots connects to all four services and displays the data in columns, side by side:
+roots connects to all four services and displays the data in columns, side by side:
 
 - **Day view** with entries per service
 - **Week view** with daily bars and target/actual comparison
 - **Month view** with calendar overview
 
-Additionally, Roots automatically detects which entries from different sources belong together (cross-source matching).
+Additionally, roots automatically detects which entries from different sources belong together (cross-source matching).
 
 ## Requirements
 

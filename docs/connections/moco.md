@@ -1,11 +1,11 @@
 ---
 title: Moco
-description: Connect Roots to your Moco account
+description: Connect roots to your Moco account
 ---
 
 # Moco
 
-Moco is Roots' primary time tracking service. It provides time entries, project data and attendance records.
+Moco is roots' primary time tracking service. It provides time entries, project data and attendance records.
 
 ## What You Need
 
@@ -28,7 +28,7 @@ Moco is Roots' primary time tracking service. It provides time entries, project 
 The API key grants full access to your Moco account. Do not share it.
 :::
 
-### 2. Connect in Roots
+### 2. Connect in roots
 
 1. Open the Connection Manager
 2. Select the **Moco** tab
@@ -36,9 +36,9 @@ The API key grants full access to your Moco account. Do not share it.
 4. Paste the API key
 5. Click **Connect**
 
-Roots validates the connection by calling the Moco session endpoint. On success you'll see a green checkmark.
+roots validates the connection by calling the Moco session endpoint. On success you'll see a green checkmark.
 
-## What Roots Fetches
+## What roots Fetches
 
 | Data | Endpoint | Description |
 |------|----------|-------------|
@@ -52,7 +52,7 @@ Roots validates the connection by calling the Moco session endpoint. On success 
 
 ### Time Entries
 
-- **View & edit** time entries directly in Roots
+- **View & edit** time entries directly in roots
 - **Create new entries** via the timer, quick-booking or from Outlook events
 - **Delete entries** from the context menu
 - **Save as draft** when stopping the timer for later booking

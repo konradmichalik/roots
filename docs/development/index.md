@@ -1,11 +1,11 @@
 ---
 title: Architecture
-description: Technical overview of the Roots codebase
+description: Technical overview of the roots codebase
 ---
 
 # Architecture
 
-Roots is a **Svelte 5 + Tauri 2** application. The frontend handles all business logic — the Tauri backend is minimal (plugin registration only, no custom Rust commands).
+roots is a **Svelte 5 + Tauri 2** application. The frontend handles all business logic — the Tauri backend is minimal (plugin registration only, no custom Rust commands).
 
 ## High-Level Overview
 

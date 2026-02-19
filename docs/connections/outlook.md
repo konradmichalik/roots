@@ -1,11 +1,11 @@
 ---
 title: Outlook
-description: Connect Roots to Microsoft Outlook via OAuth 2.0
+description: Connect roots to Microsoft Outlook via OAuth 2.0
 ---
 
 # Outlook
 
-Roots connects to Outlook (Microsoft 365) via the **Microsoft Graph API** using OAuth 2.0 with PKCE. It imports your calendar events so you can compare meetings against booked time.
+roots connects to Outlook (Microsoft 365) via the **Microsoft Graph API** using OAuth 2.0 with PKCE. It imports your calendar events so you can compare meetings against booked time.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ You need an **Azure App Registration**. This is a one-time setup performed by yo
 1. Go to [Azure Portal → App registrations](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
 2. Click **New registration**
 3. Fill in:
-   - **Name**: `Roots` (or any name)
+   - **Name**: `roots` (or any name)
    - **Supported account types**: "Accounts in this organizational directory only" (single tenant)
    - **Redirect URI**:
      - Platform: **Single-page application (SPA)**
@@ -56,7 +56,7 @@ Add both redirect URIs to your app registration to support desktop and browser m
 | **Client ID** | Application (client) ID from Azure |
 | **Tenant ID** | Directory (tenant) ID from Azure |
 
-## Connect in Roots
+## Connect in roots
 
 1. Open the Connection Manager
 2. Select the **Outlook** tab
@@ -64,10 +64,10 @@ Add both redirect URIs to your app registration to support desktop and browser m
 4. Click **Sign in with Microsoft**
 5. A browser window opens — sign in with your Microsoft account
 6. Grant the requested permissions
-7. You're redirected back to Roots — the connection is established
+7. You're redirected back to roots — the connection is established
 
 ::: info
-Roots uses the **PKCE** (Proof Key for Code Exchange) flow. No client secret is needed — the flow is secure for public clients like desktop apps.
+roots uses the **PKCE** (Proof Key for Code Exchange) flow. No client secret is needed — the flow is secure for public clients like desktop apps.
 :::
 
 ## Token Management
@@ -76,13 +76,13 @@ Roots uses the **PKCE** (Proof Key for Code Exchange) flow. No client secret is 
 - **Refresh tokens** are stored locally and used to obtain new access tokens
 - If the refresh token expires, you'll be prompted to sign in again
 
-## What Roots Fetches
+## What roots Fetches
 
 | Data | Endpoint | Description |
 |------|----------|-------------|
 | Calendar events | `/me/calendarView` | Events in the selected date range |
 
-Roots automatically filters out:
+roots automatically filters out:
 
 - Events marked as **Free** (transparent)
 - Events you have **Declined**
@@ -108,5 +108,5 @@ Roots automatically filters out:
 
 ### "No events found"
 
-- Roots only shows events from your **default calendar**
+- roots only shows events from your **default calendar**
 - All-day events, free time slots and declined events are filtered out

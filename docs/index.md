@@ -2,12 +2,12 @@
 layout: home
 
 hero:
-  name: Roots
+  name: roots
   text: Work Time Overview
   tagline: Moco, Jira, Outlook and Personio in a unified timeline
   image:
     src: /logo-sm.svg
-    alt: Roots Logo
+    alt: roots Logo
   actions:
     - theme: brand
       text: Get Started
@@ -43,7 +43,8 @@ features:
 ---
 
 <div class="app-preview">
-  <img src="/images/screenshot.jpg" alt="Roots — Unified Work Time Overview" />
+  <img class="light-only" src="/images/roots-light.jpg" alt="roots — Unified Work Time Overview (Light Mode)" />
+  <img class="dark-only" src="/images/roots-dark.jpg" alt="roots — Unified Work Time Overview (Dark Mode)" />
 </div>
 
 <style>
@@ -58,6 +59,8 @@ features:
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   border: 1px solid var(--vp-c-border);
 }
+html.dark .light-only { display: none; }
+html:not(.dark) .dark-only { display: none; }
 </style>
 
 ## Supported Services
