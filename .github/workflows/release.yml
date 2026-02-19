@@ -59,10 +59,106 @@ jobs:
           releaseBody: |
             Download Roots ${{ github.ref_name }}
 
-            **macOS** (app is unsigned): Right-click the app → "Open" on first launch, or run:
+            **macOS:** Right-click the app → "Open" on first launch, or install via Homebrew:
             ```
-            xattr -cr /Applications/Roots.app
+            brew tap konradmichalik/tap
+            brew install --cask roots
             ```
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
+
+  update-homebrew:
+    needs: release
+    runs-on: macos-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          echo "Waiting for DMG assets on release ${TAG}..."
+          for i in $(seq 1 30); do
+            ASSETS=$(gh release view "$TAG" --json assets --jq '[.assets[].name | select(endswith(".dmg"))] | length')
+            if [ "$ASSETS" -ge 2 ]; then
+              echo "Both DMGs are available."
+              exit 0
+            fi
+            echo "Found ${ASSETS}/2 DMGs, waiting 30s... (attempt ${i}/30)"
+            sleep 30
+          done
+          echo "Timed out waiting for assets."
+          exit 1
+
+      - name: Download DMGs and compute SHA256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          gh release download "$TAG" --pattern "*_aarch64.dmg" --dir /tmp/dmg
+          gh release download "$TAG" --pattern "*_x64.dmg" --dir /tmp/dmg
+
+          SHA_ARM=$(shasum -a 256 /tmp/dmg/*_aarch64.dmg | awk '{print $1}')
+          SHA_INTEL=$(shasum -a 256 /tmp/dmg/*_x64.dmg | awk '{print $1}')
+
+          APP_VERSION=$(cat package.json | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])")
+
+          echo "SHA_ARM=${SHA_ARM}" >> "$GITHUB_ENV"
+          echo "SHA_INTEL=${SHA_INTEL}" >> "$GITHUB_ENV"
+          echo "APP_VERSION=${APP_VERSION}" >> "$GITHUB_ENV"
+          echo "TAG=${TAG}" >> "$GITHUB_ENV"
+
+          echo "ARM SHA256: ${SHA_ARM}"
+          echo "Intel SHA256: ${SHA_INTEL}"
+          echo "App version: ${APP_VERSION}"
+          echo "Tag: ${TAG}"
+
+      - name: Update Homebrew tap
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          CASK_CONTENT=$(cat <<RUBY
+          cask "roots" do
+            version "${APP_VERSION},${TAG}"
+
+            on_arm do
+              url "https://github.com/konradmichalik/roots/releases/download/#{version.after_comma}/Roots_#{version.before_comma}_aarch64.dmg"
+              sha256 "${SHA_ARM}"
+            end
+
+            on_intel do
+              url "https://github.com/konradmichalik/roots/releases/download/#{version.after_comma}/Roots_#{version.before_comma}_x64.dmg"
+              sha256 "${SHA_INTEL}"
+            end
+
+            name "Roots"
+            desc "Work Time Overview & Management — aggregates Moco, Jira, Outlook, and Personio"
+            homepage "https://github.com/konradmichalik/roots"
+
+            app "Roots.app"
+
+            zap trash: [
+              "~/Library/Application Support/com.roots.time-overview",
+              "~/Library/Caches/com.roots.time-overview",
+            ]
+          end
+          RUBY
+          )
+
+          cd /tmp
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/konradmichalik/homebrew-tap.git"
+          cd homebrew-tap
+
+          echo "$CASK_CONTENT" > Casks/roots.rb
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/roots.rb
+          git commit -m "chore: update roots to ${TAG}"
+          git push

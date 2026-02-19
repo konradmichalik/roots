@@ -28,7 +28,24 @@ Roots aggregates your work time from multiple services into a single desktop app
 - **Native Desktop App** - Lightweight Tauri app, no browser CORS issues
 - **Dark Mode** - Light and dark theme support
 
-## Quick Start
+## Installation
+
+### Homebrew (recommended)
+
+```bash
+brew tap konradmichalik/tap
+brew install --cask roots
+```
+
+Updates via `brew upgrade --cask roots`.
+
+### Manual Download
+
+Download the latest `.dmg` from [GitHub Releases](https://github.com/konradmichalik/roots/releases).
+
+> The app is currently unsigned. On first launch: right-click the app and select "Open", or run `xattr -cr /Applications/Roots.app`.
+
+## Development
 
 ```bash
 git clone https://github.com/konradmichalik/roots.git
@@ -36,7 +53,7 @@ cd roots
 npm install
 ```
 
-### Development (Browser)
+### Browser Mode
 
 ```bash
 # Start the CORS proxy (required for browser mode)
@@ -46,13 +63,13 @@ cd proxy && npm install && node server.js &
 npm run dev
 ```
 
-### Development (Desktop)
+### Desktop Mode
 
 ```bash
 npm run tauri:dev
 ```
 
-## Requirements
+### Requirements
 
 - Node.js 18+
 - Rust toolchain (for Tauri builds)
