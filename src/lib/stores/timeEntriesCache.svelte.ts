@@ -13,6 +13,7 @@ import {
 } from '../utils/date-helpers';
 import { getStorageItemAsync, setStorageItemAsync, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { isDemoMode, anonymizeEntriesIfDemoMode } from '../utils/demo-data';
 import { mapMocoActivity } from './timeEntriesMappers';
 
 // ---------------------------------------------------------------------------
@@ -47,6 +48,7 @@ export async function initializeTimeEntries(): Promise<void> {
 // Cache persistence
 // ---------------------------------------------------------------------------
 function persistMonthCache(): void {
+  if (isDemoMode()) return;
   void setStorageItemAsync(STORAGE_KEYS.MONTH_CACHE, monthCacheState.cache);
 }
 
@@ -86,7 +88,7 @@ export async function fetchMonthCache(from: string, to: string): Promise<void> {
       if (client) {
         try {
           const activities = await client.getActivities(from, to);
-          entry.mocoEntries = activities.map(mapMocoActivity);
+          entry.mocoEntries = anonymizeEntriesIfDemoMode(activities.map(mapMocoActivity));
         } catch (error) {
           logger.error('Month cache: Failed to fetch Moco entries', error);
         }
@@ -121,7 +123,10 @@ export async function fetchMonthMocoOnly(monthStart: string): Promise<void> {
     const activities = await client.getActivities(monthStart, monthEnd);
     monthCacheState.cache = {
       ...monthCacheState.cache,
-      [monthStart]: { mocoEntries: activities.map(mapMocoActivity), lastFetched: Date.now() }
+      [monthStart]: {
+        mocoEntries: anonymizeEntriesIfDemoMode(activities.map(mapMocoActivity)),
+        lastFetched: Date.now()
+      }
     };
     persistMonthCache();
   } catch (error) {

@@ -12,6 +12,7 @@ import { getMocoClient, getJiraClient, getOutlookClient } from './connections.sv
 import { connectionsState } from './connections.svelte';
 import { hoursToSeconds } from '../utils/time-format';
 import { logger } from '../utils/logger';
+import { anonymizeEntriesIfDemoMode } from '../utils/demo-data';
 import { toast } from './toast.svelte';
 import {
   mapMocoActivity,
@@ -110,7 +111,7 @@ async function fetchMocoEntries(from: string, to: string): Promise<void> {
 
   try {
     const activities = await client.getActivities(from, to);
-    const mappedEntries = activities.map(mapMocoActivity);
+    const mappedEntries = anonymizeEntriesIfDemoMode(activities.map(mapMocoActivity));
     timeEntriesState.mocoActivities = mappedEntries;
     logger.store('timeEntries', `Loaded ${activities.length} Moco activities`);
 
@@ -136,7 +137,9 @@ async function fetchJiraEntries(from: string, to: string): Promise<void> {
 
   try {
     const worklogs = await client.getWorklogsForRange(from, to);
-    timeEntriesState.jiraWorklogs = worklogs.map((w) => mapJiraWorklog(w, client));
+    timeEntriesState.jiraWorklogs = anonymizeEntriesIfDemoMode(
+      worklogs.map((w) => mapJiraWorklog(w, client))
+    );
     logger.store('timeEntries', `Loaded ${worklogs.length} Jira worklogs`);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch Jira worklogs';
@@ -156,7 +159,7 @@ async function fetchOutlookEntries(from: string, to: string): Promise<void> {
 
   try {
     const events = await client.getCalendarEvents(from, to);
-    timeEntriesState.outlookEvents = events.map(mapOutlookEvent);
+    timeEntriesState.outlookEvents = anonymizeEntriesIfDemoMode(events.map(mapOutlookEvent));
     logger.store('timeEntries', `Loaded ${events.length} Outlook events`);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch Outlook events';

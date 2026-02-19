@@ -1,5 +1,6 @@
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { isDemoMode } from '../utils/demo-data';
 import { getActiveProjects, getTasksForProject } from './mocoProjects.svelte';
 import type { RecentMocoPair } from '../types';
 
@@ -18,6 +19,7 @@ export async function initializeRecentPairs(): Promise<void> {
 }
 
 function persist(): void {
+  if (isDemoMode()) return;
   saveStorage(STORAGE_KEYS.RECENT_PAIRS, recentPairsState.pairs);
 }
 

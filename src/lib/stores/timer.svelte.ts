@@ -1,5 +1,6 @@
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { isDemoMode } from '../utils/demo-data';
 import { today } from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';
 import { setDockBadge, clearDockBadge, formatBadgeTime } from '../utils/dock-badge';
@@ -78,10 +79,12 @@ export async function initializeTimer(): Promise<void> {
 // ============ Persistence ============
 
 function persistTimer(): void {
+  if (isDemoMode()) return;
   saveStorage(STORAGE_KEYS.TIMER, { ...timerState });
 }
 
 function persistDrafts(): void {
+  if (isDemoMode()) return;
   saveStorage(STORAGE_KEYS.DRAFTS, draftsState.drafts);
 }
 

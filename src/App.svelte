@@ -23,6 +23,7 @@
   import { detectOAuthCallback, clearOAuthCallbackFromUrl } from './lib/api/oauth-manager';
   import { isTauri } from './lib/utils/storage';
   import { logger } from './lib/utils/logger';
+  import { toggleDemoMode, enableDemoMode } from './lib/stores/demoMode.svelte';
   import { onMount } from 'svelte';
 
   let isInitializing = $state(true);
@@ -32,23 +33,21 @@
     document.title = `roots - ${formatDateLong(dateNavState.selectedDate)}`;
   });
 
-  // Redacted mode — toggle with Ctrl+Shift+R or ?redacted URL param
-  function initRedactedMode(): void {
-    if (new URLSearchParams(window.location.search).has('redacted')) {
-      document.documentElement.setAttribute('data-redacted', '');
+  // Demo mode — toggle with Ctrl+Shift+R or ?demo URL param
+  function initDemoMode(): void {
+    if (new URLSearchParams(window.location.search).has('demo')) {
+      enableDemoMode();
     }
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'R') {
         e.preventDefault();
-        document.documentElement.toggleAttribute('data-redacted');
+        toggleDemoMode();
       }
     });
   }
 
   onMount(() => {
-    initRedactedMode();
-
     async function initialize() {
       try {
         await initializeTheme();
@@ -105,6 +104,9 @@
         }
 
         await initializeConnections();
+
+        // Initialize demo mode after all stores are ready
+        initDemoMode();
       } finally {
         setTimeout(() => {
           isInitializing = false;

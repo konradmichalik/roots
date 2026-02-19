@@ -1,5 +1,6 @@
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
+import { isDemoMode } from '../utils/demo-data';
 import type { Favorite, FavoriteEventMatch } from '../types';
 
 export const favoritesState = $state<{ favorites: Favorite[] }>({
@@ -15,6 +16,7 @@ export async function initializeFavorites(): Promise<void> {
 }
 
 function persist(): void {
+  if (isDemoMode()) return;
   saveStorage(STORAGE_KEYS.FAVORITES, favoritesState.favorites);
 }
 
