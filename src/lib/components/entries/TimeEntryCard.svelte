@@ -7,12 +7,14 @@
   import { extractFirstIssueKey } from '../../utils/jira-issue-parser';
   import { connectionsState, getJiraBaseUrl } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
+  import { openStatsForTask } from '../../stores/statsModal.svelte';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Plus from '@lucide/svelte/icons/plus';
   import Upload from '@lucide/svelte/icons/upload';
   import Star from '@lucide/svelte/icons/star';
   import Copy from '@lucide/svelte/icons/copy';
   import ExternalLink from '@lucide/svelte/icons/external-link';
+  import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
 
   import {
     matchHoverState,
@@ -227,6 +229,11 @@
       <ContextMenu.Item onclick={openMocoDuplicate}>
         <Copy class="text-muted-foreground" />
         <span>Duplicate Entry</span>
+      </ContextMenu.Item>
+      <ContextMenu.Separator />
+      <ContextMenu.Item onclick={() => openStatsForTask(mocoMeta.projectId, mocoMeta.taskName)}>
+        <BarChart3 class="text-muted-foreground" />
+        <span>Task Stats</span>
       </ContextMenu.Item>
 
       {#if mocoIssueKey && isJiraConnected}

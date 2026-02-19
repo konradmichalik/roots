@@ -12,6 +12,7 @@
     monthCacheState
   } from '../../stores/timeEntries.svelte';
   import { getPresenceForDate } from '../../stores/presences.svelte';
+  import { statsModalState } from '../../stores/statsModal.svelte';
   import { getWeekDates, getMonthStart, getMonthWorkingDays } from '../../utils/date-helpers';
   import type { MocoMetadata } from '../../types';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
@@ -54,9 +55,7 @@
     return total > 0 ? Math.round((billable / total) * 100) : 0;
   });
 
-  // StatsModal state (for programmatic open)
-  let statsModalOpen = $state(false);
-  let statsModalSlide = $state<'overview' | 'breakdown' | 'projects'>('overview');
+  // StatsModal controlled via global store (so context menus can open it too)
 
   // Days with open hours (negative presenceBalance = not all presence time booked)
   let openDays = $derived(
@@ -125,17 +124,26 @@
       {billablePercent}
       {balancedDays}
       onBillableClick={() => {
-        statsModalSlide = 'breakdown';
-        statsModalOpen = true;
+        statsModalState.initialSlide = 'breakdown';
+        statsModalState.highlightProjectId = undefined;
+        statsModalState.highlightTaskName = undefined;
+        statsModalState.open = true;
       }}
     />
     <SidebarStatsTotal {todayStr} />
   {/if}
 
-  <StatsModal bind:open={statsModalOpen} initialSlide={statsModalSlide}>
+  <StatsModal
+    bind:open={statsModalState.open}
+    initialSlide={statsModalState.initialSlide}
+    highlightProjectId={statsModalState.highlightProjectId}
+    highlightTaskName={statsModalState.highlightTaskName}
+  >
     <button
       onclick={() => {
-        statsModalSlide = 'overview';
+        statsModalState.initialSlide = 'overview';
+        statsModalState.highlightProjectId = undefined;
+        statsModalState.highlightTaskName = undefined;
       }}
       class="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground
         hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"

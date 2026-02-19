@@ -22,6 +22,7 @@
   import type { Snippet } from 'svelte';
   import type { MocoMetadata } from '../../types';
   import type { MonthProjectStats, ProjectStats, TaskStats } from './statsTypes';
+  import { resetStatsHighlight } from '../../stores/statsModal.svelte';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
@@ -30,8 +31,16 @@
   let {
     children,
     open = $bindable(false),
-    initialSlide
-  }: { children: Snippet; open?: boolean; initialSlide?: SlideId } = $props();
+    initialSlide,
+    highlightProjectId,
+    highlightTaskName
+  }: {
+    children: Snippet;
+    open?: boolean;
+    initialSlide?: SlideId;
+    highlightProjectId?: number;
+    highlightTaskName?: string;
+  } = $props();
 
   let todayStr = $state(today());
 
@@ -41,12 +50,14 @@
   // Slider state
   let activeSlide = $state<SlideId>('overview');
 
-  // Reset state when dialog opens
+  // Reset state when dialog opens/closes
   $effect(() => {
     if (open) {
       todayStr = today();
       selectedMonth = getMonthStart(dateNavState.selectedDate);
       activeSlide = initialSlide ?? 'overview';
+    } else {
+      resetStatsHighlight();
     }
   });
 
@@ -279,7 +290,7 @@
         {:else if activeSlide === 'breakdown'}
           <StatsBreakdownSlide stats={monthProjectStats} />
         {:else if activeSlide === 'projects'}
-          <StatsProjectsSlide stats={monthProjectStats} />
+          <StatsProjectsSlide stats={monthProjectStats} {highlightProjectId} {highlightTaskName} />
         {/if}
       </div>
     </div>

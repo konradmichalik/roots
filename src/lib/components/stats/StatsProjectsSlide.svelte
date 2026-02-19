@@ -1,8 +1,25 @@
 <script lang="ts">
   import { formatHours } from '../../utils/time-format';
   import type { MonthProjectStats } from './statsTypes';
+  import { tick } from 'svelte';
 
-  let { stats }: { stats: MonthProjectStats } = $props();
+  let {
+    stats,
+    highlightProjectId,
+    highlightTaskName
+  }: {
+    stats: MonthProjectStats;
+    highlightProjectId?: number;
+    highlightTaskName?: string;
+  } = $props();
+
+  function scrollIntoViewAction(node: HTMLElement, shouldScroll: boolean): void {
+    if (shouldScroll) {
+      tick().then(() => {
+        node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+  }
 
   // Colors for project bars (cycling through Nord palette)
   const PROJECT_COLORS = [
@@ -134,7 +151,13 @@
 
     <!-- Project List -->
     {#each stats.projects as project, i (project.projectId)}
-      <div role="listitem" class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm">
+      {@const isHighlighted = highlightProjectId !== undefined && project.projectId === highlightProjectId}
+      <div
+        role="listitem"
+        class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm transition-all duration-300
+          {isHighlighted ? 'ring-2 ring-primary/50' : ''}"
+        use:scrollIntoViewAction={isHighlighted}
+      >
         <!-- Project Header -->
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -173,8 +196,10 @@
         <!-- Tasks within Project -->
         <div class="pl-5 space-y-1 pt-1">
           {#each project.tasks as task, taskIndex (`${project.projectId}-${taskIndex}`)}
-            <div class="flex items-center justify-between text-xs gap-2">
-              <span class="text-muted-foreground truncate min-w-0 flex-1" title={task.taskName}>
+            {@const isTaskHighlighted = isHighlighted && highlightTaskName !== undefined && task.taskName === highlightTaskName}
+            <div class="flex items-center justify-between text-xs gap-2 transition-colors duration-300
+              {isTaskHighlighted ? 'bg-primary/10 rounded px-1 -mx-1' : ''}">
+              <span class="{isTaskHighlighted ? 'text-foreground font-medium' : 'text-muted-foreground'} truncate min-w-0 flex-1" title={task.taskName}>
                 {task.taskName}
               </span>
               <span class="text-muted-foreground/70 flex-shrink-0 w-8 text-right">
