@@ -7,7 +7,18 @@ description: Install and set up Roots
 
 ## Desktop App (recommended)
 
-The easiest way to get started:
+### Homebrew
+
+The easiest way to install and keep Roots up to date:
+
+```bash
+brew tap konradmichalik/tap
+brew install --cask roots
+```
+
+Update with `brew upgrade --cask roots`.
+
+### Manual Download
 
 1. Download the latest version from [GitHub Releases](https://github.com/konradmichalik/roots/releases/latest)
 2. Open the `.dmg` file and drag Roots into your Applications folder

@@ -17,6 +17,17 @@ Roots is built with [Tauri 2](https://tauri.app/) and runs as a native macOS app
 
 ## Installation
 
+### Homebrew (recommended)
+
+```bash
+brew tap konradmichalik/tap
+brew install --cask roots
+```
+
+Update with `brew upgrade --cask roots`.
+
+### Manual Download
+
 1. Download from [GitHub Releases](https://github.com/konradmichalik/roots/releases/latest)
 2. Open the `.dmg` and drag to Applications
 3. First launch: right-click → "Open" to bypass Gatekeeper
