@@ -17,7 +17,9 @@
 
 Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira, Outlook and Personio, then reconciles and displays everything in a unified timeline.
 
-![screenshot.jpg](docs/images/screenshot.jpg)
+| Light | Dark |
+|-------|------|
+| ![Light Mode](docs/images/roots-light.jpg) | ![Dark Mode](docs/images/roots-dark.jpg) |
 
 ## Why "Roots"?
 
