@@ -1,6 +1,6 @@
 ---
 title: Timer & Booking
-description: Track time and create entries
+description: Track time, create entries, and manage drafts
 ---
 
 # Timer & Booking
@@ -16,7 +16,23 @@ Start a timer to track work in real-time:
 3. Optionally add a description
 4. Click **Start**
 
-While running, the timer shows elapsed time in the toolbar. When you stop it, Roots creates a Moco time entry with the recorded duration.
+While running, the timer shows elapsed time in the toolbar and as a dock badge on macOS. You can **pause** and **resume** the timer at any time.
+
+When you stop the timer, you can either:
+
+- **Book directly** — creates a Moco time entry immediately
+- **Save as draft** — saves the entry for later booking
+
+## Drafts
+
+Drafts are unsaved time entries that persist across sessions. They're useful when you stop a timer but aren't ready to book the time yet.
+
+- Open the **Drafts drawer** from the toolbar to see all saved drafts
+- Each draft shows the date, hours, project/task and description
+- Click a draft to **book it to Moco** or **delete** it
+- **Delete all** drafts at once with the button at the bottom
+
+Drafts shorter than 1 minute are automatically discarded.
 
 ## Quick Booking
 

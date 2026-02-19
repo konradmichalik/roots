@@ -66,6 +66,7 @@ export default defineConfig({
             { text: 'Overview', link: '/guide/' },
             { text: 'Timeline', link: '/guide/timeline' },
             { text: 'Timer & Booking', link: '/guide/timer' },
+            { text: 'Statistics', link: '/guide/stats' },
             { text: 'Settings', link: '/guide/settings' }
           ]
         }

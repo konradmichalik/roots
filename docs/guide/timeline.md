@@ -1,11 +1,11 @@
 ---
 title: Timeline
-description: Day, week and month views explained
+description: The day view explained
 ---
 
 # Timeline
 
-The timeline is Roots' main interface. It shows your work time across all connected services.
+The timeline is Roots' main interface. It shows your work time across all connected services in a day view with parallel columns.
 
 ## Day View
 
@@ -30,18 +30,29 @@ Cards are color-coded by service and show action icons on hover:
 - **Plus** — book an Outlook event as a Moco entry
 - **Link** — open the entry in the source application
 
-## Week View
+## Presence Bar
 
-Shows one bar per day with the total hours stacked by service. Useful for spotting days where hours are missing or imbalanced.
+When Moco is connected, a presence progress bar appears below the header. It visualizes your working time for the day:
 
-## Month View
+- **Green segments** — time covered by booked entries
+- **Red segments** — presence time not yet booked
+- **Gray segments** — breaks/gaps between presence slots
+- **Now marker** — shows the current time on today's bar
 
-A calendar grid showing daily totals. Days are color-coded:
+Click the presence bar to open the Presence Modal where you can add, edit or delete time slots and toggle Home Office mode.
 
-- **Green** — target hours met
-- **Yellow** — partially booked
-- **Red** — significantly under target
-- **Gray** — weekend or absence
+::: tip
+The bar also shows a projected end time when your presence is still open (clock-in without clock-out).
+:::
+
+## Sidebar Stats
+
+The sidebar shows summary statistics for the current week and month:
+
+- **Week balance** — booked vs. target hours (Mon–Fri), with an "until yesterday" breakdown
+- **Month balance** — booked vs. target hours for all working days, with progress bar
+
+Click the sidebar stats to open the full [Statistics](/guide/stats) modal.
 
 ## Navigation
 

@@ -49,7 +49,7 @@ npm run tauri:build
 
 The built app is located in `src-tauri/target/release/bundle/`.
 
-## Tauri Plugins
+## Tauri Backend
 
 The desktop app uses these Tauri plugins:
 
@@ -59,3 +59,5 @@ The desktop app uses these Tauri plugins:
 | `plugin-store` | Persistent key-value storage |
 | `plugin-shell` | Open external URLs in the browser |
 | `plugin-deep-link` | Handle `roots://` OAuth callbacks |
+
+There is one custom Tauri command (`http_post_form`) used for OAuth token exchange. It sends `application/x-www-form-urlencoded` POST requests, which the `plugin-http` module doesn't natively support.

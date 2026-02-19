@@ -44,14 +44,30 @@ Roots validates the connection by calling the Moco session endpoint. On success 
 |------|----------|-------------|
 | Time entries | `/api/v1/activities` | Your booked hours per day |
 | Projects | `/api/v1/projects/assigned` | Projects and tasks assigned to you |
+| Project tasks | `/api/v1/projects/{id}/tasks` | Tasks within a project |
+| Project reports | `/api/v1/projects/{id}` | Project details and report data |
 | Presences | `/api/v1/users/presences` | Attendance / clock-in records |
 
 ## Features
 
+### Time Entries
+
 - **View & edit** time entries directly in Roots
-- **Create new entries** via the timer or quick-booking
+- **Create new entries** via the timer, quick-booking or from Outlook events
 - **Delete entries** from the context menu
-- **Presence tracking** with start/end times
+- **Save as draft** when stopping the timer for later booking
+
+### Presence Management
+
+Full CRUD operations for Moco presences (clock-in/clock-out):
+
+- **View** presence times in the [Presence Bar](/guide/timeline#presence-bar)
+- **Create** new time slots with start/end times
+- **Edit** existing time slots
+- **Delete** individual presence entries
+- **Toggle Home Office** mode for the day
+
+Presences are displayed as a progress bar in the timeline header, showing booked vs. unbooked time, breaks and a live "now" marker.
 
 ## Troubleshooting
 

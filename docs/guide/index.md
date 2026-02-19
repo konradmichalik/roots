@@ -27,21 +27,30 @@ Pin frequently used project/task combinations as favorites for one-click booking
 
 ### Timer
 
-Start a timer to track work in real-time. When you stop the timer, Roots creates a Moco time entry automatically.
+Start a timer to track work in real-time. When you stop the timer, Roots creates a Moco time entry or saves it as a draft for later booking.
 
-## Views
+### Drafts
 
-| View | Description |
-|------|-------------|
-| **Day** | Detailed column view with all entries |
-| **Week** | Daily summary bars with totals |
-| **Month** | Calendar overview with daily hours |
+Save timer results as drafts when you're not ready to book yet. Drafts persist across sessions and can be booked to Moco or deleted later.
+
+### Presence Tracking
+
+When Moco is connected, Roots shows a presence progress bar for each day. It visualizes clock-in/clock-out times, breaks and booked vs. unbooked time. You can create, edit and delete presence entries directly.
+
+### Statistics
+
+Monthly and weekly statistics with project breakdown, billable/non-billable split and interactive donut chart. Navigate between months to compare performance over time.
+
+### Auto-Refresh
+
+Configure automatic data refresh at 5-minute, 30-minute or 1-hour intervals to keep your timeline up to date without manual reloading.
 
 ## Data Sources
 
 | Service | Entries | Edit | Create | Delete |
 |---------|---------|------|--------|--------|
 | **Moco** | Time entries | Yes | Yes | Yes |
+| **Moco** | Presences | Yes | Yes | Yes |
 | **Jira** | Worklogs | Yes | Yes | Yes |
 | **Outlook** | Calendar events | No | No | No |
 | **Personio** | Absences | No | No | No |
