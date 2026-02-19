@@ -299,6 +299,11 @@
 {#snippet cardContent()}
   <div class="flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
+      {#if mocoMeta?.customerName}
+        <span class="text-[11px] font-medium text-muted-foreground leading-tight">
+          {mocoMeta.customerName}
+        </span>
+      {/if}
       <span class="text-sm font-medium text-foreground line-clamp-2">
         {entry.title}
       </span>
