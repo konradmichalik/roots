@@ -136,8 +136,6 @@
   <StatsModal
     bind:open={statsModalState.open}
     initialSlide={statsModalState.initialSlide}
-    highlightProjectId={statsModalState.highlightProjectId}
-    highlightTaskName={statsModalState.highlightTaskName}
   >
     <button
       onclick={() => {

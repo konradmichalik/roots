@@ -1,25 +1,26 @@
 <script lang="ts">
   import { formatHours } from '../../utils/time-format';
   import type { MonthProjectStats } from './statsTypes';
+  import { statsModalState } from '../../stores/statsModal.svelte';
   import { tick } from 'svelte';
 
-  let {
-    stats,
-    highlightProjectId,
-    highlightTaskName
-  }: {
-    stats: MonthProjectStats;
-    highlightProjectId?: number;
-    highlightTaskName?: string;
-  } = $props();
+  let { stats }: { stats: MonthProjectStats } = $props();
 
-  function scrollIntoViewAction(node: HTMLElement, shouldScroll: boolean): void {
-    if (shouldScroll) {
+  // Read highlight directly from the global store (avoids multi-level prop chain)
+  let highlightProjectId = $derived(statsModalState.highlightProjectId);
+  let highlightTaskName = $derived(statsModalState.highlightTaskName);
+
+  let listRef: HTMLElement | undefined = $state();
+
+  // Scroll to highlighted project whenever the value changes
+  $effect(() => {
+    if (highlightProjectId !== undefined && listRef) {
       tick().then(() => {
-        node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const el = listRef?.querySelector(`[data-project-id="${highlightProjectId}"]`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     }
-  }
+  });
 
   // Colors for project bars (cycling through Nord palette)
   const PROJECT_COLORS = [
@@ -94,7 +95,7 @@
   let hoveredSegment = $state<number | null>(null);
 </script>
 
-<div class="space-y-3 animate-in fade-in duration-200">
+<div class="space-y-3 animate-in fade-in duration-200" bind:this={listRef}>
   {#if stats.projects.length > 0}
     <!-- Pie Chart with Tooltip -->
     <div class="flex flex-col items-center gap-2 py-2">
@@ -156,7 +157,7 @@
         role="listitem"
         class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm transition-all duration-300
           {isHighlighted ? 'ring-2 ring-primary/50' : ''}"
-        use:scrollIntoViewAction={isHighlighted}
+        data-project-id={project.projectId}
       >
         <!-- Project Header -->
         <div class="flex items-center justify-between">
