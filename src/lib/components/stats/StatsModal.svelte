@@ -209,7 +209,9 @@
     <div class="flex items-center justify-between pr-8">
       <Dialog.Header class="p-0 space-y-0">
         <Dialog.Title>Statistics</Dialog.Title>
-        <Dialog.Description class="sr-only">Overview of your time bookings for week and month.</Dialog.Description>
+        <Dialog.Description class="sr-only"
+          >Overview of your time bookings for week and month.</Dialog.Description
+        >
       </Dialog.Header>
 
       <div class="flex items-center gap-1">
@@ -221,7 +223,9 @@
         >
           <ChevronLeft class="size-4" />
         </button>
-        <span class="text-sm font-medium text-foreground min-w-[120px] text-center">{monthLabel}</span>
+        <span class="text-sm font-medium text-foreground min-w-[120px] text-center"
+          >{monthLabel}</span
+        >
         <button
           onclick={nextMonth}
           disabled={isCurrentMonth}

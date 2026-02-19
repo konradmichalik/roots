@@ -133,10 +133,7 @@
     <SidebarStatsTotal {todayStr} />
   {/if}
 
-  <StatsModal
-    bind:open={statsModalState.open}
-    initialSlide={statsModalState.initialSlide}
-  >
+  <StatsModal bind:open={statsModalState.open} initialSlide={statsModalState.initialSlide}>
     <button
       onclick={() => {
         statsModalState.initialSlide = 'overview';

@@ -152,7 +152,8 @@
 
     <!-- Project List -->
     {#each stats.projects as project, i (project.projectId)}
-      {@const isHighlighted = highlightProjectId !== undefined && project.projectId === highlightProjectId}
+      {@const isHighlighted =
+        highlightProjectId !== undefined && project.projectId === highlightProjectId}
       <div
         role="listitem"
         class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm transition-all duration-300
@@ -197,10 +198,20 @@
         <!-- Tasks within Project -->
         <div class="pl-5 space-y-1 pt-1">
           {#each project.tasks as task, taskIndex (`${project.projectId}-${taskIndex}`)}
-            {@const isTaskHighlighted = isHighlighted && highlightTaskName !== undefined && task.taskName === highlightTaskName}
-            <div class="flex items-center justify-between text-xs gap-2 transition-colors duration-300
-              {isTaskHighlighted ? 'bg-primary/10 rounded px-1 -mx-1' : ''}">
-              <span class="{isTaskHighlighted ? 'text-foreground font-medium' : 'text-muted-foreground'} truncate min-w-0 flex-1" title={task.taskName}>
+            {@const isTaskHighlighted =
+              isHighlighted &&
+              highlightTaskName !== undefined &&
+              task.taskName === highlightTaskName}
+            <div
+              class="flex items-center justify-between text-xs gap-2 transition-colors duration-300
+              {isTaskHighlighted ? 'bg-primary/10 rounded px-1 -mx-1' : ''}"
+            >
+              <span
+                class="{isTaskHighlighted
+                  ? 'text-foreground font-medium'
+                  : 'text-muted-foreground'} truncate min-w-0 flex-1"
+                title={task.taskName}
+              >
                 {task.taskName}
               </span>
               <span class="text-muted-foreground/70 flex-shrink-0 w-8 text-right">
