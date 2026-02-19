@@ -32,7 +32,23 @@
     document.title = `roots - ${formatDateLong(dateNavState.selectedDate)}`;
   });
 
+  // Redacted mode — toggle with Ctrl+Shift+R or ?redacted URL param
+  function initRedactedMode(): void {
+    if (new URLSearchParams(window.location.search).has('redacted')) {
+      document.documentElement.setAttribute('data-redacted', '');
+    }
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        document.documentElement.toggleAttribute('data-redacted');
+      }
+    });
+  }
+
   onMount(() => {
+    initRedactedMode();
+
     async function initialize() {
       try {
         await initializeTheme();

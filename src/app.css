@@ -345,3 +345,64 @@ html[data-color-mode='dark'] {
   opacity: 0;
   animation: stagger-in 0.5s ease-out forwards;
 }
+
+/* ============================================================
+   Redacted Mode — anonymize sensitive text for screenshots.
+   Toggle: Ctrl+Shift+R  or  ?redacted URL parameter.
+   ============================================================ */
+html[data-redacted] {
+  /* All regular text → scribble font */
+  & body {
+    font-family: 'Redacted Script', cursive !important;
+  }
+
+  /* Preserve monospace text (hours, times, dates, balances) */
+  & .font-mono,
+  & [class*='font-mono'] {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace !important;
+  }
+
+  /* Preserve interactive UI chrome */
+  & button,
+  & [role='menuitem'],
+  & [role='tab'],
+  & [role='option'],
+  & summary {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+  }
+
+  /* Preserve navigation & header labels */
+  & nav,
+  & nav * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+  }
+
+  /* Preserve tooltip content for readability */
+  & [role='tooltip'],
+  & [role='tooltip'] * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+  }
+
+  /* Preserve screen-reader-only text */
+  & .sr-only {
+    font-family: inherit !important;
+  }
+
+  /* Redacted mode indicator */
+  &::after {
+    content: 'REDACTED';
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    font-family: ui-monospace, monospace !important;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ds-text-danger);
+    background: var(--ds-background-danger);
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+}
