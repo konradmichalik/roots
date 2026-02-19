@@ -254,9 +254,9 @@
       {/each}
     </div>
 
-    <div class="pt-3 flex-1 min-h-0">
+    <div class="pt-3 flex-1 min-h-0 overflow-y-auto">
       <!-- Slide Container - fills remaining space, scrolls internally -->
-      <div class="h-full overflow-y-auto">
+      <div>
         {#if isMonthLoading}
           <!-- Skeleton mimicking overview layout -->
           <div class="space-y-4 animate-pulse">
