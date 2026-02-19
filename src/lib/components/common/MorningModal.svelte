@@ -88,9 +88,7 @@
           project_id: match.favorite.projectId,
           task_id: match.favorite.taskId,
           hours: match.hours,
-          description: match.favorite.description || match.eventTitle,
-          remote_service: 'outlook',
-          remote_id: match.eventId
+          description: match.favorite.description || match.eventTitle
         });
         if (success) {
           successCount++;
