@@ -48,9 +48,7 @@
   let unbookedEvents = $derived(allMatchable.filter((e) => !e.booked));
   let bookedEvents = $derived(allMatchable.filter((e) => e.booked));
 
-  let totalUnbookedHours = $derived(
-    unbookedEvents.reduce((sum, e) => sum + e.hours, 0)
-  );
+  let totalUnbookedHours = $derived(unbookedEvents.reduce((sum, e) => sum + e.hours, 0));
 
   // Day context
   let targetHours = $derived(settingsState.weekdayHours[getDayOfWeekIndex(todayStr)]);
@@ -88,9 +86,7 @@
   }
 
   let greeting = $derived(
-    mocoUserName.value
-      ? `${getTimeGreeting()}, ${mocoUserName.value}!`
-      : `${getTimeGreeting()}!`
+    mocoUserName.value ? `${getTimeGreeting()}, ${mocoUserName.value}!` : `${getTimeGreeting()}!`
   );
 
   let summaryText = $derived.by(() => {
@@ -184,7 +180,10 @@
     </Dialog.Header>
 
     <!-- Hero icon (two-tone) + Summary prose -->
-    <div class="animate-stagger-in flex flex-col items-center text-center gap-3" style={staggerDelay(0, 120)}>
+    <div
+      class="animate-stagger-in flex flex-col items-center text-center gap-3"
+      style={staggerDelay(0, 120)}
+    >
       <div class="relative size-12">
         <Sunrise class="size-12 text-muted-foreground/25 absolute inset-0" />
         <div class="absolute inset-0 overflow-hidden" style="clip-path: inset(40% 0 0 0)">
@@ -201,7 +200,9 @@
       <div class="animate-stagger-in min-w-0" style={staggerDelay(1, 120)}>
         <div class="flex items-center gap-1.5 mb-2">
           <CalendarDays class="size-3.5 text-muted-foreground shrink-0" />
-          <span class="text-xs font-medium text-muted-foreground uppercase tracking-wide">Schedule</span>
+          <span class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+            >Schedule</span
+          >
         </div>
         <div class="space-y-0.5 max-h-[200px] overflow-y-auto">
           {#each outlookEvents as event, i (event.id)}
@@ -210,7 +211,9 @@
               class="animate-stagger-in flex items-center gap-3 rounded-md px-3 py-1.5 text-sm min-w-0"
               style={staggerDelay(i + 2, 60)}
             >
-              <span class="text-xs text-muted-foreground tabular-nums whitespace-nowrap w-[100px] shrink-0">
+              <span
+                class="text-xs text-muted-foreground tabular-nums whitespace-nowrap w-[100px] shrink-0"
+              >
                 {#if meta.isAllDay}
                   All day
                 {:else if event.startTime && event.endTime}
@@ -231,7 +234,10 @@
 
     <!-- Booking Section (conditional) -->
     {#if unbookedEvents.length > 0 || bookedEvents.length > 0}
-      <div class="animate-stagger-in border-t border-border pt-3 mt-1 min-w-0" style={staggerDelay(outlookEvents.length + 2, 60)}>
+      <div
+        class="animate-stagger-in border-t border-border pt-3 mt-1 min-w-0"
+        style={staggerDelay(outlookEvents.length + 2, 60)}
+      >
         <div class="flex items-center gap-1.5 mb-2">
           <Sparkles class="size-3.5 text-primary" />
           <span class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -261,10 +267,13 @@
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-medium text-foreground truncate">{event.eventTitle}</div>
                   <div class="text-xs text-muted-foreground truncate">
-                    {event.favorite.customerName} &middot; {event.favorite.projectName} &rarr; {event.favorite.taskName}
+                    {event.favorite.customerName} &middot; {event.favorite.projectName} &rarr; {event
+                      .favorite.taskName}
                   </div>
                 </div>
-                <span class="text-xs text-muted-foreground tabular-nums shrink-0 mt-0.5">{formatHours(event.hours)}</span>
+                <span class="text-xs text-muted-foreground tabular-nums shrink-0 mt-0.5"
+                  >{formatHours(event.hours)}</span
+                >
               </label>
             {/each}
           {/if}
@@ -279,10 +288,13 @@
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-medium text-foreground truncate">{event.eventTitle}</div>
                   <div class="text-xs text-muted-foreground truncate">
-                    {event.favorite.customerName} &middot; {event.favorite.projectName} &rarr; {event.favorite.taskName}
+                    {event.favorite.customerName} &middot; {event.favorite.projectName} &rarr; {event
+                      .favorite.taskName}
                   </div>
                 </div>
-                <span class="text-xs text-muted-foreground tabular-nums shrink-0 mt-0.5">{formatHours(event.hours)}</span>
+                <span class="text-xs text-muted-foreground tabular-nums shrink-0 mt-0.5"
+                  >{formatHours(event.hours)}</span
+                >
               </div>
             {/each}
           {/if}
