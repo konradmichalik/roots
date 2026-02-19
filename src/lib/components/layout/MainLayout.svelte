@@ -11,13 +11,13 @@
   import {
     fetchDayEntries,
     refreshDayEntries,
-    fetchMonthCache
+    fetchMonthCache,
+    getEntriesForDate
   } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
-  import { hasUnbookedMatchableEvents } from '../../utils/matchable-events';
   import { onMount } from 'svelte';
 
   let lastMonthKey = '';
@@ -43,7 +43,8 @@
     const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
     if (lastShown === todayStr) return;
 
-    if (hasUnbookedMatchableEvents(todayStr)) {
+    const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
+    if (hasOutlookEvents) {
       showMorningModal = true;
     }
   }
