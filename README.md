@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="docs/images/roots-logo.svg" alt="Roots Logo" width="200" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/roots-logo-dark.svg" />
+    <img src="docs/images/roots-logo.svg" alt="roots Logo" width="200" />
+  </picture>
 </p>
 
 <p align="center">
@@ -18,10 +21,6 @@
 Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira, Outlook and Personio, then reconciles and displays everything in a unified timeline.
 
 ![roots — Unified Work Time Overview](docs/images/roots-light.jpg)
-
-## Why "Roots"?
-
-In nature, roots are the hidden network that connects and nourishes everything above the surface. Roots does the same for your work time: it connects the scattered data from Moco, Jira, Outlook and Personio beneath the surface and brings it all together into one clear view.
 
 ## Features
 
