@@ -119,48 +119,15 @@ jobs:
           echo "App version: ${APP_VERSION}"
           echo "Tag: ${TAG}"
 
-      - name: Update Homebrew tap
+      - name: Trigger Homebrew tap update
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
-          # Build cask content
-          CASK_CONTENT="cask \"roots\" do
-            version \"${APP_VERSION},${TAG}\"
-
-            on_arm do
-              url \"https://github.com/konradmichalik/roots/releases/download/\#{version.after_comma}/Roots_\#{version.before_comma}_aarch64.dmg\"
-              sha256 \"${SHA_ARM}\"
-            end
-
-            on_intel do
-              url \"https://github.com/konradmichalik/roots/releases/download/\#{version.after_comma}/Roots_\#{version.before_comma}_x64.dmg\"
-              sha256 \"${SHA_INTEL}\"
-            end
-
-            name \"Roots\"
-            desc \"Work Time Overview & Management — aggregates Moco, Jira, Outlook, and Personio\"
-            homepage \"https://github.com/konradmichalik/roots\"
-
-            app \"Roots.app\"
-
-            postflight do
-              system_command \"/usr/bin/xattr\",
-                             args: [\"-cr\", \"\#{appdir}/Roots.app\"]
-            end
-
-            zap trash: [
-              \"~/Library/Application Support/com.roots.time-overview\",
-              \"~/Library/Caches/com.roots.time-overview\",
-            ]
-          end
-          "
-
-          # Get current file SHA (required for update via API)
-          FILE_SHA=$(gh api repos/konradmichalik/homebrew-tap/contents/Casks/roots.rb --jq '.sha')
-
-          # Update file via GitHub API
-          gh api repos/konradmichalik/homebrew-tap/contents/Casks/roots.rb \
-            --method PUT \
-            --field message="chore: update roots to ${TAG}" \
-            --field content="$(echo "$CASK_CONTENT" | base64)" \
-            --field sha="$FILE_SHA"
+          gh api repos/konradmichalik/homebrew-tap/dispatches \
+            --method POST \
+            --field event_type="update-cask" \
+            --field "client_payload[app]=roots" \
+            --field "client_payload[version]=${APP_VERSION}" \
+            --field "client_payload[tag]=${TAG}" \
+            --field "client_payload[sha_arm]=${SHA_ARM}" \
+            --field "client_payload[sha_intel]=${SHA_INTEL}"
