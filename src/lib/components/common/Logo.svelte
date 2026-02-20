@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { themeState } from '../../stores/theme.svelte';
+
   let {
     animate = false,
     size = 'md',
@@ -20,10 +22,14 @@
     md: 'h-6',
     lg: 'h-8'
   };
+
+  const logoSrc = $derived(
+    themeState.resolvedTheme === 'dark' ? '/images/roots-logo-dark.svg' : '/images/roots-logo.svg'
+  );
 </script>
 
 {#if variant === 'full'}
-  <img src="/images/roots-logo.svg" alt="roots" class="{fullSizeClasses[size]} w-auto" />
+  <img src={logoSrc} alt="roots" class="{fullSizeClasses[size]} w-auto" />
 {:else}
   <img
     src="/images/roots-logo-sm.svg"
