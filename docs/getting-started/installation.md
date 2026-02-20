@@ -18,11 +18,18 @@ brew install --cask roots
 
 Update with `brew upgrade --cask roots`.
 
+::: tip
+Homebrew automatically removes the macOS quarantine attribute — no extra steps needed.
+:::
+
 ### Manual Download
 
 1. Download the latest version from [GitHub Releases](https://github.com/konradmichalik/roots/releases/latest)
 2. Open the `.dmg` file and drag roots into your Applications folder
-3. On first launch: right-click the app and select "Open" (macOS Gatekeeper)
+3. Remove the quarantine attribute so macOS allows the unsigned app:
+   ```bash
+   xattr -cr /Applications/Roots.app
+   ```
 
 ::: tip
 The desktop app connects directly to service APIs — no CORS proxy required.

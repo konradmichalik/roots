@@ -24,16 +24,19 @@ brew tap konradmichalik/tap
 brew install --cask roots
 ```
 
-Update with `brew upgrade --cask roots`.
+Update with `brew upgrade --cask roots`. Homebrew automatically removes the macOS quarantine attribute.
 
 ### Manual Download
 
 1. Download from [GitHub Releases](https://github.com/konradmichalik/roots/releases/latest)
 2. Open the `.dmg` and drag to Applications
-3. First launch: right-click → "Open" to bypass Gatekeeper
+3. Remove the quarantine attribute so macOS allows the unsigned app:
+   ```bash
+   xattr -cr /Applications/Roots.app
+   ```
 
 ::: warning macOS Gatekeeper
-Since roots is not notarized through Apple, macOS will warn you on first launch. Right-click the app and select "Open" to allow it.
+roots is not notarized through Apple. When installing manually, you must remove the quarantine attribute with the command above. Homebrew handles this automatically.
 :::
 
 ## Building from Source
