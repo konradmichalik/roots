@@ -7,6 +7,10 @@ description: What is roots and what problem does it solve?
 
 roots is a desktop application that aggregates work time from multiple tools into a single, unified overview. Instead of switching between Moco, Jira, Outlook and Personio, roots displays all entries side by side in a timeline.
 
+## Why "roots"?
+
+In nature, roots are the hidden network that connects and nourishes everything above the surface. roots does the same for your work time: it connects the scattered data from Moco, Jira, Outlook and Personio beneath the surface and brings it all together into one clear view.
+
 ## The Problem
 
 In day-to-day work, time is often tracked across several systems:
