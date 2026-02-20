@@ -121,49 +121,46 @@ jobs:
 
       - name: Update Homebrew tap
         env:
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
-          CASK_CONTENT=$(cat <<RUBY
-          cask "roots" do
-            version "${APP_VERSION},${TAG}"
+          # Build cask content
+          CASK_CONTENT="cask \"roots\" do
+            version \"${APP_VERSION},${TAG}\"
 
             on_arm do
-              url "https://github.com/konradmichalik/roots/releases/download/#{version.after_comma}/Roots_#{version.before_comma}_aarch64.dmg"
-              sha256 "${SHA_ARM}"
+              url \"https://github.com/konradmichalik/roots/releases/download/\#{version.after_comma}/Roots_\#{version.before_comma}_aarch64.dmg\"
+              sha256 \"${SHA_ARM}\"
             end
 
             on_intel do
-              url "https://github.com/konradmichalik/roots/releases/download/#{version.after_comma}/Roots_#{version.before_comma}_x64.dmg"
-              sha256 "${SHA_INTEL}"
+              url \"https://github.com/konradmichalik/roots/releases/download/\#{version.after_comma}/Roots_\#{version.before_comma}_x64.dmg\"
+              sha256 \"${SHA_INTEL}\"
             end
 
-            name "Roots"
-            desc "Work Time Overview & Management — aggregates Moco, Jira, Outlook, and Personio"
-            homepage "https://github.com/konradmichalik/roots"
+            name \"Roots\"
+            desc \"Work Time Overview & Management — aggregates Moco, Jira, Outlook, and Personio\"
+            homepage \"https://github.com/konradmichalik/roots\"
 
-            app "Roots.app"
+            app \"Roots.app\"
 
             postflight do
-              system_command "/usr/bin/xattr",
-                             args: ["-cr", "#{appdir}/Roots.app"]
+              system_command \"/usr/bin/xattr\",
+                             args: [\"-cr\", \"\#{appdir}/Roots.app\"]
             end
 
             zap trash: [
-              "~/Library/Application Support/com.roots.time-overview",
-              "~/Library/Caches/com.roots.time-overview",
+              \"~/Library/Application Support/com.roots.time-overview\",
+              \"~/Library/Caches/com.roots.time-overview\",
             ]
           end
-          RUBY
-          )
+          "
 
-          cd /tmp
-          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/konradmichalik/homebrew-tap.git"
-          cd homebrew-tap
+          # Get current file SHA (required for update via API)
+          FILE_SHA=$(gh api repos/konradmichalik/homebrew-tap/contents/Casks/roots.rb --jq '.sha')
 
-          echo "$CASK_CONTENT" > Casks/roots.rb
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Casks/roots.rb
-          git commit -m "chore: update roots to ${TAG}"
-          git push
+          # Update file via GitHub API
+          gh api repos/konradmichalik/homebrew-tap/contents/Casks/roots.rb \
+            --method PUT \
+            --field message="chore: update roots to ${TAG}" \
+            --field content="$(echo "$CASK_CONTENT" | base64)" \
+            --field sha="$FILE_SHA"
