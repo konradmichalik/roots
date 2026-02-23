@@ -3,7 +3,7 @@ import { logger } from '../utils/logger';
 import type { ManualAbsence, AbsenceType, PersonioAbsence, PersonioAbsenceBalance } from '../types';
 import { getPersonioClient } from './connections.svelte';
 import { connectionsState } from './connections.svelte';
-import { mapTimeOffToAbsence } from '../api/personio-client';
+import { mapTimeOffToAbsence } from '../services/personio';
 
 export const absencesState = $state<{
   absences: ManualAbsence[];
