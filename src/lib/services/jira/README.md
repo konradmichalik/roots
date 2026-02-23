@@ -15,12 +15,14 @@ The factory function `createJiraWorklogClient()` automatically creates the corre
 ## Authentication
 
 ### Jira Cloud
+
 - **Method**: Basic Auth (Base64-encoded)
 - **Credentials**: Email + API Token
 - **Header**: `Authorization: Basic {base64(email:token)}`
 - **API Version**: v3
 
 ### Jira Server / Data Center
+
 - **Method**: Basic Auth OR Personal Access Token (PAT)
 - **Basic**: `Authorization: Basic {base64(username:password)}`
 - **PAT**: `Authorization: Bearer {token}`
@@ -33,22 +35,22 @@ Both send `X-Atlassian-Token: no-check` (CSRF protection).
 ```typescript
 interface JiraConnectionConfig {
   instanceType: 'cloud' | 'server';
-  baseUrl: string;                    // e.g. "https://company.atlassian.net"
-  credentials: JiraCredentials;       // Cloud or Server credentials
-  proxyUrl?: string;                  // Optional, default: localhost:3002/jira
+  baseUrl: string; // e.g. "https://company.atlassian.net"
+  credentials: JiraCredentials; // Cloud or Server credentials
+  proxyUrl?: string; // Optional, default: localhost:3002/jira
 }
 ```
 
 ## Client Methods
 
-| Method | Description |
-|--------|-------------|
-| `testConnection()` | Test connection via `/myself` endpoint |
-| `getWorklogsForRange(from, to)` | All own worklogs in date range |
-| `createWorklog(issueKey, payload)` | Create worklog on issue |
-| `updateWorklog(issueKey, worklogId, payload)` | Update worklog |
-| `deleteWorklog(issueKey, worklogId)` | Delete worklog |
-| `extractWorklogComment(comment)` | Extract comment from string or ADF |
+| Method                                        | Description                            |
+| --------------------------------------------- | -------------------------------------- |
+| `testConnection()`                            | Test connection via `/myself` endpoint |
+| `getWorklogsForRange(from, to)`               | All own worklogs in date range         |
+| `createWorklog(issueKey, payload)`            | Create worklog on issue                |
+| `updateWorklog(issueKey, worklogId, payload)` | Update worklog                         |
+| `deleteWorklog(issueKey, worklogId)`          | Delete worklog                         |
+| `extractWorklogComment(comment)`              | Extract comment from string or ADF     |
 
 ## Worklog Retrieval (Pagination)
 
@@ -64,9 +66,7 @@ Jira Cloud v3 uses ADF for comments:
 {
   "type": "doc",
   "version": 1,
-  "content": [
-    { "type": "paragraph", "content": [{ "type": "text", "text": "Comment" }] }
-  ]
+  "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Comment" }] }]
 }
 ```
 

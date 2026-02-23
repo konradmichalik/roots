@@ -20,13 +20,13 @@ services/
 
 Each service folder follows the same pattern:
 
-| File | Contents |
-|------|----------|
-| `client.ts` | API client class(es) |
-| `types.ts` | TypeScript interfaces for API data + connection config |
-| `schemas.ts` | Zod schemas for runtime validation |
-| `index.ts` | Barrel export |
-| `README.md` | Service-specific documentation |
+| File         | Contents                                               |
+| ------------ | ------------------------------------------------------ |
+| `client.ts`  | API client class(es)                                   |
+| `types.ts`   | TypeScript interfaces for API data + connection config |
+| `schemas.ts` | Zod schemas for runtime validation                     |
+| `index.ts`   | Barrel export                                          |
+| `README.md`  | Service-specific documentation                         |
 
 ## Factory Functions
 

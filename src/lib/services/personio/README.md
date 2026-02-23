@@ -13,22 +13,22 @@ API client for [Personio](https://www.personio.de/) HR system (absences and work
 
 ```typescript
 interface PersonioConnectionConfig {
-  clientId: string;      // Personio API Client ID
-  clientSecret: string;  // Personio API Client Secret
-  email: string;         // Employee email (for identification)
-  employeeId?: number;   // Automatically set during testConnection()
+  clientId: string; // Personio API Client ID
+  clientSecret: string; // Personio API Client Secret
+  email: string; // Employee email (for identification)
+  employeeId?: number; // Automatically set during testConnection()
 }
 ```
 
 ## Client Methods
 
-| Method | Description |
-|--------|-------------|
-| `testConnection()` | Authenticate + find employee by email |
-| `findCurrentEmployee()` | Employee search via `/v1/company/employees` |
-| `getTimeOffs(from, to)` | Approved absences in date range |
-| `getAbsenceBalance()` | Remaining vacation days and other absence balances |
-| `getWorkSchedule(employee)` | Weekly work hours from work schedule |
+| Method                      | Description                                        |
+| --------------------------- | -------------------------------------------------- |
+| `testConnection()`          | Authenticate + find employee by email              |
+| `findCurrentEmployee()`     | Employee search via `/v1/company/employees`        |
+| `getTimeOffs(from, to)`     | Approved absences in date range                    |
+| `getAbsenceBalance()`       | Remaining vacation days and other absence balances |
+| `getWorkSchedule(employee)` | Weekly work hours from work schedule               |
 
 ## Data Flow
 
@@ -41,13 +41,13 @@ Personio does **not** provide time entries. Instead it provides:
 
 `mapTimeOffToAbsence()` converts Personio `TimeOff` to internal `PersonioAbsence`:
 
-| Personio Type (name) | Internal Type |
-|----------------------|---------------|
-| "Urlaub", "Vacation", "Holiday" | `vacation` |
-| "Krank", "Sick", "Illness" | `sick` |
-| "Feiertag", "Public Holiday" | `public_holiday` |
-| "Sonderurlaub", "Child Sick" | `personal` |
-| Other | `other` |
+| Personio Type (name)            | Internal Type    |
+| ------------------------------- | ---------------- |
+| "Urlaub", "Vacation", "Holiday" | `vacation`       |
+| "Krank", "Sick", "Illness"      | `sick`           |
+| "Feiertag", "Public Holiday"    | `public_holiday` |
+| "Sonderurlaub", "Child Sick"    | `personal`       |
+| Other                           | `other`          |
 
 Matching is case-insensitive via keywords in the type name.
 

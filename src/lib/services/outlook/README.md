@@ -26,11 +26,11 @@ API client for Microsoft Outlook calendar via MS Graph API.
 
 ### Tauri vs. Browser
 
-| | Tauri | Browser |
-|---|---|---|
+|              | Tauri                                | Browser                  |
+| ------------ | ------------------------------------ | ------------------------ |
 | Redirect URI | `roots://oauth/callback` (deep link) | `window.location.origin` |
-| Browser | System browser | In-place navigation |
-| Token POST | Rust command (`http_post_form`) | `fetch` |
+| Browser      | System browser                       | In-place navigation      |
+| Token POST   | Rust command (`http_post_form`)      | `fetch`                  |
 
 PKCE state is stored in `localStorage` (survives navigation and deep-link round-trips).
 
@@ -38,22 +38,23 @@ PKCE state is stored in `localStorage` (survives navigation and deep-link round-
 
 ```typescript
 interface OutlookConnectionConfig {
-  clientId: string;     // Azure App Registration Client ID
-  tenantId: string;     // Azure Tenant ID
-  redirectUri: string;  // Determined automatically per platform
+  clientId: string; // Azure App Registration Client ID
+  tenantId: string; // Azure Tenant ID
+  redirectUri: string; // Determined automatically per platform
 }
 ```
 
 ## Client Methods
 
-| Method | Description |
-|--------|-------------|
-| `testConnection()` | Test connection via `/me` |
+| Method                        | Description                    |
+| ----------------------------- | ------------------------------ |
+| `testConnection()`            | Test connection via `/me`      |
 | `getCalendarEvents(from, to)` | Calendar events for date range |
 
 ## Event Filtering
 
 Events are filtered:
+
 - `showAs !== 'free'` (only busy/tentative/oof times)
 - `responseStatus.response !== 'declined'` (no declined invitations)
 
@@ -72,9 +73,9 @@ Calendars.Read User.Read offline_access
 
 ## Files
 
-| File | Contents |
-|------|----------|
-| `client.ts` | `OutlookClient` (MS Graph requests) |
+| File               | Contents                                          |
+| ------------------ | ------------------------------------------------- |
+| `client.ts`        | `OutlookClient` (MS Graph requests)               |
 | `oauth-manager.ts` | OAuth PKCE flow, token refresh, callback handling |
-| `types.ts` | MS Graph types + OAuth token types |
-| `schemas.ts` | Zod schemas for MS Graph responses |
+| `types.ts`         | MS Graph types + OAuth token types                |
+| `schemas.ts`       | Zod schemas for MS Graph responses                |

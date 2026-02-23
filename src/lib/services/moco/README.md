@@ -12,8 +12,8 @@ API client for [Moco](https://www.mocoapp.com/) time tracking and attendance.
 
 ```typescript
 interface MocoConnectionConfig {
-  domain: string;   // e.g. "company" -> company.mocoapp.com
-  apiKey: string;    // Personal API key from Moco profile
+  domain: string; // e.g. "company" -> company.mocoapp.com
+  apiKey: string; // Personal API key from Moco profile
 }
 ```
 
@@ -23,29 +23,29 @@ interface MocoConnectionConfig {
 
 ### Time Entries (Activities)
 
-| Method | Description |
-|--------|-------------|
-| `getActivities(from, to)` | Time entries for date range (filtered by current user) |
-| `createActivity(data)` | Create a new time entry |
-| `updateActivity(id, data)` | Update a time entry |
-| `deleteActivity(id)` | Delete a time entry |
+| Method                     | Description                                            |
+| -------------------------- | ------------------------------------------------------ |
+| `getActivities(from, to)`  | Time entries for date range (filtered by current user) |
+| `createActivity(data)`     | Create a new time entry                                |
+| `updateActivity(id, data)` | Update a time entry                                    |
+| `deleteActivity(id)`       | Delete a time entry                                    |
 
 ### Projects & Tasks
 
-| Method | Description |
-|--------|-------------|
-| `getAssignedProjects()` | Projects assigned to the user (incl. tasks) |
-| `getProjectTasks(projectId)` | Tasks for a project with budget info |
-| `getProjectReport(projectId)` | Budget/hours report per task |
+| Method                        | Description                                 |
+| ----------------------------- | ------------------------------------------- |
+| `getAssignedProjects()`       | Projects assigned to the user (incl. tasks) |
+| `getProjectTasks(projectId)`  | Tasks for a project with budget info        |
+| `getProjectReport(projectId)` | Budget/hours report per task                |
 
 ### Attendance (Presences)
 
-| Method | Description |
-|--------|-------------|
-| `getPresences(from, to)` | Attendance entries for date range |
-| `createPresence(data)` | Create a new attendance entry |
-| `updatePresence(id, data)` | Update an attendance entry |
-| `deletePresence(id)` | Delete an attendance entry |
+| Method                     | Description                       |
+| -------------------------- | --------------------------------- |
+| `getPresences(from, to)`   | Attendance entries for date range |
+| `createPresence(data)`     | Create a new attendance entry     |
+| `updatePresence(id, data)` | Update an attendance entry        |
+| `deletePresence(id)`       | Delete an attendance entry        |
 
 ## Types
 
