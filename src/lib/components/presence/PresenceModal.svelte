@@ -6,7 +6,8 @@
     updatePresence,
     deletePresence,
     getRawPresencesForDate,
-    setDayHomeOffice
+    setDayHomeOffice,
+    getMostCommonPresencePattern
   } from '../../stores/presences.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatDateLong } from '../../utils/date-helpers';
@@ -18,6 +19,7 @@
   import Building2 from '@lucide/svelte/icons/building-2';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Trash2 from '@lucide/svelte/icons/trash-2';
+  import Clock from '@lucide/svelte/icons/clock';
 
   let {
     children,
@@ -48,6 +50,12 @@
 
   // Delete confirmation
   let deleteConfirmId = $state<number | null>(null);
+
+  // Pattern suggestion (only when no presences exist)
+  let suggestedPattern = $derived(
+    existingPresences.length === 0 ? getMostCommonPresencePattern() : null
+  );
+  let applyingPattern = $state(false);
 
   function resetForm(): void {
     newFromTime = '';
@@ -164,6 +172,24 @@
       }
     } finally {
       saving = false;
+    }
+  }
+
+  async function handleApplyPattern(): Promise<void> {
+    if (!suggestedPattern) return;
+    applyingPattern = true;
+    error = null;
+
+    try {
+      for (const slot of suggestedPattern.slots) {
+        await createPresence({
+          date: effectiveDate,
+          from: slot.from,
+          to: slot.to
+        });
+      }
+    } finally {
+      applyingPattern = false;
     }
   }
 
@@ -339,8 +365,35 @@
         </div>
       {/if}
 
+      <!-- Pattern suggestion (when no presences exist) -->
+      {#if suggestedPattern}
+        <div class="mb-1">
+          <div class="flex items-center gap-1.5 mb-2 text-xs text-muted-foreground">
+            <Clock class="size-3" />
+            <span>Frequently used</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onclick={handleApplyPattern}
+              disabled={applyingPattern}
+              class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md
+                bg-accent/50 text-foreground border border-border
+                hover:bg-accent hover:border-primary/30 disabled:opacity-50 transition-colors duration-150
+                focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            >
+              {#if applyingPattern}
+                Applying...
+              {:else}
+                {suggestedPattern.slots.map((s) => `${s.from}–${s.to}`).join(', ')}
+              {/if}
+            </button>
+          </div>
+        </div>
+      {/if}
+
       <!-- Add new entry -->
-      <div class="border-t border-border pt-4">
+      <div class={suggestedPattern ? 'pt-2' : 'border-t border-border pt-4'}>
         <h4 class="text-sm font-medium text-foreground mb-3">Add time slot</h4>
         <div class="space-y-3">
           <div class="grid grid-cols-2 gap-4">

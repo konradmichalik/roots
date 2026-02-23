@@ -200,6 +200,57 @@ export function getRawPresencesForDate(date: string): MocoPresence[] {
   return [...presences].sort((a, b) => a.from.localeCompare(b.from));
 }
 
+// ---------------------------------------------------------------------------
+// Pattern Suggestion
+// ---------------------------------------------------------------------------
+
+export interface PresencePattern {
+  slots: Array<{ from: string; to: string }>;
+}
+
+/**
+ * Analyze cached presences and return the most frequently booked time pattern.
+ * A pattern is the set of time slots for a complete day (all slots have from+to).
+ * Returns null if no complete days are cached.
+ */
+export function getMostCommonPresencePattern(): PresencePattern | null {
+  const byDate = presencesState.cache?.byDate;
+  if (!byDate) return null;
+
+  const counts = new Map<string, { count: number; slots: Array<{ from: string; to: string }> }>();
+
+  for (const presences of Object.values(byDate)) {
+    if (presences.length === 0) continue;
+
+    // Only consider days where every slot is complete (has both from and to)
+    const allComplete = presences.every((p) => p.from && p.to);
+    if (!allComplete) continue;
+
+    // Sort by start time and build a normalized key
+    const sorted = [...presences].sort((a, b) => a.from.localeCompare(b.from));
+    const slots = sorted.map((p) => ({ from: p.from, to: p.to! }));
+    const key = slots.map((s) => `${s.from}-${s.to}`).join(',');
+
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      counts.set(key, { count: 1, slots });
+    }
+  }
+
+  if (counts.size === 0) return null;
+
+  let best: { count: number; slots: Array<{ from: string; to: string }> } | null = null;
+  for (const entry of counts.values()) {
+    if (!best || entry.count > best.count) {
+      best = entry;
+    }
+  }
+
+  return best ? { slots: best.slots } : null;
+}
+
 /**
  * Invalidate the presence cache (e.g. after date range change).
  */
