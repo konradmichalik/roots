@@ -4,11 +4,11 @@ import type {
   MSGraphUser,
   MSGraphEvent,
   MSGraphCalendarResponse
-} from '../types';
+} from './types';
 import { ensureFreshTokens, refreshAccessToken } from './oauth-manager';
-import { logger } from '../utils/logger';
-import { validateResponse } from '../schemas/validate';
-import { msGraphUserSchema, msGraphCalendarResponseSchema } from '../schemas/outlook';
+import { logger } from '../../utils/logger';
+import { validateResponse } from '../validate';
+import { msGraphUserSchema, msGraphCalendarResponseSchema } from './schemas';
 
 const GRAPH_BASE = 'https://graph.microsoft.com/v1.0';
 const MAX_REQUEST_RETRIES = 2;

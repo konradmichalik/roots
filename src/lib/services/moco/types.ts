@@ -1,3 +1,8 @@
+export interface MocoConnectionConfig {
+  domain: string;
+  apiKey: string;
+}
+
 export interface MocoActivity {
   id: number;
   date: string;

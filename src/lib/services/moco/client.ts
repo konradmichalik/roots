@@ -1,4 +1,4 @@
-import { ApiClient, type ApiClientConfig } from './base-client';
+import { ApiClient, type ApiClientConfig } from '../base-client';
 import type {
   MocoActivity,
   MocoUser,
@@ -10,9 +10,9 @@ import type {
   MocoCreatePresence,
   MocoUpdatePresence,
   MocoProjectReport
-} from '../types';
-import { logger } from '../utils/logger';
-import { validateResponse } from '../schemas/validate';
+} from './types';
+import { logger } from '../../utils/logger';
+import { validateResponse } from '../validate';
 import {
   mocoActivitiesSchema,
   mocoUserSchema,
@@ -21,7 +21,7 @@ import {
   mocoActivitySchema,
   mocoPresenceSchema,
   mocoProjectReportSchema
-} from '../schemas/moco';
+} from './schemas';
 
 export interface MocoClientConfig extends ApiClientConfig {
   apiKey: string;

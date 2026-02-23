@@ -4,7 +4,7 @@
     reauthenticateOutlook,
     disconnectOutlook
   } from '../../stores/connections.svelte';
-  import { startOAuthFlow } from '../../api/oauth-manager';
+  import { startOAuthFlow } from '../../services/outlook/oauth-manager';
   import type { OutlookConnectionConfig } from '../../types';
 
   let clientId = $state('');

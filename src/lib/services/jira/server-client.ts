@@ -1,10 +1,10 @@
-import { JiraWorklogClient, type JiraWorklogClientConfig } from './jira-worklog-client';
+import { JiraWorklogClient, type JiraWorklogClientConfig } from './client';
 import type {
   JiraUser,
   JiraWorklogAuthor,
   JiraCreateWorklogPayload,
   JiraUpdateWorklogPayload
-} from '../types';
+} from './types';
 
 interface JiraServerConfig extends JiraWorklogClientConfig {
   authMethod: 'basic' | 'pat';

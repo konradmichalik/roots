@@ -1,3 +1,27 @@
+export interface JiraConnectionConfig {
+  instanceType: 'cloud' | 'server';
+  baseUrl: string;
+  credentials: JiraCredentials;
+  proxyUrl?: string;
+  accountId?: string;
+}
+
+export type JiraCredentials = JiraCloudCredentials | JiraServerCredentials;
+
+export interface JiraCloudCredentials {
+  type: 'cloud';
+  email: string;
+  apiToken: string;
+}
+
+export interface JiraServerCredentials {
+  type: 'server';
+  authMethod: 'basic' | 'pat';
+  username?: string;
+  password?: string;
+  personalAccessToken?: string;
+}
+
 export interface JiraSearchResponse {
   startAt: number;
   maxResults: number;

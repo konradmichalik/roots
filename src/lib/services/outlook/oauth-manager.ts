@@ -1,7 +1,7 @@
-import type { OutlookConnectionConfig, OAuthTokens, OAuthTokenResponse } from '../types';
-import { logger } from '../utils/logger';
-import { withRetry } from '../utils/retry';
-import { isTauri } from '../utils/storage';
+import type { OutlookConnectionConfig, OAuthTokens, OAuthTokenResponse } from './types';
+import { logger } from '../../utils/logger';
+import { withRetry } from '../../utils/retry';
+import { isTauri } from '../../utils/storage';
 
 const OAUTH_SCOPES =
   'https://graph.microsoft.com/Calendars.Read https://graph.microsoft.com/User.Read offline_access';

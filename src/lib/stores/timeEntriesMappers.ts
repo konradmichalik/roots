@@ -1,6 +1,6 @@
 import type { UnifiedTimeEntry, MocoMetadata, JiraMetadata, OutlookMetadata } from '../types';
 import type { MocoActivity, MSGraphEvent } from '../types';
-import type { WorklogWithIssue, JiraWorklogClient } from '../api';
+import type { WorklogWithIssue, JiraWorklogClient } from '../services';
 import { settingsState } from './settings.svelte';
 import { getDayOfWeekIndex } from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';

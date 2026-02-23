@@ -1,4 +1,4 @@
-import { ApiClient, type ApiClientConfig } from './base-client';
+import { ApiClient, type ApiClientConfig } from '../base-client';
 import type {
   JiraSearchResponse,
   JiraIssue,
@@ -7,15 +7,15 @@ import type {
   JiraWorklogResponse,
   JiraCreateWorklogPayload,
   JiraUpdateWorklogPayload
-} from '../types';
-import { logger } from '../utils/logger';
-import { validateResponse } from '../schemas/validate';
+} from './types';
+import { logger } from '../../utils/logger';
+import { validateResponse } from '../validate';
 import {
   jiraUserSchema,
   jiraSearchResponseSchema,
   jiraWorklogResponseSchema,
   jiraWorklogSchema
-} from '../schemas/jira';
+} from './schemas';
 
 export interface JiraWorklogClientConfig extends ApiClientConfig {
   instanceType: 'cloud' | 'server';

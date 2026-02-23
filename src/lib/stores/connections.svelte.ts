@@ -17,8 +17,12 @@ import {
   OutlookClient,
   createPersonioClient,
   type PersonioClient
-} from '../api';
-import { exchangeCodeForTokens, getStoredOAuthConfig, startOAuthFlow } from '../api/oauth-manager';
+} from '../services';
+import {
+  exchangeCodeForTokens,
+  getStoredOAuthConfig,
+  startOAuthFlow
+} from '../services/outlook/oauth-manager';
 import {
   getStorageItemAsync,
   setStorageItemAsync,

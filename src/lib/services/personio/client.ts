@@ -1,24 +1,22 @@
-import { ApiClient, getPlatformFetch } from './base-client';
+import { ApiClient, getPlatformFetch } from '../base-client';
 import type {
   PersonioConnectionConfig,
   PersonioAuthToken,
   PersonioResponse,
   PersonioEmployee,
   PersonioTimeOff,
-  PersonioAbsence,
-  PersonioAbsenceBalance,
-  WeekdayHours
-} from '../types';
-import type { AbsenceType } from '../types';
-import { isTauri } from '../utils/storage';
-import { logger } from '../utils/logger';
-import { validateResponse } from '../schemas/validate';
+  PersonioAbsenceBalance
+} from './types';
+import type { PersonioAbsence, AbsenceType, WeekdayHours } from '../../types';
+import { isTauri } from '../../utils/storage';
+import { logger } from '../../utils/logger';
+import { validateResponse } from '../validate';
 import {
   personioAuthResponseSchema,
   personioEmployeesResponseSchema,
   personioTimeOffsResponseSchema,
   personioAbsenceBalanceResponseSchema
-} from '../schemas/personio';
+} from './schemas';
 
 const PERSONIO_API_BASE = 'https://api.personio.de';
 const PROXY_BASE = 'http://localhost:3002/personio';

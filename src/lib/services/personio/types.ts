@@ -1,4 +1,9 @@
-import type { AbsenceType } from './unified';
+export interface PersonioConnectionConfig {
+  clientId: string;
+  clientSecret: string;
+  email: string;
+  employeeId?: number;
+}
 
 // Personio API envelope
 export interface PersonioResponse<T> {
@@ -74,33 +79,10 @@ export interface PersonioTimeOff {
   };
 }
 
-// Mapped internal type
-export interface PersonioAbsence {
-  id: string;
-  source: 'personio';
-  type: AbsenceType;
-  startDate: string;
-  endDate: string;
-  daysCount: number;
-  halfDay: boolean;
-  note?: string;
-  personioId: number;
-  status: string;
-  typeName: string;
-}
-
 // Absence balance (vacation days remaining, etc.)
 export interface PersonioAbsenceBalance {
   id: number;
   name: string;
   category: string | null;
   balance: number;
-}
-
-// Connection config
-export interface PersonioConnectionConfig {
-  clientId: string;
-  clientSecret: string;
-  email: string;
-  employeeId?: number;
 }

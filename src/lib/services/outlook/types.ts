@@ -1,3 +1,9 @@
+export interface OutlookConnectionConfig {
+  clientId: string;
+  tenantId: string;
+  redirectUri: string;
+}
+
 export interface MSGraphEvent {
   id: string;
   subject: string;

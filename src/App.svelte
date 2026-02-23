@@ -20,7 +20,10 @@
   import { initializeRecentPairs } from './lib/stores/recentMocoPairs.svelte';
   import { initializeSidebar } from './lib/stores/sidebar.svelte';
   import { initializeTimer } from './lib/stores/timer.svelte';
-  import { detectOAuthCallback, clearOAuthCallbackFromUrl } from './lib/api/oauth-manager';
+  import {
+    detectOAuthCallback,
+    clearOAuthCallbackFromUrl
+  } from './lib/services/outlook/oauth-manager';
   import { isTauri } from './lib/utils/storage';
   import { logger } from './lib/utils/logger';
   import { toggleDemoMode, enableDemoMode } from './lib/stores/demoMode.svelte';

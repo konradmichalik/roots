@@ -1,22 +1,18 @@
-import type {
-  MocoConnectionConfig,
-  JiraConnectionConfig,
-  OutlookConnectionConfig,
-  PersonioConnectionConfig,
-  PersonioAuthToken,
-  OAuthTokens
-} from '../types';
-import { MocoClient, type MocoClientConfig } from './moco-client';
-import { JiraCloudWorklogClient } from './jira-cloud-worklog';
-import { JiraServerWorklogClient } from './jira-server-worklog';
-import type { JiraWorklogClient } from './jira-worklog-client';
-import { OutlookClient } from './outlook-client';
-import { PersonioClient } from './personio-client';
+import type { MocoConnectionConfig } from './moco/types';
+import type { JiraConnectionConfig } from './jira/types';
+import type { OutlookConnectionConfig, OAuthTokens } from './outlook/types';
+import type { PersonioConnectionConfig, PersonioAuthToken } from './personio/types';
+import { MocoClient, type MocoClientConfig } from './moco/client';
+import { JiraCloudWorklogClient } from './jira/cloud-client';
+import { JiraServerWorklogClient } from './jira/server-client';
+import type { JiraWorklogClient } from './jira/client';
+import { OutlookClient } from './outlook/client';
+import { PersonioClient } from './personio/client';
 
-export { MocoClient } from './moco-client';
-export { JiraWorklogClient, type WorklogWithIssue } from './jira-worklog-client';
-export { OutlookClient } from './outlook-client';
-export { PersonioClient } from './personio-client';
+export { MocoClient } from './moco';
+export { JiraWorklogClient, type WorklogWithIssue } from './jira';
+export { OutlookClient } from './outlook';
+export { PersonioClient } from './personio';
 
 const PROXY_BASE = 'http://localhost:3002';
 
