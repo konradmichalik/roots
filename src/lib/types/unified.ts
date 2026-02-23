@@ -1,5 +1,4 @@
 import type { ServiceType } from './connections';
-import type { PersonioAbsence } from './personio';
 
 export interface UnifiedTimeEntry {
   id: string;
@@ -107,6 +106,21 @@ export interface DayOverview {
   };
   balance: number;
   presenceBalance?: number; // mocoTotal - presence hours (if presence exists)
+}
+
+// Mapped from Personio TimeOff records
+export interface PersonioAbsence {
+  id: string;
+  source: 'personio';
+  type: AbsenceType;
+  startDate: string;
+  endDate: string;
+  daysCount: number;
+  halfDay: boolean;
+  note?: string;
+  personioId: number;
+  status: string;
+  typeName: string;
 }
 
 export type Theme = 'light' | 'dark' | 'system';
