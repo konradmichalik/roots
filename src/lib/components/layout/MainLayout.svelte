@@ -5,7 +5,7 @@
   import FavoritesSidebar from '../sidebar/FavoritesSidebar.svelte';
   import ToastContainer from '../common/ToastContainer.svelte';
   import MorningModal from '../common/MorningModal.svelte';
-  import { sidebarState } from '../../stores/sidebar.svelte';
+  import { sidebarState, toggleRightSidebar } from '../../stores/sidebar.svelte';
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { getDateRange } from '../../stores/dateNavigation.svelte';
   import {
@@ -19,6 +19,9 @@
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
   import { onMount } from 'svelte';
+
+  let innerWidth = $state(0);
+  const isCompact = $derived(innerWidth < 1280);
 
   let lastMonthKey = '';
   let showMorningModal = $state(false);
@@ -89,6 +92,8 @@
   });
 </script>
 
+<svelte:window bind:innerWidth />
+
 <div class="flex h-screen flex-col">
   <TopBar />
 
@@ -108,8 +113,20 @@
     </main>
 
     {#if sidebarState.rightOpen}
+      {#if isCompact}
+        <!-- eslint-disable-next-line svelte/no-static-element-interactions -->
+        <div
+          class="fixed inset-0 top-14 z-30 bg-black/20 backdrop-blur-[1px]"
+          onclick={toggleRightSidebar}
+          role="button"
+          tabindex="-1"
+          aria-label="Close favorites"
+        ></div>
+      {/if}
       <aside
-        class="w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right"
+        class={isCompact
+          ? 'fixed right-0 top-14 bottom-0 z-40 w-80 border-l border-border bg-card overflow-y-auto shadow-xl animate-slide-in-right'
+          : 'w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right'}
       >
         <FavoritesSidebar />
       </aside>
