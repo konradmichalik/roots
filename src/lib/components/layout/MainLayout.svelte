@@ -6,8 +6,7 @@
   import ToastContainer from '../common/ToastContainer.svelte';
   import MorningModal from '../common/MorningModal.svelte';
   import { sidebarState, toggleRightSidebar } from '../../stores/sidebar.svelte';
-  import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
-  import { getDateRange } from '../../stores/dateNavigation.svelte';
+  import { dateNavState, setDate, getDateRange } from '../../stores/dateNavigation.svelte';
   import {
     fetchDayEntries,
     refreshDayEntries,
@@ -40,17 +39,21 @@
     const todayStr = today();
     if (morningCheckedForDate === todayStr) return;
 
-    if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
+    try {
+      if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
 
-    const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
-    if (lastShown === todayStr) {
-      morningCheckedForDate = todayStr;
-      return;
-    }
+      const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
+      if (lastShown === todayStr) {
+        morningCheckedForDate = todayStr;
+        return;
+      }
 
-    const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
-    if (hasOutlookEvents) {
-      showMorningModal = true;
+      const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
+      if (hasOutlookEvents) {
+        showMorningModal = true;
+      }
+    } catch {
+      morningCheckedForDate = '';
     }
     morningCheckedForDate = todayStr;
   }
@@ -73,11 +76,20 @@
       const todayStr = today();
 
       // Navigate to today if the date changed overnight
-      if (dateNavState.selectedDate !== todayStr) {
+      const dateChanged = dateNavState.selectedDate !== todayStr;
+      if (dateChanged) {
         setDate(todayStr);
       }
 
-      refreshDayEntries(todayStr).then(() => checkMorningGreeting());
+      // If the date changed, $effect already triggers fetchDayEntries for the new date.
+      // Only force-refresh when staying on the same day (e.g. waking mid-day).
+      if (!dateChanged) {
+        refreshDayEntries(todayStr)
+          .then(() => checkMorningGreeting())
+          .catch(() => checkMorningGreeting());
+      } else {
+        checkMorningGreeting();
+      }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
