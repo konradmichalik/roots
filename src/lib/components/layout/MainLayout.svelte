@@ -5,7 +5,7 @@
   import FavoritesSidebar from '../sidebar/FavoritesSidebar.svelte';
   import ToastContainer from '../common/ToastContainer.svelte';
   import MorningModal from '../common/MorningModal.svelte';
-  import { sidebarState } from '../../stores/sidebar.svelte';
+  import { sidebarState, toggleRightSidebar } from '../../stores/sidebar.svelte';
   import { dateNavState, setDate, getDateRange } from '../../stores/dateNavigation.svelte';
   import {
     fetchDayEntries,
@@ -18,6 +18,9 @@
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
   import { onMount } from 'svelte';
+
+  let innerWidth = $state(0);
+  const isCompact = $derived(innerWidth < 1280);
 
   let lastMonthKey = '';
   let showMorningModal = $state(false);
@@ -35,13 +38,15 @@
   async function checkMorningGreeting(): Promise<void> {
     const todayStr = today();
     if (morningCheckedForDate === todayStr) return;
-    morningCheckedForDate = todayStr;
 
     try {
       if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
 
       const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
-      if (lastShown === todayStr) return;
+      if (lastShown === todayStr) {
+        morningCheckedForDate = todayStr;
+        return;
+      }
 
       const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
       if (hasOutlookEvents) {
@@ -50,6 +55,7 @@
     } catch {
       morningCheckedForDate = '';
     }
+    morningCheckedForDate = todayStr;
   }
 
   function handleMorningClose(): void {
@@ -78,7 +84,7 @@
       // If the date changed, $effect already triggers fetchDayEntries for the new date.
       // Only force-refresh when staying on the same day (e.g. waking mid-day).
       if (!dateChanged) {
-        refreshDayEntries(dateNavState.selectedDate)
+        refreshDayEntries(todayStr)
           .then(() => checkMorningGreeting())
           .catch(() => checkMorningGreeting());
       } else {
@@ -101,6 +107,8 @@
   });
 </script>
 
+<svelte:window bind:innerWidth />
+
 <div class="flex h-screen flex-col">
   <TopBar />
 
@@ -120,8 +128,18 @@
     </main>
 
     {#if sidebarState.rightOpen}
+      {#if isCompact}
+        <button
+          type="button"
+          class="fixed inset-0 top-14 z-30 bg-black/20 backdrop-blur-[1px]"
+          onclick={toggleRightSidebar}
+          aria-label="Close favorites"
+        ></button>
+      {/if}
       <aside
-        class="w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right"
+        class={isCompact
+          ? 'fixed right-0 top-14 bottom-0 z-40 w-80 border-l border-border bg-card overflow-y-auto shadow-xl animate-slide-in-right'
+          : 'w-80 flex-shrink-0 border-l border-border bg-card overflow-y-auto animate-slide-in-right'}
       >
         <FavoritesSidebar />
       </aside>
