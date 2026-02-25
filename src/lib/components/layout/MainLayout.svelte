@@ -6,7 +6,7 @@
   import ToastContainer from '../common/ToastContainer.svelte';
   import MorningModal from '../common/MorningModal.svelte';
   import { sidebarState } from '../../stores/sidebar.svelte';
-  import { dateNavState } from '../../stores/dateNavigation.svelte';
+  import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { getDateRange } from '../../stores/dateNavigation.svelte';
   import {
     fetchDayEntries,
@@ -22,7 +22,7 @@
 
   let lastMonthKey = '';
   let showMorningModal = $state(false);
-  let morningCheckDone = false;
+  let morningCheckedForDate = '';
 
   function fetchMonth() {
     const range = getDateRange();
@@ -34,12 +34,12 @@
   }
 
   async function checkMorningGreeting(): Promise<void> {
-    if (morningCheckDone) return;
-    morningCheckDone = true;
+    const todayStr = today();
+    if (morningCheckedForDate === todayStr) return;
+    morningCheckedForDate = todayStr;
 
     if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
 
-    const todayStr = today();
     const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
     if (lastShown === todayStr) return;
 
@@ -64,7 +64,14 @@
 
     function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return;
-      refreshDayEntries(dateNavState.selectedDate);
+      const todayStr = today();
+
+      // Navigate to today if the date changed overnight
+      if (dateNavState.selectedDate !== todayStr) {
+        setDate(todayStr);
+      }
+
+      refreshDayEntries(dateNavState.selectedDate).then(() => checkMorningGreeting());
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
