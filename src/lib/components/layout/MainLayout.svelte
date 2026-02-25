@@ -6,8 +6,7 @@
   import ToastContainer from '../common/ToastContainer.svelte';
   import MorningModal from '../common/MorningModal.svelte';
   import { sidebarState } from '../../stores/sidebar.svelte';
-  import { dateNavState } from '../../stores/dateNavigation.svelte';
-  import { getDateRange } from '../../stores/dateNavigation.svelte';
+  import { dateNavState, setDate, getDateRange } from '../../stores/dateNavigation.svelte';
   import {
     fetchDayEntries,
     refreshDayEntries,
@@ -22,7 +21,7 @@
 
   let lastMonthKey = '';
   let showMorningModal = $state(false);
-  let morningCheckDone = false;
+  let morningCheckedForDate = '';
 
   function fetchMonth() {
     const range = getDateRange();
@@ -34,18 +33,22 @@
   }
 
   async function checkMorningGreeting(): Promise<void> {
-    if (morningCheckDone) return;
-    morningCheckDone = true;
-
-    if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
-
     const todayStr = today();
-    const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
-    if (lastShown === todayStr) return;
+    if (morningCheckedForDate === todayStr) return;
+    morningCheckedForDate = todayStr;
 
-    const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
-    if (hasOutlookEvents) {
-      showMorningModal = true;
+    try {
+      if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
+
+      const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
+      if (lastShown === todayStr) return;
+
+      const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
+      if (hasOutlookEvents) {
+        showMorningModal = true;
+      }
+    } catch {
+      morningCheckedForDate = '';
     }
   }
 
@@ -64,7 +67,23 @@
 
     function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return;
-      refreshDayEntries(dateNavState.selectedDate);
+      const todayStr = today();
+
+      // Navigate to today if the date changed overnight
+      const dateChanged = dateNavState.selectedDate !== todayStr;
+      if (dateChanged) {
+        setDate(todayStr);
+      }
+
+      // If the date changed, $effect already triggers fetchDayEntries for the new date.
+      // Only force-refresh when staying on the same day (e.g. waking mid-day).
+      if (!dateChanged) {
+        refreshDayEntries(dateNavState.selectedDate)
+          .then(() => checkMorningGreeting())
+          .catch(() => checkMorningGreeting());
+      } else {
+        checkMorningGreeting();
+      }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
