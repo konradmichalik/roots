@@ -39,17 +39,20 @@
   async function checkMorningGreeting(): Promise<void> {
     const todayStr = today();
     if (morningCheckedForDate === todayStr) return;
-    morningCheckedForDate = todayStr;
 
     if (!connectionsState.moco.isConnected || !connectionsState.outlook.isConnected) return;
 
     const lastShown = await getStorageItemAsync<string>(STORAGE_KEYS.MORNING_GREETING);
-    if (lastShown === todayStr) return;
+    if (lastShown === todayStr) {
+      morningCheckedForDate = todayStr;
+      return;
+    }
 
     const hasOutlookEvents = getEntriesForDate(todayStr).outlook.length > 0;
     if (hasOutlookEvents) {
       showMorningModal = true;
     }
+    morningCheckedForDate = todayStr;
   }
 
   function handleMorningClose(): void {
@@ -74,7 +77,7 @@
         setDate(todayStr);
       }
 
-      refreshDayEntries(dateNavState.selectedDate).then(() => checkMorningGreeting());
+      refreshDayEntries(todayStr).then(() => checkMorningGreeting());
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
