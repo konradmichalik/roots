@@ -117,14 +117,12 @@
 
     {#if sidebarState.rightOpen}
       {#if isCompact}
-        <!-- eslint-disable-next-line svelte/no-static-element-interactions -->
-        <div
+        <button
+          type="button"
           class="fixed inset-0 top-14 z-30 bg-black/20 backdrop-blur-[1px]"
           onclick={toggleRightSidebar}
-          role="button"
-          tabindex="-1"
           aria-label="Close favorites"
-        ></div>
+        ></button>
       {/if}
       <aside
         class={isCompact
