@@ -19,8 +19,6 @@
   import ConnectionManager from '../connection/ConnectionManager.svelte';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
-  import Calendar from '@lucide/svelte/icons/calendar';
-  import FileText from '@lucide/svelte/icons/file-text';
 
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira, entries.outlook));
@@ -36,6 +34,16 @@
     overview.presence ? (overview.presenceBalance ?? 0) : overview.balance
   );
   let displayTarget = $derived(overview.presence?.hours ?? overview.requiredHours);
+
+  let showOutlook = $derived(connectionsState.outlook.isConnected);
+  let showJira = $derived(connectionsState.jira.isConnected);
+
+  let gridCols = $derived.by(() => {
+    if (showOutlook && showJira) return 'grid-cols-[1fr_1.4fr_1fr]';
+    if (showOutlook) return 'grid-cols-[1fr_1.4fr]';
+    if (showJira) return 'grid-cols-[1.4fr_1fr]';
+    return 'grid-cols-1 max-w-2xl mx-auto';
+  });
 </script>
 
 <div class="mx-auto max-w-6xl space-y-4">
@@ -145,10 +153,10 @@
     </div>
   </div>
 
-  <!-- Three-column layout: Outlook | Moco (emphasized) | Jira -->
-  <div class="grid grid-cols-[1fr_1.4fr_1fr] gap-4 items-start" style="min-height: 60vh;">
-    <!-- Left: Outlook Calendar -->
-    {#if connectionsState.outlook.isConnected}
+  <!-- Dynamic column layout based on connected services -->
+  <div class="grid {gridCols} gap-4 items-start" style="min-height: 60vh;">
+    <!-- Outlook Calendar (only when connected) -->
+    {#if showOutlook}
       <SourceColumn
         source="outlook"
         entries={matchResult.sortedOutlook}
@@ -157,19 +165,9 @@
         onretry={retryFetch}
         entryGroupMap={matchResult.entryGroupMap}
       />
-    {:else}
-      <ConnectionManager>
-        <button
-          class="w-full rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50
-            hover:opacity-80 hover:border-border hover:bg-accent/30 transition-all duration-150 cursor-pointer"
-        >
-          <Calendar class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
-          <p class="text-xs text-muted-foreground/50">Connect Outlook</p>
-        </button>
-      </ConnectionManager>
     {/if}
 
-    <!-- Center: Moco (emphasized) -->
+    <!-- Moco (always visible, emphasized when other columns present) -->
     {#if connectionsState.moco.isConnected}
       <SourceColumn
         source="moco"
@@ -177,7 +175,7 @@
         loading={timeEntriesState.loading.moco}
         error={timeEntriesState.errors.moco}
         onretry={retryFetch}
-        emphasized
+        emphasized={showOutlook || showJira}
         entryGroupMap={matchResult.entryGroupMap}
       >
         {#snippet headerAction()}
@@ -205,8 +203,8 @@
       </ConnectionManager>
     {/if}
 
-    <!-- Right: Jira Worklogs -->
-    {#if connectionsState.jira.isConnected}
+    <!-- Jira Worklogs (only when connected) -->
+    {#if showJira}
       <SourceColumn
         source="jira"
         entries={matchResult.sortedJira}
@@ -215,16 +213,6 @@
         onretry={retryFetch}
         entryGroupMap={matchResult.entryGroupMap}
       />
-    {:else}
-      <ConnectionManager>
-        <button
-          class="w-full rounded-xl border border-dashed border-border/50 p-6 text-center flex flex-col items-center gap-2 opacity-50
-            hover:opacity-80 hover:border-border hover:bg-accent/30 transition-all duration-150 cursor-pointer"
-        >
-          <FileText class="size-6 text-muted-foreground/30" strokeWidth={1.5} />
-          <p class="text-xs text-muted-foreground/50">Connect Jira</p>
-        </button>
-      </ConnectionManager>
     {/if}
   </div>
 </div>
