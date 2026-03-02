@@ -14,7 +14,7 @@
   import { getPresenceForDate } from '../../stores/presences.svelte';
   import { statsModalState } from '../../stores/statsModal.svelte';
   import { getWeekDates, getMonthStart, getMonthWorkingDays } from '../../utils/date-helpers';
-  import type { MocoMetadata } from '../../types';
+  import type { MocoMetadata, DayOverview } from '../../types';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
 
   let { todayStr }: { todayStr: string } = $props();
@@ -57,17 +57,24 @@
 
   // StatsModal controlled via global store (so context menus can open it too)
 
-  // Days with open hours (negative presenceBalance = not all presence time booked)
-  let openDays = $derived(
-    monthWorkingDaysUntilYesterday
-      .map((date, i) => ({ date, overview: monthOverviews[i] }))
-      .filter(({ date, overview }) => {
-        if (!hasCachedDataForDate(date, monthStart)) return false;
-        if (!overview.presence || overview.presence.to === null) return false;
-        return overview.presenceBalance !== undefined && overview.presenceBalance < -0.01;
-      })
-      .sort((a, b) => (a.overview.presenceBalance ?? 0) - (b.overview.presenceBalance ?? 0))
-  );
+  // Days with open hours across ALL cached months (not just selected month)
+  let openDays = $derived.by(() => {
+    const result: Array<{ date: string; overview: DayOverview }> = [];
+    for (const cachedMonthStart of Object.keys(monthCacheState.cache)) {
+      const workingDays = getMonthWorkingDays(cachedMonthStart).filter((d) => d < todayStr);
+      for (const date of workingDays) {
+        if (!hasCachedDataForDate(date, cachedMonthStart)) continue;
+        const overview = getCachedDayOverview(date, cachedMonthStart);
+        if (!overview.presence || overview.presence.to === null) continue;
+        if (overview.presenceBalance !== undefined && overview.presenceBalance < -0.01) {
+          result.push({ date, overview });
+        }
+      }
+    }
+    return result.sort(
+      (a, b) => (a.overview.presenceBalance ?? 0) - (b.overview.presenceBalance ?? 0)
+    );
+  });
 
   // Days with non-zero balance (excludes open hours days)
   let openDaysSet = $derived(new Set(openDays.map((d) => d.date)));
