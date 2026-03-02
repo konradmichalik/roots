@@ -20,7 +20,7 @@
   import { onMount } from 'svelte';
 
   let innerWidth = $state(0);
-  const isCompact = $derived(innerWidth < 1280);
+  const isCompact = $derived(innerWidth < 1536);
 
   let lastMonthKey = '';
   let showMorningModal = $state(false);
