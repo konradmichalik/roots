@@ -64,6 +64,11 @@ jobs:
             brew tap konradmichalik/tap
             brew install --cask roots
             ```
+
+            **Update existing installation:**
+            ```
+            brew update && brew upgrade --cask roots
+            ```
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}

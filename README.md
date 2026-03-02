@@ -40,7 +40,11 @@ brew tap konradmichalik/tap
 brew install --cask roots
 ```
 
-Updates via `brew upgrade --cask roots`.
+Update to the latest version:
+
+```bash
+brew update && brew upgrade --cask roots
+```
 
 ### Manual Download
 
