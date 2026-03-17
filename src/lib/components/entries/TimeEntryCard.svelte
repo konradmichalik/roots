@@ -15,6 +15,8 @@
   import Copy from '@lucide/svelte/icons/copy';
   import ExternalLink from '@lucide/svelte/icons/external-link';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+  import CircleDollarSign from '@lucide/svelte/icons/circle-dollar-sign';
+  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
   import {
     matchHoverState,
@@ -297,7 +299,7 @@
 </ContextMenu.Root>
 
 {#snippet cardContent()}
-  <div class="flex items-start justify-between gap-2">
+  <div class="relative flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
       {#if mocoMeta?.customerName}
         <span class="text-[11px] font-medium text-muted-foreground leading-tight">
@@ -308,13 +310,6 @@
         <span class="text-sm font-medium text-foreground line-clamp-2">
           {entry.title}
         </span>
-        {#if mocoMeta?.billable}
-          <span
-            class="inline-flex items-center rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-medium text-success-text leading-none flex-shrink-0"
-          >
-            billable
-          </span>
-        {/if}
       </div>
       {#if entry.description}
         <p class="text-xs text-muted-foreground truncate">
@@ -367,6 +362,16 @@
         {formatHours(entry.hours)}
       </span>
       <!-- Hover action: overlays hours display -->
+      {#if mocoMeta?.billable}
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
+            </Tooltip.Trigger>
+            <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      {/if}
       {#if mocoMeta && isMocoConnected}
         <button
           type="button"
