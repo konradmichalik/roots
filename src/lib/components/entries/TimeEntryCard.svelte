@@ -309,7 +309,9 @@
           {entry.title}
         </span>
         {#if mocoMeta?.billable}
-          <span class="inline-flex items-center rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-medium text-success-text leading-none flex-shrink-0">
+          <span
+            class="inline-flex items-center rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-medium text-success-text leading-none flex-shrink-0"
+          >
             billable
           </span>
         {/if}

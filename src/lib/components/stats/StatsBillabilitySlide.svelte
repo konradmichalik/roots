@@ -102,7 +102,10 @@
 
     <!-- Compact bar -->
     <div class="h-2 rounded-full bg-muted overflow-hidden flex">
-      <div class="h-full bg-success transition-all duration-300" style="width: {overallRate}%"></div>
+      <div
+        class="h-full bg-success transition-all duration-300"
+        style="width: {overallRate}%"
+      ></div>
     </div>
 
     <div class="flex items-center justify-between text-xs text-muted-foreground">
@@ -120,24 +123,60 @@
     {#if weeks.length > 1}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="relative pt-1 overflow-x-clip" onmouseleave={() => (hoveredPoint = null)}>
-        <svg viewBox="0 0 {chartW} {chartH}" class="w-full h-auto" role="img" aria-label="Weekly billability sparkline">
+        <svg
+          viewBox="0 0 {chartW} {chartH}"
+          class="w-full h-auto"
+          role="img"
+          aria-label="Weekly billability sparkline"
+        >
           <!-- Y-axis range labels -->
-          <text x={padX - 2} y={padY + 3} text-anchor="end" class="fill-muted-foreground/50" font-size="8" font-family="ui-monospace, monospace">{yRange.max}</text>
-          <text x={padX - 2} y={padY + innerH + 3} text-anchor="end" class="fill-muted-foreground/50" font-size="8" font-family="ui-monospace, monospace">{yRange.min}</text>
+          <text
+            x={padX - 2}
+            y={padY + 3}
+            text-anchor="end"
+            class="fill-muted-foreground/50"
+            font-size="8"
+            font-family="ui-monospace, monospace">{yRange.max}</text
+          >
+          <text
+            x={padX - 2}
+            y={padY + innerH + 3}
+            text-anchor="end"
+            class="fill-muted-foreground/50"
+            font-size="8"
+            font-family="ui-monospace, monospace">{yRange.min}</text
+          >
 
           <!-- Target line -->
           <line
-            x1={padX} y1={targetY} x2={padX + innerW} y2={targetY}
-            stroke="var(--muted-foreground)" stroke-width="0.7" stroke-dasharray="5 3" opacity="0.4"
+            x1={padX}
+            y1={targetY}
+            x2={padX + innerW}
+            y2={targetY}
+            stroke="var(--muted-foreground)"
+            stroke-width="0.7"
+            stroke-dasharray="5 3"
+            opacity="0.4"
           />
           <text
-            x={padX + innerW + 4} y={targetY + 3}
-            class="fill-muted-foreground/60" font-size="8" font-family="ui-monospace, monospace"
-          >{target}%</text>
+            x={padX + innerW + 4}
+            y={targetY + 3}
+            class="fill-muted-foreground/60"
+            font-size="8"
+            font-family="ui-monospace, monospace">{target}%</text
+          >
 
           <!-- Connecting line -->
           {#if linePath}
-            <path d={linePath} fill="none" stroke="var(--muted-foreground)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.2" />
+            <path
+              d={linePath}
+              fill="none"
+              stroke="var(--muted-foreground)"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              opacity="0.2"
+            />
           {/if}
 
           <!-- Dots -->
@@ -145,11 +184,16 @@
             <circle
               role="img"
               aria-label="{weeks[i].weekLabel}: {weeks[i].rate}%"
-              cx={point.x} cy={point.y} r="18" fill="transparent" class="cursor-pointer"
+              cx={point.x}
+              cy={point.y}
+              r="18"
+              fill="transparent"
+              class="cursor-pointer"
               onmouseenter={() => (hoveredPoint = i)}
             />
             <circle
-              cx={point.x} cy={point.y}
+              cx={point.x}
+              cy={point.y}
               r={hoveredPoint === i ? 6 : 4.5}
               fill={dotColor(weeks[i].rate)}
               stroke="var(--card)"
@@ -167,11 +211,19 @@
           {@const isRight = pct > 75}
           <div
             class="absolute pointer-events-none bg-popover border border-border rounded-md shadow-md px-2 py-1 text-[11px] z-10 whitespace-nowrap -top-1.5"
-            style="left: {pct}%; transform: translateX({isLeft ? '0%' : isRight ? '-100%' : '-50%'})"
+            style="left: {pct}%; transform: translateX({isLeft
+              ? '0%'
+              : isRight
+                ? '-100%'
+                : '-50%'})"
           >
             <span class="text-muted-foreground">{hp.week.weekLabel}</span>
-            <span class="ml-1.5 font-mono font-medium" style="color: {dotColor(hp.week.rate)}">{hp.week.rate}%</span>
-            <span class="ml-1 text-muted-foreground/60 font-mono">{formatHours(hp.week.billable)}/{formatHours(hp.week.total)}</span>
+            <span class="ml-1.5 font-mono font-medium" style="color: {dotColor(hp.week.rate)}"
+              >{hp.week.rate}%</span
+            >
+            <span class="ml-1 text-muted-foreground/60 font-mono"
+              >{formatHours(hp.week.billable)}/{formatHours(hp.week.total)}</span
+            >
           </div>
         {/if}
 
@@ -182,10 +234,12 @@
               <span class="inline-block w-1.5 h-1.5 rounded-full bg-success"></span>≥{target}%
             </span>
             <span class="flex items-center gap-1">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-warning"></span>{target - 10}–{target - 1}%
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-warning"></span>{target -
+                10}–{target - 1}%
             </span>
             <span class="flex items-center gap-1">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground"></span>&lt;{target - 10}%
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground"
+              ></span>&lt;{target - 10}%
             </span>
           </div>
           <span>{weeks.length} weeks</span>

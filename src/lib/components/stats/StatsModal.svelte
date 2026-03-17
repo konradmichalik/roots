@@ -25,12 +25,7 @@
   } from '../../utils/date-helpers';
   import type { Snippet } from 'svelte';
   import type { MocoMetadata } from '../../types';
-  import type {
-    MonthProjectStats,
-    ProjectStats,
-    TaskStats,
-    WeekBillability
-  } from './statsTypes';
+  import type { MonthProjectStats, ProjectStats, TaskStats, WeekBillability } from './statsTypes';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
@@ -165,14 +160,10 @@
           billabilityRate: 0
         };
 
-      const projectRecord: Record<
-        number,
-        ProjectStats & { taskMap: Record<string, TaskStats> }
-      > = {};
-      const weekMap: Record<
-        string,
-        { billable: number; nonBillable: number; weekStart: string }
-      > = {};
+      const projectRecord: Record<number, ProjectStats & { taskMap: Record<string, TaskStats> }> =
+        {};
+      const weekMap: Record<string, { billable: number; nonBillable: number; weekStart: string }> =
+        {};
       let billable = 0;
       let nonBillable = 0;
 
@@ -347,10 +338,7 @@
             {showMonthUntilYesterday}
           />
         {:else if activeSlide === 'billability'}
-          <StatsBillabilitySlide
-            weeks={weeklyBillability}
-            overallRate={overallBillabilityRate}
-          />
+          <StatsBillabilitySlide weeks={weeklyBillability} overallRate={overallBillabilityRate} />
         {:else if activeSlide === 'projects'}
           <StatsProjectsSlide stats={monthProjectStats} />
         {/if}
