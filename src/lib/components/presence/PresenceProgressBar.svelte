@@ -179,104 +179,101 @@
   <Tooltip.Provider delayDuration={200}>
     <Tooltip.Root>
       <Tooltip.Trigger class="w-full">
-          <div class="flex items-center gap-2 cursor-pointer group">
-            <!-- Start time -->
-            <span class="text-[10px] font-mono text-muted-foreground shrink-0">
-              {formatTime(timeline.startMinutes)}
-            </span>
+        <div class="flex items-center gap-2 cursor-pointer group">
+          <!-- Start time -->
+          <span class="text-[10px] font-mono text-muted-foreground shrink-0">
+            {formatTime(timeline.startMinutes)}
+          </span>
 
-            <!-- Progress bar -->
-            <div
-              class="relative h-1.5 flex-1 rounded-full bg-muted/30 group-hover:bg-muted/50 transition-colors"
-            >
-              {#each timeline.segments as segment (`${segment.type}-${segment.start}`)}
-                {#if segment.type === 'booked'}
-                  <!-- Booked time: full intensity -->
-                  <div
-                    class="absolute top-0 h-full rounded-full bg-success transition-all duration-300"
-                    style={getSegmentStyle(segment)}
-                  ></div>
-                {:else if segment.type === 'open'}
-                  <!-- Open/unbooked time: warning color -->
-                  <div
-                    class="absolute top-0 h-full rounded-full bg-danger/50 transition-all duration-300"
-                    style={getSegmentStyle(segment)}
-                  ></div>
-                {:else if segment.type === 'gap'}
-                  <!-- Break/gap between presences -->
-                  <div
-                    class="absolute top-0 h-full rounded-full bg-muted transition-all duration-300"
-                    style={getSegmentStyle(segment)}
-                  ></div>
-                {/if}
-              {/each}
-
-              <!-- Now marker -->
-              {#if showNowMarker}
+          <!-- Progress bar -->
+          <div
+            class="relative h-1.5 flex-1 rounded-full bg-muted/30 group-hover:bg-muted/50 transition-colors"
+          >
+            {#each timeline.segments as segment (`${segment.type}-${segment.start}`)}
+              {#if segment.type === 'booked'}
+                <!-- Booked time: full intensity -->
                 <div
-                  class="absolute top-1/2 -translate-y-1/2 w-0.5 h-3.5 bg-foreground rounded-full shadow-sm ring-2 ring-background"
-                  style="left: {getNowMarkerPosition()};"
+                  class="absolute top-0 h-full rounded-full bg-success transition-all duration-300"
+                  style={getSegmentStyle(segment)}
+                ></div>
+              {:else if segment.type === 'open'}
+                <!-- Open/unbooked time: warning color -->
+                <div
+                  class="absolute top-0 h-full rounded-full bg-danger/50 transition-all duration-300"
+                  style={getSegmentStyle(segment)}
+                ></div>
+              {:else if segment.type === 'gap'}
+                <!-- Break/gap between presences -->
+                <div
+                  class="absolute top-0 h-full rounded-full bg-muted transition-all duration-300"
+                  style={getSegmentStyle(segment)}
                 ></div>
               {/if}
-            </div>
+            {/each}
 
-            <!-- End time -->
-            <span
-              class="text-[10px] font-mono text-muted-foreground shrink-0 {timeline.projectedEndMinutes
-                ? 'opacity-50'
-                : ''}"
-            >
-              {#if timeline.projectedEndMinutes}~{/if}{formatTime(timeline.endMinutes)}
-            </span>
+            <!-- Now marker -->
+            {#if showNowMarker}
+              <div
+                class="absolute top-1/2 -translate-y-1/2 w-0.5 h-3.5 bg-foreground rounded-full shadow-sm ring-2 ring-background"
+                style="left: {getNowMarkerPosition()};"
+              ></div>
+            {/if}
           </div>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="bottom" class="max-w-xs">
-          <div class="space-y-2">
-            <div class="text-xs space-y-0.5">
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Presence:</span>
-                <span class="font-mono font-medium">{formatHours(presence.hours)}</span>
-              </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="text-muted-foreground">Booked:</span>
-                <span class="font-mono font-medium text-success-text"
-                  >{formatHours(bookedHours)}</span
-                >
-              </div>
-              {#if openHours > 0.01}
-                <div class="flex items-center justify-between gap-4">
-                  <span class="text-muted-foreground">Open:</span>
-                  <span class="font-mono font-medium text-danger-text"
-                    >{formatHours(openHours)}</span
-                  >
-                </div>
-              {/if}
-              <div class="text-muted-foreground/70 text-[10px] pt-1">Click to edit presence</div>
+
+          <!-- End time -->
+          <span
+            class="text-[10px] font-mono text-muted-foreground shrink-0 {timeline.projectedEndMinutes
+              ? 'opacity-50'
+              : ''}"
+          >
+            {#if timeline.projectedEndMinutes}~{/if}{formatTime(timeline.endMinutes)}
+          </span>
+        </div>
+      </Tooltip.Trigger>
+      <Tooltip.Content side="bottom" class="max-w-xs">
+        <div class="space-y-2">
+          <div class="text-xs space-y-0.5">
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Presence:</span>
+              <span class="font-mono font-medium">{formatHours(presence.hours)}</span>
             </div>
-            <div class="space-y-1 pt-1 border-t border-border/50">
-              {#each rawPresences as p, i (p.from)}
-                <div class="flex items-center gap-2 text-xs">
-                  <span class="font-mono">{p.from}–{p.to ?? '...'}</span>
-                  {#if p.is_home_office}
-                    <span class="text-muted-foreground">(Home)</span>
-                  {/if}
-                  {#if p.break && p.break > 0}
-                    <span class="text-warning-text">-{formatBreakMinutes(p.break)} break</span>
-                  {/if}
-                </div>
-                {#if i < rawPresences.length - 1}
-                  {@const nextStart = rawPresences[i + 1].from}
-                  {@const currentEnd = p.to}
-                  {#if currentEnd && nextStart > currentEnd}
-                    <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
-                      <span class="italic">Gap: {currentEnd}–{nextStart}</span>
-                    </div>
-                  {/if}
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-muted-foreground">Booked:</span>
+              <span class="font-mono font-medium text-success-text">{formatHours(bookedHours)}</span
+              >
+            </div>
+            {#if openHours > 0.01}
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Open:</span>
+                <span class="font-mono font-medium text-danger-text">{formatHours(openHours)}</span>
+              </div>
+            {/if}
+            <div class="text-muted-foreground/70 text-[10px] pt-1">Click to edit presence</div>
+          </div>
+          <div class="space-y-1 pt-1 border-t border-border/50">
+            {#each rawPresences as p, i (p.from)}
+              <div class="flex items-center gap-2 text-xs">
+                <span class="font-mono">{p.from}–{p.to ?? '...'}</span>
+                {#if p.is_home_office}
+                  <span class="text-muted-foreground">(Home)</span>
                 {/if}
-              {/each}
-            </div>
+                {#if p.break && p.break > 0}
+                  <span class="text-warning-text">-{formatBreakMinutes(p.break)} break</span>
+                {/if}
+              </div>
+              {#if i < rawPresences.length - 1}
+                {@const nextStart = rawPresences[i + 1].from}
+                {@const currentEnd = p.to}
+                {#if currentEnd && nextStart > currentEnd}
+                  <div class="flex items-center gap-2 text-xs text-muted-foreground pl-2">
+                    <span class="italic">Gap: {currentEnd}–{nextStart}</span>
+                  </div>
+                {/if}
+              {/if}
+            {/each}
           </div>
-        </Tooltip.Content>
+        </div>
+      </Tooltip.Content>
     </Tooltip.Root>
   </Tooltip.Provider>
 {/if}
