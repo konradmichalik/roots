@@ -178,7 +178,9 @@
       hours: matchedFavorite?.defaultHours ?? entry.hours,
       description:
         matchedFavorite?.description ??
-        (jiraMeta ? `#${jiraMeta.issueKey} ${jiraMeta.issueSummary}` : entry.title),
+        (jiraMeta
+          ? `#${jiraMeta.issueKey} ${entry.description ?? jiraMeta.issueSummary}`
+          : entry.title),
       projectId: matchedFavorite?.projectId,
       taskId: matchedFavorite?.taskId,
       remoteService: jiraMeta ? 'jira' : undefined,
