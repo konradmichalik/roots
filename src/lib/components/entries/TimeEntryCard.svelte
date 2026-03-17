@@ -368,9 +368,7 @@
             <Tooltip.Trigger>
               <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
             </Tooltip.Trigger>
-            <Tooltip.Content side="top" sideOffset={4}>
-              Billable
-            </Tooltip.Content>
+            <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
       {/if}
