@@ -3,8 +3,6 @@
   import { today } from '../../utils/date-helpers';
   import { formatHours } from '../../utils/time-format';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-  import PresenceModal from './PresenceModal.svelte';
-
   interface Props {
     date: string;
     /** Expected working hours for projection (e.g. 8.0) */
@@ -178,10 +176,9 @@
 </script>
 
 {#if timeline && timeline.segments.length > 0 && presence}
-  <PresenceModal {date}>
-    <Tooltip.Provider delayDuration={200}>
-      <Tooltip.Root>
-        <Tooltip.Trigger class="w-full">
+  <Tooltip.Provider delayDuration={200}>
+    <Tooltip.Root>
+      <Tooltip.Trigger class="w-full">
           <div class="flex items-center gap-2 cursor-pointer group">
             <!-- Start time -->
             <span class="text-[10px] font-mono text-muted-foreground shrink-0">
@@ -280,7 +277,6 @@
             </div>
           </div>
         </Tooltip.Content>
-      </Tooltip.Root>
-    </Tooltip.Provider>
-  </PresenceModal>
+    </Tooltip.Root>
+  </Tooltip.Provider>
 {/if}
