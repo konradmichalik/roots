@@ -1,8 +1,9 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
   import StatsOverviewSlide from './StatsOverviewSlide.svelte';
-  import StatsBreakdownSlide from './StatsBreakdownSlide.svelte';
+
   import StatsProjectsSlide from './StatsProjectsSlide.svelte';
+  import StatsBillabilitySlide from './StatsBillabilitySlide.svelte';
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import {
@@ -12,20 +13,23 @@
   } from '../../stores/timeEntries.svelte';
   import {
     getWeekDates,
+    getWeekStart,
     getMonthStart,
     getMonthEnd,
     getMonthWorkingDays,
     today,
     parseDate,
-    toDateString
+    toDateString,
+    addDays,
+    formatDateShort
   } from '../../utils/date-helpers';
   import type { Snippet } from 'svelte';
   import type { MocoMetadata } from '../../types';
-  import type { MonthProjectStats, ProjectStats, TaskStats } from './statsTypes';
+  import type { MonthProjectStats, ProjectStats, TaskStats, WeekBillability } from './statsTypes';
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
-  type SlideId = 'overview' | 'breakdown' | 'projects';
+  type SlideId = 'overview' | 'billability' | 'projects';
 
   let {
     children,
@@ -77,7 +81,7 @@
 
   const slides: { id: SlideId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'breakdown', label: 'Breakdown' },
+    { id: 'billability', label: 'Billability' },
     { id: 'projects', label: 'Tasks' }
   ];
 
@@ -141,57 +145,106 @@
 
   let isMonthLoading = $derived(monthCacheState.loading && !monthCacheState.cache[selectedMonth]);
 
-  // Month project+task distribution from cache
-  let monthProjectStats = $derived.by((): MonthProjectStats => {
-    const cached = monthCacheState.cache[monthStart];
-    if (!cached) return { projects: [], billable: 0, nonBillable: 0, total: 0 };
-
-    const projectRecord: Record<number, ProjectStats & { taskMap: Record<string, TaskStats> }> = {};
-    let billable = 0;
-    let nonBillable = 0;
-
-    for (const entry of cached.mocoEntries) {
-      const meta = entry.metadata as MocoMetadata;
-
-      if (!projectRecord[meta.projectId]) {
-        projectRecord[meta.projectId] = {
-          projectId: meta.projectId,
-          projectName: meta.projectName,
-          customerName: meta.customerName,
-          hours: 0,
-          tasks: [],
-          taskMap: {}
+  // Single pass over mocoEntries: project stats and weekly billability
+  let mocoAnalysis = $derived.by(
+    (): {
+      projectStats: MonthProjectStats;
+      weeks: WeekBillability[];
+      billabilityRate: number;
+    } => {
+      const cached = monthCacheState.cache[monthStart];
+      if (!cached)
+        return {
+          projectStats: { projects: [], billable: 0, nonBillable: 0, total: 0 },
+          weeks: [],
+          billabilityRate: 0
         };
+
+      const projectRecord: Record<number, ProjectStats & { taskMap: Record<string, TaskStats> }> =
+        {};
+      const weekMap: Record<string, { billable: number; nonBillable: number; weekStart: string }> =
+        {};
+      let billable = 0;
+      let nonBillable = 0;
+
+      for (const entry of cached.mocoEntries) {
+        const meta = entry.metadata as MocoMetadata;
+
+        // --- Project stats ---
+        if (!projectRecord[meta.projectId]) {
+          projectRecord[meta.projectId] = {
+            projectId: meta.projectId,
+            projectName: meta.projectName,
+            customerName: meta.customerName,
+            hours: 0,
+            tasks: [],
+            taskMap: {}
+          };
+        }
+        const project = projectRecord[meta.projectId];
+        if (!project.taskMap[meta.taskName]) {
+          project.taskMap[meta.taskName] = { taskName: meta.taskName, hours: 0 };
+        }
+        project.taskMap[meta.taskName].hours += entry.hours;
+        project.hours += entry.hours;
+
+        // --- Billable totals ---
+        if (meta.billable) {
+          billable += entry.hours;
+        } else {
+          nonBillable += entry.hours;
+        }
+
+        // --- Weekly billability ---
+        const ws = getWeekStart(entry.date);
+        if (!weekMap[ws]) {
+          weekMap[ws] = { billable: 0, nonBillable: 0, weekStart: ws };
+        }
+        if (meta.billable) {
+          weekMap[ws].billable += entry.hours;
+        } else {
+          weekMap[ws].nonBillable += entry.hours;
+        }
       }
 
-      const project = projectRecord[meta.projectId];
+      const projects = Object.values(projectRecord)
+        .sort((a, b) => b.hours - a.hours)
+        .map((p) => ({
+          projectId: p.projectId,
+          projectName: p.projectName,
+          customerName: p.customerName,
+          hours: p.hours,
+          tasks: Object.values(p.taskMap).sort((a, b) => b.hours - a.hours)
+        }));
 
-      if (!project.taskMap[meta.taskName]) {
-        project.taskMap[meta.taskName] = { taskName: meta.taskName, hours: 0 };
-      }
+      const total = billable + nonBillable;
 
-      project.taskMap[meta.taskName].hours += entry.hours;
-      project.hours += entry.hours;
+      const weeks = Object.values(weekMap)
+        .sort((a, b) => a.weekStart.localeCompare(b.weekStart))
+        .map((w) => {
+          const wTotal = w.billable + w.nonBillable;
+          const endDate = addDays(w.weekStart, 4);
+          return {
+            weekLabel: `${formatDateShort(w.weekStart)} – ${formatDateShort(endDate)}`,
+            weekStart: w.weekStart,
+            billable: w.billable,
+            nonBillable: w.nonBillable,
+            total: wTotal,
+            rate: wTotal > 0 ? Math.round((w.billable / wTotal) * 100) : 0
+          };
+        });
 
-      if (meta.billable) {
-        billable += entry.hours;
-      } else {
-        nonBillable += entry.hours;
-      }
+      return {
+        projectStats: { projects, billable, nonBillable, total },
+        weeks,
+        billabilityRate: total > 0 ? Math.round((billable / total) * 100) : 0
+      };
     }
+  );
 
-    const projects = Object.values(projectRecord)
-      .sort((a, b) => b.hours - a.hours)
-      .map((project) => ({
-        projectId: project.projectId,
-        projectName: project.projectName,
-        customerName: project.customerName,
-        hours: project.hours,
-        tasks: Object.values(project.taskMap).sort((a, b) => b.hours - a.hours)
-      }));
-
-    return { projects, billable, nonBillable, total: billable + nonBillable };
-  });
+  let monthProjectStats = $derived(mocoAnalysis.projectStats);
+  let weeklyBillability = $derived(mocoAnalysis.weeks);
+  let overallBillabilityRate = $derived(mocoAnalysis.billabilityRate);
 </script>
 
 <Dialog.Root bind:open>
@@ -284,8 +337,8 @@
             monthWorkingDaysCount={monthWorkingDays.length}
             {showMonthUntilYesterday}
           />
-        {:else if activeSlide === 'breakdown'}
-          <StatsBreakdownSlide stats={monthProjectStats} />
+        {:else if activeSlide === 'billability'}
+          <StatsBillabilitySlide weeks={weeklyBillability} overallRate={overallBillabilityRate} />
         {:else if activeSlide === 'projects'}
           <StatsProjectsSlide stats={monthProjectStats} />
         {/if}

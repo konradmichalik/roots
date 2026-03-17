@@ -131,7 +131,7 @@
       {billablePercent}
       {balancedDays}
       onBillableClick={() => {
-        statsModalState.initialSlide = 'breakdown';
+        statsModalState.initialSlide = 'billability';
         statsModalState.highlightProjectId = undefined;
         statsModalState.highlightTaskName = undefined;
         statsModalState.open = true;

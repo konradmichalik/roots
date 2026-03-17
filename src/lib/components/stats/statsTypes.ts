@@ -17,3 +17,12 @@ export interface MonthProjectStats {
   nonBillable: number;
   total: number;
 }
+
+export interface WeekBillability {
+  weekLabel: string;
+  weekStart: string;
+  billable: number;
+  nonBillable: number;
+  total: number;
+  rate: number;
+}

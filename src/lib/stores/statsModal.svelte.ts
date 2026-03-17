@@ -2,7 +2,7 @@
 // Global StatsModal control — lets any component open the stats dialog
 // ---------------------------------------------------------------------------
 
-type SlideId = 'overview' | 'breakdown' | 'projects';
+type SlideId = 'overview' | 'billability' | 'projects';
 
 export const statsModalState = $state({
   open: false,
