@@ -304,9 +304,16 @@
           {mocoMeta.customerName}
         </span>
       {/if}
-      <span class="text-sm font-medium text-foreground line-clamp-2">
-        {entry.title}
-      </span>
+      <div class="flex items-center gap-1.5">
+        <span class="text-sm font-medium text-foreground line-clamp-2">
+          {entry.title}
+        </span>
+        {#if mocoMeta?.billable}
+          <span class="inline-flex items-center rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-medium text-success-text leading-none flex-shrink-0">
+            billable
+          </span>
+        {/if}
+      </div>
       {#if entry.description}
         <p class="text-xs text-muted-foreground truncate">
           {entry.description}
