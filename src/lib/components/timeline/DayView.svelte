@@ -68,30 +68,32 @@
 
     <!-- Presence progress bar (or empty placeholder for alignment) -->
     <div class="flex-1 min-w-0 -mt-0.5">
-      {#if hasPresence && isLoadingMoco}
-        <!-- Loading skeleton while fetching booked hours -->
-        <div class="flex items-center gap-2">
-          <Skeleton class="h-3 w-10" />
-          <Skeleton class="h-1.5 flex-1 rounded-full" />
-          <Skeleton class="h-3 w-10" />
-        </div>
-      {:else if hasPresence}
-        <PresenceProgressBar
-          date={dateNavState.selectedDate}
-          targetHours={overview.requiredHours}
-          bookedHours={overview.totals.actual}
-        />
-      {:else if connectionsState.moco.isConnected}
-        <!-- Placeholder with add presence button when no presence -->
+      {#if connectionsState.moco.isConnected}
         <PresenceModal date={dateNavState.selectedDate}>
-          <button
-            class="flex items-center justify-center gap-1.5 w-full h-6 rounded-lg border border-dashed border-border/50
-              text-muted-foreground/50 hover:border-border hover:text-muted-foreground hover:bg-accent/30
-              transition-colors text-[10px]"
-          >
-            <Clock class="size-3" />
-            <span>Add working time</span>
-          </button>
+          {#if hasPresence && isLoadingMoco}
+            <!-- Loading skeleton while fetching booked hours -->
+            <div class="flex items-center gap-2">
+              <Skeleton class="h-3 w-10" />
+              <Skeleton class="h-1.5 flex-1 rounded-full" />
+              <Skeleton class="h-3 w-10" />
+            </div>
+          {:else if hasPresence}
+            <PresenceProgressBar
+              date={dateNavState.selectedDate}
+              targetHours={overview.requiredHours}
+              bookedHours={overview.totals.actual}
+            />
+          {:else}
+            <!-- Placeholder with add presence button when no presence -->
+            <button
+              class="flex items-center justify-center gap-1.5 w-full h-6 rounded-lg border border-dashed border-border/50
+                text-muted-foreground/50 hover:border-border hover:text-muted-foreground hover:bg-accent/30
+                transition-colors text-[10px]"
+            >
+              <Clock class="size-3" />
+              <span>Add working time</span>
+            </button>
+          {/if}
         </PresenceModal>
       {/if}
     </div>
