@@ -14,24 +14,25 @@
   <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tailwind-4-06b6d4?logo=tailwindcss" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" />
 </p>
 
 ---
 
-Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira, Outlook and Personio, then reconciles and displays everything in a unified timeline.
+Roots aggregates your work time from multiple services into a single desktop app. It pulls data from Moco, Jira, Outlook and Personio, then reconciles and displays everything in a unified timeline — so you always know where your hours went.
 
 ![roots — Unified Work Time Overview](docs/images/roots-light.jpg)
 
-## Features
+## ✨ Features
 
-- **Multi-Service Integration** - Connect Moco, Jira (Cloud & Server), Outlook and Personio
-- **Unified Timeline** - Day, week and month views across all services
-- **Reconciliation** - Confidence-based matching and comparison between services
-- **Personio Sync** - Automatic work schedule and absence import
-- **Native Desktop App** - Lightweight Tauri app, no browser CORS issues
-- **Dark Mode** - Light and dark theme support
+- **Multi-Service Integration** — Connect Moco, Jira (Cloud & Server), Outlook and Personio
+- **Unified Timeline** — Day, week and month views across all connected services
+- **Confidence-Based Reconciliation** — Automatic matching and comparison between services
+- **Personio Sync** — Work schedule and absence import with automatic weekday-hours update
+- **Native Desktop App** — Lightweight Tauri 2 app; no browser CORS issues
+- **Dark / Light Mode** — Nord-palette design tokens with full theme support
 
-## Installation
+## 🔥 Installation
 
 ### Homebrew (recommended)
 
@@ -50,9 +51,33 @@ brew update && brew upgrade --cask roots
 
 Download the latest `.dmg` from [GitHub Releases](https://github.com/konradmichalik/roots/releases).
 
-> The app is currently unsigned. On first launch: right-click the app and select "Open", or run `xattr -cr /Applications/Roots.app`.
+> [!WARNING]
+> The app is currently unsigned. On first launch, right-click the app and select **Open**, or run `xattr -cr /Applications/Roots.app` in your terminal.
 
-## Development
+## 🚀 Getting Started
+
+Connect at least one service in **Settings → Connections** to start seeing entries. Each service requires different credentials:
+
+| Service | Auth Method | Provides |
+|---------|-------------|----------|
+| **Moco** | API Key | Time entries, projects, presences |
+| **Jira Cloud** | Email + API Token | Worklogs |
+| **Jira Server** | Username/Password or PAT | Worklogs |
+| **Outlook** | OAuth2 | Calendar events |
+| **Personio** | Client ID + Secret | Absences, work schedule |
+
+> [!NOTE]
+> Personio does not provide time entries. When connected, it automatically updates your weekday-hours target from your work schedule and disables manual absence editing.
+
+## 🧑‍💻 Contributing
+
+### Prerequisites
+
+- Node.js 18+
+- Rust toolchain (required for Tauri builds)
+- At least one service account (Moco, Jira, Outlook, or Personio)
+
+### Setup
 
 ```bash
 git clone https://github.com/konradmichalik/roots.git
@@ -60,58 +85,51 @@ cd roots
 npm install
 ```
 
-### Browser Mode
+### Development Modes
+
+**Browser mode** — fastest iteration, no Rust compilation:
 
 ```bash
-# Start the CORS proxy (required for browser mode)
-cd proxy && npm install && node server.js &
+# Terminal 1 — CORS proxy (required)
+cd proxy && npm install && node server.js
 
-# Start the dev server
+# Terminal 2 — Vite dev server
 npm run dev
 ```
 
-### Desktop Mode
+> [!TIP]
+> Use browser mode for UI development. The CORS proxy runs on `localhost:3002` and forwards requests to external services.
+
+**Desktop mode** — full Tauri app with native features:
 
 ```bash
 npm run tauri:dev
 ```
 
-### Requirements
-
-- Node.js 18+
-- Rust toolchain (for Tauri builds)
-- One or more of: Moco, Jira, Outlook, Personio account
-
-## Supported Services
-
-| Service | Auth Method | Provides |
-|---------|------------|----------|
-| **Moco** | API Key | Time entries, projects, presences |
-| **Jira Cloud** | Email + API Token | Worklogs |
-| **Jira Server** | Username/Password or PAT | Worklogs |
-| **Outlook** | OAuth2 | Calendar events |
-| **Personio** | Client ID + Secret | Absences, work schedule |
-
-## Tech Stack
-
-- **[Svelte 5](https://svelte.dev/)** with TypeScript and Runes
-- **[Tauri 2](https://tauri.app/)** for native desktop runtime
-- **[Tailwind CSS v4](https://tailwindcss.com/)** for styling
-- **[shadcn-svelte](https://www.shadcn-svelte.com/)** UI components
-
-## Scripts
+### Scripts
 
 | Command | Description |
-|---------|------------|
-| `npm run dev` | Start Vite dev server |
+|---------|-------------|
+| `npm run dev` | Vite dev server (browser mode) |
 | `npm run build` | Production build |
 | `npm run tauri:dev` | Desktop app development |
 | `npm run tauri:build` | Build native app bundle |
-| `npm run check` | TypeScript type checking |
-| `npm run lint` | ESLint check |
-| `npm run format` | Prettier formatting |
-| `npm run release` | Bump version, tag and push |
+| `npm run check` | Svelte check + TypeScript |
+| `npm run lint` | ESLint |
+| `npm run lint:fix` | ESLint with auto-fix |
+| `npm run format` | Prettier |
+| `npm run release` | Bump version, sync Tauri config, tag and push |
 
-## License
+## ⚙️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| UI Framework | [Svelte 5](https://svelte.dev/) with Runes + TypeScript |
+| Desktop Runtime | [Tauri 2](https://tauri.app/) (Rust) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) + Nord palette design tokens |
+| UI Components | [shadcn-svelte](https://www.shadcn-svelte.com/) + [bits-ui](https://bits-ui.com/) |
+| Validation | [Zod](https://zod.dev/) for all API response schemas |
+
+## 📜 License
 
 MIT
