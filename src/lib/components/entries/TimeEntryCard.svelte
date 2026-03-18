@@ -345,18 +345,8 @@
           {/if}
         </div>
       {/if}
-      {#if outlookMeta}
-        <div class="flex items-center gap-1.5">
-          {#if entry.startTime && entry.endTime}
-            <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
-          {/if}
-          {#if outlookMeta.isOnlineMeeting}
-            <span class="text-xs text-discovery-text">Online</span>
-          {/if}
-          {#if outlookMeta.attendeeCount && outlookMeta.attendeeCount > 0}
-            <span class="text-xs text-muted-foreground">{outlookMeta.attendeeCount} attendees</span>
-          {/if}
-        </div>
+      {#if outlookMeta && entry.startTime && entry.endTime}
+        <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
       {/if}
     </div>
     <div class="relative flex flex-col items-end flex-shrink-0 min-w-8">
