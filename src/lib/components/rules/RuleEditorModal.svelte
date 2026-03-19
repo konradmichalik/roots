@@ -417,17 +417,15 @@
             </div>
           </label>
 
-          {#if enabled}
-            <label class="flex items-start gap-2 cursor-pointer pl-5">
-              <input type="checkbox" bind:checked={autoSync} class="accent-primary mt-0.5" />
-              <div>
-                <span class="text-sm text-foreground">Auto-sync</span>
-                <p class="text-[10px] text-muted-foreground">
-                  Automatically transfer new entries when opening the day.
-                </p>
-              </div>
-            </label>
-          {/if}
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" bind:checked={autoSync} class="accent-primary mt-0.5" />
+            <div>
+              <span class="text-sm text-foreground">Auto-sync</span>
+              <p class="text-[10px] text-muted-foreground">
+                Automatically transfer new entries when opening the day.
+              </p>
+            </div>
+          </label>
         </div>
 
         <!-- Overlap Warning -->
