@@ -43,7 +43,8 @@ export {
   getCachedDayOverview,
   getCachedDatesWithData,
   hasCachedDataForDate,
-  getLoggedHoursForTask
+  getLoggedHoursForTask,
+  getOpenHoursDays
 } from './timeEntriesCache.svelte';
 
 // ---------------------------------------------------------------------------

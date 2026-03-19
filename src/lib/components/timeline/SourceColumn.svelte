@@ -64,8 +64,10 @@
 </script>
 
 <div
-  class="flex flex-col rounded-xl border border-border bg-card overflow-hidden transition-all duration-200
-    {emphasized ? 'shadow-lg ring-1 ring-border z-10' : 'shadow-sm opacity-95'}"
+  class="flex flex-col rounded-xl border overflow-hidden transition-all duration-200
+    {emphasized
+    ? 'border-border shadow-md ring-1 ring-border z-10 bg-card'
+    : 'border-border/70 bg-card/80'}"
 >
   <!-- Source header -->
   <div class="px-4 py-3 border-b border-border {colorClasses.bg}">
@@ -76,7 +78,7 @@
           alt={label}
           class="size-4 opacity-50 grayscale dark:invert dark:opacity-40"
         />
-        <span class="text-sm font-semibold text-foreground uppercase tracking-wide">{label}</span>
+        <span class="text-sm font-bold text-foreground uppercase tracking-wider">{label}</span>
       </div>
       <div class="flex items-center gap-2">
         <span class="font-mono text-sm font-medium text-foreground">

@@ -13,7 +13,7 @@
   import List from '@lucide/svelte/icons/list';
   import History from '@lucide/svelte/icons/history';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
-  import Layers from '@lucide/svelte/icons/layers';
+  import Play from '@lucide/svelte/icons/play';
   let {
     children,
     defaultOpen = false,
@@ -193,10 +193,10 @@
             <button
               class="rounded p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150
                 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-              title="Bulk Sync"
-              aria-label="Bulk Sync"
+              title="Run all rules"
+              aria-label="Run all rules"
             >
-              <Layers class="size-4" />
+              <Play class="size-4" />
             </button>
           </BulkSyncDialog>
           <button

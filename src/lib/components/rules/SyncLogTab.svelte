@@ -160,59 +160,61 @@
   <div class="space-y-1 max-h-[50vh] overflow-y-auto">
     {#each visibleRecords as record (record.id)}
       <div
-        class="flex items-start gap-2 rounded-lg px-2.5 py-2 text-xs transition-colors hover:bg-accent/50
+        class="group/log grid grid-cols-[16px_1fr_auto_auto] items-center gap-x-2 rounded-lg px-2.5 py-2 text-xs transition-colors hover:bg-accent/50
           {record.status === 'failed' ? 'bg-danger-subtle/30' : ''}"
       >
-        <!-- Status icon -->
-        <div class="flex-shrink-0 mt-0.5">
+        <!-- Col 1: Status icon -->
+        <div class="flex-shrink-0">
           {#if record.status === 'success'}
-            <Check class="size-3 text-success" />
+            <Check class="size-3.5 text-success-text" />
           {:else}
-            <X class="size-3 text-danger-text" />
+            <X class="size-3.5 text-danger-text" />
           {/if}
         </div>
 
-        <!-- Content -->
-        <div class="flex-1 min-w-0">
+        <!-- Col 2: Action -->
+        <div class="min-w-0">
           <div class="flex items-center gap-1.5">
             <span class="font-medium text-foreground truncate">{record.sourceKey}</span>
             <span class="text-muted-foreground/50">→</span>
             <span class="text-muted-foreground truncate">{getRuleName(record.ruleId)}</span>
-          </div>
-          <div class="flex items-center gap-2 text-muted-foreground">
-            <span>{record.mocoDate}</span>
-            <span class="font-mono">{formatHours(record.hours)}</span>
-            <span
-              class="rounded-full px-1 py-0 text-[9px] font-medium
-                {record.autoSynced
-                ? 'bg-information-subtle text-brand-text'
-                : 'bg-secondary text-muted-foreground'}"
-            >
-              {record.autoSynced ? 'auto' : 'manual'}
-            </span>
-            <span
-              class="rounded-full px-1 py-0 text-[9px] font-medium
-                {record.sourceType === 'jira'
-                ? 'bg-brand/10 text-brand-text'
-                : 'bg-source-outlook/10 text-source-outlook'}"
-            >
-              {record.sourceType}
-            </span>
           </div>
           {#if record.status === 'failed' && record.errorReason}
             <p class="text-danger-text truncate">{record.errorReason}</p>
           {/if}
         </div>
 
-        <!-- Timestamp + actions -->
-        <div class="flex flex-col items-end gap-0.5 flex-shrink-0">
-          <span class="text-[10px] text-muted-foreground/60">{formatSyncDate(record.syncedAt)}</span
+        <!-- Col 3: Badges + Duration -->
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="font-mono text-muted-foreground">{formatHours(record.hours)}</span>
+          <span
+            class="rounded-full px-1 py-0 text-[9px] font-medium
+              {record.autoSynced
+              ? 'bg-information-subtle text-brand-text'
+              : 'bg-secondary text-muted-foreground'}"
+          >
+            {record.autoSynced ? 'auto' : 'manual'}
+          </span>
+          <span
+            class="rounded-full px-1 py-0 text-[9px] font-medium
+              {record.sourceType === 'jira'
+              ? 'bg-brand/10 text-brand-text'
+              : 'bg-source-outlook/10 text-source-outlook'}"
+          >
+            {record.sourceType}
+          </span>
+        </div>
+
+        <!-- Col 4: Timestamp + delete -->
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <span class="text-[10px] font-mono text-muted-foreground/60"
+            >{formatSyncDate(record.syncedAt)}</span
           >
           <button
             type="button"
             onclick={() => handleDelete(record.id)}
-            class="rounded p-0.5 text-muted-foreground/40 hover:text-danger-text transition-colors
-              focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            class="rounded p-0.5 opacity-0 group-hover/log:opacity-100 text-muted-foreground/40 hover:text-danger-text transition-all
+              focus-visible:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
             title={confirmDeleteId === record.id
               ? 'Click again to confirm deletion'
               : 'Delete sync record'}

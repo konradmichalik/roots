@@ -27,6 +27,7 @@
   import SyncBadge from '../rules/SyncBadge.svelte';
   import RuleEditorModal from '../rules/RuleEditorModal.svelte';
   import Zap from '@lucide/svelte/icons/zap';
+  import Tag from '@lucide/svelte/icons/tag';
 
   let {
     entry,
@@ -87,6 +88,30 @@
     }
 
     return null;
+  });
+
+  function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Clean description: remove ticket key to avoid duplication with badge
+  let displayDescription = $derived.by(() => {
+    if (!entry.description) return null;
+    if (mocoMeta?.remoteTicketKey) {
+      const ticketKey = escapeRegExp(mocoMeta.remoteTicketKey);
+      const cleaned = entry.description.replace(new RegExp(`#?${ticketKey}\\s*`), '').trim();
+      return cleaned || null;
+    }
+    return entry.description;
+  });
+
+  // Extract initials from organizer name (Outlook)
+  let organizerInitials = $derived.by(() => {
+    const name = outlookMeta ? entry.description : null;
+    if (!name) return null;
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return parts[0]?.[0]?.toUpperCase() ?? null;
   });
 
   let jiraIssueUrl = $derived.by(() => {
@@ -249,9 +274,9 @@
     {#snippet child({ props })}
       <div
         {...props}
-        class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
+        class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 hover:border-border-bold transition-all duration-150
           {isDimmed ? 'opacity-40' : ''}
-          {isInHoveredGroup ? 'shadow-md' : ''}"
+          {isInHoveredGroup ? 'border-border-bold' : ''}"
         onmouseenter={handleMouseEnter}
         onmouseleave={handleMouseLeave}
       >
@@ -349,50 +374,77 @@
 {#snippet cardContent()}
   <div class="relative flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
-      {#if mocoMeta?.customerName}
+      <!-- Primary context (top-left): time for Outlook, customer for Moco, ticket badge for Jira -->
+      {#if outlookMeta?.isAllDay}
+        <span class="text-[11px] font-medium text-muted-foreground leading-tight">All day</span>
+      {:else if outlookMeta && entry.startTime && entry.endTime}
+        <span class="text-[11px] font-mono font-medium text-muted-foreground leading-tight">
+          {entry.startTime}–{entry.endTime}
+        </span>
+      {:else if mocoMeta?.customerName}
         <span class="text-[11px] font-medium text-muted-foreground leading-tight">
           {mocoMeta.customerName}
         </span>
-      {/if}
-      <div class="flex items-center gap-1.5">
-        <span class="text-sm font-medium text-foreground line-clamp-2">
-          {entry.title}
-        </span>
-      </div>
-      {#if entry.description}
-        <p class="text-xs text-muted-foreground truncate">
-          {entry.description}
-        </p>
-      {/if}
-      {#if mocoMeta?.remoteTicketKey}
-        <span class="text-xs text-muted-foreground font-mono">
-          {mocoMeta.remoteTicketKey}
-        </span>
-      {/if}
-      {#if jiraMeta}
+      {:else if jiraMeta}
         <div class="flex items-center gap-1.5">
           {#if jiraIssueUrl}
             <a
               href={jiraIssueUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-xs font-mono font-medium text-brand-text hover:underline"
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text hover:bg-brand/20 transition-colors"
               onclick={(e) => e.stopPropagation()}
             >
               {jiraMeta.issueKey}
             </a>
           {:else}
-            <span class="text-xs font-mono font-medium text-brand-text">
+            <span
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text"
+            >
               {jiraMeta.issueKey}
             </span>
           {/if}
           {#if jiraMeta.projectKey}
-            <span class="text-xs text-muted-foreground">{jiraMeta.projectKey}</span>
+            <span class="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
+              <Tag class="size-2.5" />
+              {jiraMeta.projectKey}
+            </span>
           {/if}
         </div>
       {/if}
-      {#if outlookMeta && entry.startTime && entry.endTime}
-        <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
+
+      <!-- Title -->
+      <span class="text-sm font-semibold text-foreground leading-snug line-clamp-2">
+        {entry.title}
+      </span>
+
+      <!-- Description / Organizer -->
+      {#if outlookMeta && displayDescription}
+        <div class="flex items-center gap-1.5 mt-0.5">
+          {#if organizerInitials}
+            <span
+              class="inline-flex items-center justify-center size-4 rounded-full bg-source-outlook-subtle text-[8px] font-bold text-source-outlook-text flex-shrink-0"
+            >
+              {organizerInitials}
+            </span>
+          {/if}
+          <p class="min-w-0 flex-1 text-xs font-medium text-muted-foreground/70 truncate">
+            {displayDescription}
+          </p>
+        </div>
+      {:else if displayDescription}
+        <p class="text-xs font-medium text-muted-foreground/70 truncate">
+          {displayDescription}
+        </p>
+      {/if}
+
+      <!-- Ticket badge for Moco entries with linked Jira ticket -->
+      {#if mocoMeta?.remoteTicketKey}
+        <span
+          class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text mt-0.5"
+        >
+          {mocoMeta.remoteTicketKey}
+        </span>
       {/if}
     </div>
     <div class="relative flex flex-col items-end flex-shrink-0 min-w-8">

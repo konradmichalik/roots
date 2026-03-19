@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatBalance } from '../../utils/time-format';
-  import { formatDateShort } from '../../utils/date-helpers';
+  import { formatDateShort, today } from '../../utils/date-helpers';
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import type { DayOverview } from '../../types';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -13,6 +13,9 @@
   } = $props();
 
   let isOpen = $state(true);
+
+  // Show urgent (red) styling only in the last ~7 days of the month
+  let isMonthEndUrgent = $derived(new Date(today()).getDate() >= 24);
 </script>
 
 <div class="rounded-lg border border-warning/30 bg-warning/5">
@@ -49,7 +52,7 @@
             {date === dateNavState.selectedDate ? 'bg-accent' : ''}"
         >
           <span class="text-muted-foreground">{formatDateShort(date)}</span>
-          <span class="font-mono text-danger-text"
+          <span class="font-mono {isMonthEndUrgent ? 'text-danger-text' : 'text-warning-text'}"
             >{formatBalance(overview.presenceBalance ?? 0)}</span
           >
         </button>

@@ -76,6 +76,8 @@
     return 'var(--muted-foreground)';
   }
 
+  const MONO_FONT = "'JetBrains Mono Variable', ui-monospace, monospace";
+
   let hoveredPoint = $state<number | null>(null);
 </script>
 
@@ -94,9 +96,9 @@
           <Minus class="size-3.5 text-muted-foreground" />
         {/if}
       </div>
-      <div class="flex items-baseline gap-1">
-        <span class="text-2xl font-mono font-semibold text-foreground">{overallRate}%</span>
-        <span class="text-xs text-muted-foreground">/ {target}%</span>
+      <div class="flex items-baseline gap-1.5">
+        <span class="text-4xl font-mono font-extrabold text-foreground">{overallRate}%</span>
+        <span class="text-lg font-mono text-muted-foreground/60">/ {target}%</span>
       </div>
     </div>
 
@@ -111,11 +113,11 @@
     <div class="flex items-center justify-between text-xs text-muted-foreground">
       <span>
         <span class="inline-block w-1.5 h-1.5 rounded-full bg-success mr-1"></span>
-        {formatHours(billableTotal)} billable
+        <span class="font-mono">{formatHours(billableTotal)}</span> billable
       </span>
       <span>
         <span class="inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground/30 mr-1"></span>
-        {formatHours(nonBillableTotal)} non-billable
+        <span class="font-mono">{formatHours(nonBillableTotal)}</span> non-billable
       </span>
     </div>
 
@@ -131,20 +133,20 @@
         >
           <!-- Y-axis range labels -->
           <text
-            x={padX - 2}
+            x={padX - 3}
             y={padY + 3}
             text-anchor="end"
-            class="fill-muted-foreground/50"
-            font-size="8"
-            font-family="ui-monospace, monospace">{yRange.max}</text
+            class="fill-muted-foreground/40"
+            font-size="7"
+            font-family={MONO_FONT}>{yRange.max}</text
           >
           <text
-            x={padX - 2}
+            x={padX - 3}
             y={padY + innerH + 3}
             text-anchor="end"
-            class="fill-muted-foreground/50"
-            font-size="8"
-            font-family="ui-monospace, monospace">{yRange.min}</text
+            class="fill-muted-foreground/40"
+            font-size="7"
+            font-family={MONO_FONT}>{yRange.min}</text
           >
 
           <!-- Target line -->
@@ -161,9 +163,9 @@
           <text
             x={padX + innerW + 4}
             y={targetY + 3}
-            class="fill-muted-foreground/60"
-            font-size="8"
-            font-family="ui-monospace, monospace">{target}%</text
+            class="fill-muted-foreground/50"
+            font-size="7"
+            font-family={MONO_FONT}>{target}%</text
           >
 
           <!-- Connecting line -->

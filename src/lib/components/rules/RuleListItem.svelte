@@ -100,9 +100,10 @@
         {statusLabel}
       </span>
     </div>
-    <p class="text-xs text-muted-foreground truncate">{sourceLabel}</p>
     <p class="text-xs text-muted-foreground truncate">
-      {rule.target.customerName} — {rule.target.mocoProjectName} / {rule.target.mocoTaskName}
+      {sourceLabel}
+      <span class="text-muted-foreground/50 mx-0.5">→</span>
+      {rule.target.customerName} / {rule.target.mocoProjectName}
     </p>
     {#if isStale}
       <p class="text-xs text-warning truncate">Task no longer available</p>

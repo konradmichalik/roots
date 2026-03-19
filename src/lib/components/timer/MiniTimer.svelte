@@ -78,7 +78,7 @@
         <Tooltip.Root>
           <Tooltip.Trigger>
             <span
-              class="font-mono text-sm tabular-nums {timerState.status === 'running'
+              class="font-mono text-sm {timerState.status === 'running'
                 ? 'text-success-text'
                 : 'text-warning-text opacity-70'}"
             >
