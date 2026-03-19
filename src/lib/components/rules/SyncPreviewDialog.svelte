@@ -78,7 +78,6 @@
       isSyncing = false;
     }
   }
-
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpen}>
