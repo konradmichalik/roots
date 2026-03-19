@@ -17,8 +17,17 @@
   import { formatHours, formatBalance } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
   import ConnectionManager from '../connection/ConnectionManager.svelte';
+  import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
+  import { rulesState, getStaleRules, findMatchingRules } from '../../stores/rules.svelte';
+  import { syncDay, detectHoursChanges } from '../../stores/ruleSync.svelte';
+  import { isSynced } from '../../stores/syncRecords.svelte';
+  import type { SyncPreview, UnifiedTimeEntry } from '../../types';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
+  import Zap from '@lucide/svelte/icons/zap';
+  import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+  import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
   let entries = $derived(getEntriesForDate(dateNavState.selectedDate));
   let matchResult = $derived(buildMatchResult(entries.moco, entries.jira, entries.outlook));
@@ -37,6 +46,54 @@
 
   let showOutlook = $derived(connectionsState.outlook.isConnected);
   let showJira = $derived(connectionsState.jira.isConnected);
+
+  // Rules sync
+  let hasRules = $derived(rulesState.rules.length > 0 && connectionsState.moco.isConnected);
+  let showSyncPreview = $state(false);
+  let syncPreview = $state<SyncPreview | null>(null);
+  let isBuildingPreview = $state(false);
+  let staleRules = $derived(getStaleRules());
+
+  // Count pending entries (matched by rules but not yet synced)
+  let pendingCount = $derived.by(() => {
+    if (!hasRules) return 0;
+    const sourceEntries: UnifiedTimeEntry[] = [
+      ...entries.jira,
+      ...entries.outlook
+    ];
+    let count = 0;
+    for (const entry of sourceEntries) {
+      if (entry.hours <= 0) continue;
+      const rules = findMatchingRules(entry);
+      if (rules.length === 0) continue;
+      const sourceId =
+        entry.metadata.source === 'jira'
+          ? entry.metadata.worklogId
+          : entry.metadata.source === 'outlook'
+            ? entry.metadata.eventId
+            : entry.id;
+      if (!isSynced(entry.source as 'jira' | 'outlook', sourceId)) {
+        count++;
+      }
+    }
+    return count;
+  });
+
+  // Change detection: find synced entries where hours have changed
+  let hoursChanges = $derived.by(() => {
+    if (!hasRules) return [];
+    return detectHoursChanges(entries.jira, entries.outlook);
+  });
+
+  async function handleApplyRules(): Promise<void> {
+    isBuildingPreview = true;
+    try {
+      syncPreview = await syncDay(dateNavState.selectedDate, { dryRun: true });
+      showSyncPreview = true;
+    } finally {
+      isBuildingPreview = false;
+    }
+  }
 
   let gridCols = $derived.by(() => {
     if (showOutlook && showJira) return 'grid-cols-[1fr_1.4fr_1fr]';
@@ -98,6 +155,58 @@
       {/if}
     </div>
 
+    <!-- Apply Rules button -->
+    {#if hasRules}
+      <div class="flex items-center gap-1 shrink-0">
+        {#if staleRules.length > 0}
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-warning-subtle text-warning-text">
+                  <AlertTriangle class="size-3 mr-0.5" />
+                  {staleRules.length}
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content side="bottom" sideOffset={4}>
+                {staleRules.length} rule{staleRules.length !== 1 ? 's' : ''} with unavailable targets
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        {/if}
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <button
+                type="button"
+                onclick={handleApplyRules}
+                disabled={isBuildingPreview}
+                class="relative rounded-lg p-1.5 text-warning hover:text-warning hover:bg-warning/10
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150
+                  focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                aria-label="Apply Rules"
+              >
+                {#if isBuildingPreview}
+                  <LoaderCircle class="size-4 animate-spin" />
+                {:else}
+                  <Zap class="size-4" />
+                {/if}
+                {#if pendingCount > 0}
+                  <span class="absolute -top-1 -right-1 inline-flex items-center justify-center h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                    {pendingCount}
+                  </span>
+                {/if}
+              </button>
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom" sideOffset={4}>
+              {pendingCount > 0
+                ? `Apply Rules (${pendingCount} pending)`
+                : 'Apply Rules'}
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      </div>
+    {/if}
+
     <!-- Right: Hours and balance (visually separated) -->
     <div
       class="flex items-center gap-2 shrink-0 pl-2 border-l border-border"
@@ -154,6 +263,45 @@
       </Tooltip.Provider>
     </div>
   </div>
+
+  <!-- Sync status bar -->
+  {#if hasRules && pendingCount > 0}
+    <button
+      type="button"
+      onclick={handleApplyRules}
+      disabled={isBuildingPreview}
+      class="w-full flex items-center justify-center gap-2 rounded-lg border border-warning/20 bg-warning-subtle/30 px-3 py-1.5
+        text-xs text-warning-text hover:bg-warning-subtle/50 transition-colors cursor-pointer
+        disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <Zap class="size-3" />
+      <span>
+        {pendingCount} {pendingCount === 1 ? 'entry' : 'entries'} ready for sync
+      </span>
+    </button>
+  {/if}
+
+  <!-- Hours change detection -->
+  {#if hoursChanges.length > 0}
+    <div class="w-full flex items-start gap-2 rounded-lg border border-discovery/20 bg-discovery-subtle/30 px-3 py-1.5 text-xs text-discovery-text">
+      <TriangleAlert class="size-3 mt-0.5 flex-shrink-0" />
+      <div>
+        <span class="font-medium">
+          {hoursChanges.length} synced {hoursChanges.length === 1 ? 'entry has' : 'entries have'} changed hours
+        </span>
+        <div class="mt-0.5 space-y-0.5">
+          {#each hoursChanges.slice(0, 3) as change}
+            <p class="text-[10px] text-discovery-text/80">
+              {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(change.currentHours)}
+            </p>
+          {/each}
+          {#if hoursChanges.length > 3}
+            <p class="text-[10px] text-discovery-text/60">+{hoursChanges.length - 3} more</p>
+          {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
 
   <!-- Dynamic column layout based on connected services -->
   <div class="grid {gridCols} gap-4 items-start" style="min-height: 60vh;">
@@ -218,3 +366,15 @@
     {/if}
   </div>
 </div>
+
+<!-- Sync Preview Dialog -->
+{#if showSyncPreview && syncPreview}
+  <SyncPreviewDialog
+    preview={syncPreview}
+    defaultOpen={true}
+    onClose={() => {
+      showSyncPreview = false;
+      syncPreview = null;
+    }}
+  />
+{/if}
