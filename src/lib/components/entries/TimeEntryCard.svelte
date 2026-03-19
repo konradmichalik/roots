@@ -248,7 +248,7 @@
     {#snippet child({ props })}
       <div
         {...props}
-        class="group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
+        class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
           {isDimmed ? 'opacity-40' : ''}
           {isInHoveredGroup ? 'shadow-md' : ''}"
         onmouseenter={handleMouseEnter}
