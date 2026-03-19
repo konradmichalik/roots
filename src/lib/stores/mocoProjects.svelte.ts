@@ -38,7 +38,9 @@ export async function fetchAssignedProjects(): Promise<void> {
     if (rulesState.rules.length > 0) {
       const newlyStale = validateRuleTargets();
       for (const rule of newlyStale) {
-        toast.error(`Rule "${rule.name}" — task "${rule.target.mocoTaskName}" is no longer available`);
+        toast.error(
+          `Rule "${rule.name}" — task "${rule.target.mocoTaskName}" is no longer available`
+        );
       }
     }
   } catch (error) {
