@@ -40,7 +40,9 @@
       <p class="text-[10px] text-muted-foreground mt-0.5">entries synced</p>
     </div>
     <div class="rounded-lg border border-border bg-card p-3 text-center">
-      <span class="text-3xl font-extrabold font-mono text-foreground">{formatHours(totalHours)}</span>
+      <span class="text-3xl font-extrabold font-mono text-foreground"
+        >{formatHours(totalHours)}</span
+      >
       <p class="text-[10px] text-muted-foreground mt-0.5">total hours</p>
     </div>
   </div>

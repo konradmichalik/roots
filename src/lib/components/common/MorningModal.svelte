@@ -9,12 +9,7 @@
   import { mocoUserName } from '../../stores/connections.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { toast } from '../../stores/toast.svelte';
-  import {
-    today,
-    getWeekDates,
-    getMonthStart,
-    parseDate
-  } from '../../utils/date-helpers';
+  import { today, getWeekDates, getMonthStart, parseDate } from '../../utils/date-helpers';
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS } from '../../types/unified';
   import type { OutlookMetadata, AbsenceType } from '../../types/unified';
@@ -175,28 +170,28 @@
 
     <!-- Snackable metrics or absence notice -->
     {#if absenceLabel}
-      <p
-        class="animate-stagger-in text-sm text-muted-foreground"
-        style={staggerDelay(0, 120)}
-      >
+      <p class="animate-stagger-in text-sm text-muted-foreground" style={staggerDelay(0, 120)}>
         You're on {absenceLabel.toLowerCase()} today. Enjoy your day!
       </p>
     {:else}
-      <div
-        class="animate-stagger-in grid grid-cols-2 gap-2"
-        style={staggerDelay(0, 120)}
-      >
+      <div class="animate-stagger-in grid grid-cols-2 gap-2" style={staggerDelay(0, 120)}>
         <div class="rounded-lg bg-accent/50 px-3 py-2">
-          <span class="text-lg font-semibold tabular-nums text-foreground">{outlookEvents.length}</span>
+          <span class="text-lg font-semibold tabular-nums text-foreground"
+            >{outlookEvents.length}</span
+          >
           <span class="ml-1 text-xs text-muted-foreground">
             {outlookEvents.length === 1 ? 'Appointment' : 'Appointments'}
             {#if onlineMeetingCount > 0}
-              <span class="text-muted-foreground/70">({onlineMeetingCount} <Video class="inline size-3 -mt-0.5" /> online)</span>
+              <span class="text-muted-foreground/70"
+                >({onlineMeetingCount} <Video class="inline size-3 -mt-0.5" /> online)</span
+              >
             {/if}
           </span>
         </div>
         <div class="rounded-lg bg-accent/50 px-3 py-2">
-          <span class="text-lg font-semibold tabular-nums {getBalanceClass(weekBalance)}">{formatBalance(weekBalance)}</span>
+          <span class="text-lg font-semibold tabular-nums {getBalanceClass(weekBalance)}"
+            >{formatBalance(weekBalance)}</span
+          >
           <span class="ml-1 text-xs text-muted-foreground">Week Balance</span>
         </div>
       </div>
@@ -231,7 +226,9 @@
               </span>
               <span class="truncate flex-1 min-w-0 text-foreground">{event.title}</span>
               {#if meta.isOnlineMeeting}
-                <Video class="size-3.5 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 transition-colors" />
+                <Video
+                  class="size-3.5 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 transition-colors"
+                />
               {/if}
             </div>
           {/each}

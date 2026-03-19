@@ -207,7 +207,9 @@
 
         <!-- Col 4: Timestamp + delete -->
         <div class="flex items-center gap-1 flex-shrink-0">
-          <span class="text-[10px] font-mono text-muted-foreground/60">{formatSyncDate(record.syncedAt)}</span>
+          <span class="text-[10px] font-mono text-muted-foreground/60"
+            >{formatSyncDate(record.syncedAt)}</span
+          >
           <button
             type="button"
             onclick={() => handleDelete(record.id)}

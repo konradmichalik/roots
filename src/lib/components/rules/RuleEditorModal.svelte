@@ -324,7 +324,9 @@
 
         <!-- Trigger Section -->
         <div class="rounded-lg bg-secondary/40 p-3 space-y-3">
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Trigger</p>
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Trigger
+          </p>
 
           <!-- Source Type -->
           <div>
@@ -369,7 +371,9 @@
 
         <!-- Action Section -->
         <div class="rounded-lg bg-secondary/40 p-3 space-y-3">
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Action</p>
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Action
+          </p>
 
           <!-- Moco Target -->
           <div>
