@@ -17,6 +17,9 @@
   import { initializeSettings } from './lib/stores/settings.svelte';
   import { initializeAbsences } from './lib/stores/absences.svelte';
   import { initializeFavorites } from './lib/stores/favorites.svelte';
+  import { initializeRules } from './lib/stores/rules.svelte';
+  import { initializeSyncRecords } from './lib/stores/syncRecords.svelte';
+  import { migrateEventFavoritesToRules } from './lib/stores/rulesMigration';
   import { initializeRecentPairs } from './lib/stores/recentMocoPairs.svelte';
   import { initializeSidebar } from './lib/stores/sidebar.svelte';
   import { initializeTimer } from './lib/stores/timer.svelte';
@@ -58,6 +61,9 @@
         await initializeSettings();
         await initializeAbsences();
         await initializeFavorites();
+        await initializeRules();
+        await initializeSyncRecords();
+        await migrateEventFavoritesToRules();
         await initializeRecentPairs();
         await initializeTimer();
         initializeDateNavigation();

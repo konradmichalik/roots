@@ -23,6 +23,10 @@
     setHoveredGroup,
     clearHoveredGroup
   } from '../../stores/entryMatching.svelte';
+  import { getSyncRecordByActivityId } from '../../stores/syncRecords.svelte';
+  import SyncBadge from '../rules/SyncBadge.svelte';
+  import RuleEditorModal from '../rules/RuleEditorModal.svelte';
+  import Zap from '@lucide/svelte/icons/zap';
 
   let {
     entry,
@@ -66,6 +70,7 @@
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
   let isJiraConnected = $derived(connectionsState.jira.isConnected);
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
+  let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
   // Detect Jira issue key in Moco entry description or remoteTicketKey
   let mocoIssueKey = $derived.by(() => {
@@ -97,6 +102,7 @@
   let showMocoDuplicateModal = $state(false);
   let showJiraEditModal = $state(false);
   let showJiraSyncModal = $state(false);
+  let showRuleEditorModal = $state(false);
 
   // Context menu actions
   function openMocoEdit(): void {
@@ -206,13 +212,44 @@
   />
 {/if}
 
+<!-- Rule Editor Modal (from context menu) -->
+{#if showRuleEditorModal && outlookMeta}
+  <RuleEditorModal
+    mode="create"
+    prefill={{
+      source: {
+        type: 'outlook',
+        eventPattern: entry.title,
+        matchType: 'contains',
+        overrideHours: entry.hours > 0 ? entry.hours : undefined
+      }
+    }}
+    defaultOpen={true}
+    onClose={() => (showRuleEditorModal = false)}
+  />
+{:else if showRuleEditorModal && jiraMeta}
+  <RuleEditorModal
+    mode="create"
+    prefill={{
+      source: {
+        type: 'jira',
+        connectionId: 'default',
+        projectKey: jiraMeta.projectKey ?? jiraMeta.issueKey.split('-')[0],
+        issuePattern: jiraMeta.issueKey
+      }
+    }}
+    defaultOpen={true}
+    onClose={() => (showRuleEditorModal = false)}
+  />
+{/if}
+
 <!-- Card with Context Menu -->
 <ContextMenu.Root>
   <ContextMenu.Trigger>
     {#snippet child({ props })}
       <div
         {...props}
-        class="group rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
+        class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 shadow-sm hover:shadow-md hover:border-border-bold transition-all duration-150
           {isDimmed ? 'opacity-40' : ''}
           {isInHoveredGroup ? 'shadow-md' : ''}"
         onmouseenter={handleMouseEnter}
@@ -277,6 +314,10 @@
           <Plus class="text-success" />
           <span>Book in Moco</span>
         </ContextMenu.Item>
+        <ContextMenu.Item onclick={() => (showRuleEditorModal = true)}>
+          <Zap class="text-warning" />
+          <span>Create Rule</span>
+        </ContextMenu.Item>
       {/if}
     {/if}
 
@@ -296,6 +337,11 @@
           <span>Book in Moco</span>
         </ContextMenu.Item>
       {/if}
+      <ContextMenu.Separator />
+      <ContextMenu.Item onclick={() => (showRuleEditorModal = true)}>
+        <Zap class="text-warning" />
+        <span>Create Rule</span>
+      </ContextMenu.Item>
     {/if}
   </ContextMenu.Content>
 </ContextMenu.Root>
@@ -353,17 +399,6 @@
       <span class="text-sm font-mono font-medium text-foreground group-hover:invisible">
         {formatHours(entry.hours)}
       </span>
-      <!-- Hover action: overlays hours display -->
-      {#if mocoMeta?.billable}
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      {/if}
       {#if mocoMeta && isMocoConnected}
         <button
           type="button"
@@ -409,4 +444,22 @@
       {/if}
     </div>
   </div>
+  <!-- Bottom-right badges (outside the hours container so edit button doesn't cover them) -->
+  {#if syncRecord || mocoMeta?.billable}
+    <div class="absolute bottom-2.5 right-3 flex items-center gap-1.5">
+      {#if syncRecord}
+        <SyncBadge {syncRecord} />
+      {/if}
+      {#if mocoMeta?.billable}
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
+            </Tooltip.Trigger>
+            <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      {/if}
+    </div>
+  {/if}
 {/snippet}

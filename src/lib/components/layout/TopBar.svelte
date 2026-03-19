@@ -15,11 +15,18 @@
   } from '../../stores/timeEntries.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
+  import RulesModal from '../rules/RulesModal.svelte';
+  import { getStaleRules } from '../../stores/rules.svelte';
+  import { connectionsState } from '../../stores/connections.svelte';
   import PanelLeft from '@lucide/svelte/icons/panel-left';
   import Star from '@lucide/svelte/icons/star';
+  import Zap from '@lucide/svelte/icons/zap';
   import Settings from '@lucide/svelte/icons/settings';
   import CircleHelp from '@lucide/svelte/icons/circle-help';
   import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+
+  let showRules = $derived(connectionsState.moco.isConnected);
+  let staleCount = $derived(getStaleRules().length);
 
   let isLoading = $derived(isAnyLoading());
   let lastFetched = $derived(
@@ -115,6 +122,27 @@
 
     <!-- Timer -->
     <MiniTimer />
+
+    <!-- Rules -->
+    {#if showRules}
+      <RulesModal>
+        <button
+          class="relative rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground
+            transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          title="Rules"
+          aria-label="Rules"
+        >
+          <Zap class="size-[18px]" />
+          {#if staleCount > 0}
+            <span
+              class="absolute -top-0.5 -right-0.5 flex items-center justify-center h-3.5 min-w-3.5 px-0.5 rounded-full bg-warning text-[8px] font-bold text-warning-foreground"
+            >
+              {staleCount}
+            </span>
+          {/if}
+        </button>
+      </RulesModal>
+    {/if}
 
     <!-- Right sidebar toggle (Favorites) -->
     <button

@@ -1,7 +1,7 @@
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
 import { isDemoMode } from '../utils/demo-data';
-import type { Favorite, FavoriteEventMatch } from '../types';
+import type { Favorite } from '../types';
 
 export const favoritesState = $state<{ favorites: Favorite[] }>({
   favorites: []
@@ -29,7 +29,6 @@ export function addFavorite(data: {
   customerName: string;
   defaultHours?: number;
   description?: string;
-  eventMatch?: FavoriteEventMatch;
 }): Favorite {
   const maxOrder = favoritesState.favorites.reduce((max, f) => Math.max(max, f.sortOrder), -1);
 
@@ -67,12 +66,12 @@ export function getSortedFavorites(): Favorite[] {
   return [...favoritesState.favorites].sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
-export function getRegularFavorites(): Favorite[] {
-  return getSortedFavorites().filter((f) => !f.eventMatch);
-}
-
-export function getEventFavorites(): Favorite[] {
-  return getSortedFavorites().filter((f) => f.eventMatch);
+/**
+ * @deprecated Event-favorites have been replaced by Rules.
+ * Kept for backward compatibility — always returns undefined after migration.
+ */
+export function findMatchingFavorite(_eventTitle: string): Favorite | undefined {
+  return undefined;
 }
 
 export function reorderFavorites(orderedIds: string[]): void {
@@ -82,29 +81,8 @@ export function reorderFavorites(orderedIds: string[]): void {
     if (newOrder !== -1) {
       return { ...f, sortOrder: newOrder };
     }
-    // Offset non-included items to avoid sortOrder conflicts
     return { ...f, sortOrder: f.sortOrder + maxNewOrder };
   });
   persist();
   logger.store('favorites', 'Reordered', { count: orderedIds.length });
-}
-
-export function findMatchingFavorite(eventTitle: string): Favorite | undefined {
-  const title = eventTitle.toLowerCase();
-
-  return favoritesState.favorites.find((f) => {
-    if (!f.eventMatch) return false;
-    const pattern = f.eventMatch.pattern.toLowerCase();
-
-    switch (f.eventMatch.matchType) {
-      case 'exact':
-        return title === pattern;
-      case 'startsWith':
-        return title.startsWith(pattern);
-      case 'contains':
-        return title.includes(pattern);
-      default:
-        return false;
-    }
-  });
 }

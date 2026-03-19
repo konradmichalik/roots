@@ -18,6 +18,21 @@ export type {
 export { ABSENCE_LABELS, ABSENCE_COLORS } from './unified';
 
 export type { Favorite, FavoriteEventMatch } from './favorites';
+export type {
+  Rule,
+  RuleTarget,
+  SourceMatcher,
+  JiraSourceMatcher,
+  OutlookSourceMatcher
+} from './rules';
+export type {
+  SyncRecord,
+  SyncCandidate,
+  SkippedEntry,
+  SyncError,
+  SyncPreview,
+  SyncResult
+} from './syncRecords';
 export type { RecentMocoPair } from './recentPairs';
 export type { TimerStatus, TimerMocoBooking, TimerState, DraftEntry } from './timer';
 
