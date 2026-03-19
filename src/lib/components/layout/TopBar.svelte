@@ -11,7 +11,8 @@
   import {
     isAnyLoading,
     timeEntriesState,
-    refreshDayEntries
+    refreshDayEntries,
+    getOpenHoursDays
   } from '../../stores/timeEntries.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
@@ -40,6 +41,9 @@
     return () => clearInterval(interval);
   });
 
+  // Count open hours days across all cached months
+  let openHoursCount = $derived(getOpenHoursDays().length);
+
   function handleRefresh(): void {
     refreshDayEntries(dateNavState.selectedDate);
   }
@@ -53,7 +57,7 @@
     <!-- Left sidebar toggle -->
     <button
       onclick={toggleLeftSidebar}
-      class="rounded-lg p-1.5 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+      class="relative rounded-lg p-1.5 transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
         {sidebarState.leftOpen
         ? 'bg-primary/10 text-primary'
         : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}"
@@ -65,6 +69,12 @@
           ? ''
           : '-scale-x-100'}"
       />
+      {#if openHoursCount > 0 && !sidebarState.leftOpen}
+        <span
+          class="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-warning border-2 border-card"
+          aria-label="{openHoursCount} days with open hours"
+        ></span>
+      {/if}
     </button>
 
     <div class="h-4 w-px bg-border"></div>
