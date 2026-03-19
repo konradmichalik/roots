@@ -22,6 +22,7 @@
   } from '../../utils/description-template';
   import type { Rule, SourceMatcher, OutlookSourceMatcher } from '../../types';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import { onMount } from 'svelte';
 
   let {
     mode = 'create',
@@ -247,18 +248,18 @@
     }
   }
 
-  // Auto-open when defaultOpen is set
-  $effect(() => {
-    if (defaultOpen && !open) {
+  // Fetch projects on mount (covers both defaultOpen and trigger-based opening)
+  onMount(() => {
+    if (defaultOpen) {
       open = true;
-      resetForm();
-      if (isMocoConnected) {
-        fetchAssignedProjects().then(() => {
-          if (selectedProjectId) {
-            fetchTasksForProject(selectedProjectId);
-          }
-        });
-      }
+    }
+    resetForm();
+    if (isMocoConnected) {
+      fetchAssignedProjects().then(() => {
+        if (selectedProjectId) {
+          fetchTasksForProject(selectedProjectId);
+        }
+      });
     }
   });
 </script>
