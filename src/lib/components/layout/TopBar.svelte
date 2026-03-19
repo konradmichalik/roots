@@ -16,7 +16,7 @@
   import { dateNavState } from '../../stores/dateNavigation.svelte';
   import { formatRelativeTime, formatDateTime } from '../../utils/date-helpers';
   import RulesModal from '../rules/RulesModal.svelte';
-  import { rulesState, getStaleRules } from '../../stores/rules.svelte';
+  import { getStaleRules } from '../../stores/rules.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import PanelLeft from '@lucide/svelte/icons/panel-left';
   import Star from '@lucide/svelte/icons/star';

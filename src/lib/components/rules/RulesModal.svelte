@@ -5,7 +5,7 @@
   import SyncLogTab from './SyncLogTab.svelte';
   import RuleAnalyticsTab from './RuleAnalyticsTab.svelte';
   import BulkSyncDialog from './BulkSyncDialog.svelte';
-  import { rulesState, getSortedRules, reorderRules } from '../../stores/rules.svelte';
+  import { getSortedRules, reorderRules } from '../../stores/rules.svelte';
   import type { Rule, SourceMatcher } from '../../types';
   import type { Snippet } from 'svelte';
   import Zap from '@lucide/svelte/icons/zap';

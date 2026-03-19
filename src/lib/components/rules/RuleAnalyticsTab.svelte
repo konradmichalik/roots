@@ -1,6 +1,6 @@
 <script lang="ts">
   import { rulesState } from '../../stores/rules.svelte';
-  import { getRuleAnalytics, type RuleAnalytics } from '../../stores/syncRecords.svelte';
+  import { getRuleAnalytics } from '../../stores/syncRecords.svelte';
   import { formatHours } from '../../utils/time-format';
   import Zap from '@lucide/svelte/icons/zap';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
@@ -74,7 +74,7 @@
           <!-- Monthly breakdown -->
           {#if stats.byMonth.length > 0}
             <div class="space-y-1">
-              {#each stats.byMonth.slice(0, 4) as month}
+              {#each stats.byMonth.slice(0, 4) as month (month.month)}
                 <div class="flex items-center gap-2">
                   <span class="text-[10px] text-muted-foreground w-16 shrink-0">
                     {formatMonth(month.month)}

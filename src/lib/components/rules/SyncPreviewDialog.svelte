@@ -3,7 +3,8 @@
   import { executeSyncCandidates, getEntrySourceLabel } from '../../stores/ruleSync.svelte';
   import { toast } from '../../stores/toast.svelte';
   import { formatHours } from '../../utils/time-format';
-  import type { SyncPreview, SyncCandidate } from '../../types';
+  import type { SyncPreview } from '../../types';
+  import { SvelteSet } from 'svelte/reactivity';
   import Check from '@lucide/svelte/icons/check';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import SkipForward from '@lucide/svelte/icons/skip-forward';
@@ -24,11 +25,7 @@
   let isSyncing = $state(false);
 
   // Track which candidates are selected (all by default)
-  let selectedIds = $state<Set<string>>(new Set());
-
-  $effect(() => {
-    selectedIds = new Set(preview.pending.map((c) => c.sourceEntry.id));
-  });
+  let selectedIds = new SvelteSet(preview.pending.map((c) => c.sourceEntry.id));
 
   let selectedCandidates = $derived(
     preview.pending.filter((c) => selectedIds.has(c.sourceEntry.id))
@@ -37,20 +34,20 @@
   let totalHours = $derived(selectedCandidates.reduce((sum, c) => sum + c.mocoPayload.hours, 0));
 
   function toggleCandidate(id: string): void {
-    const next = new Set(selectedIds);
-    if (next.has(id)) {
-      next.delete(id);
+    if (selectedIds.has(id)) {
+      selectedIds.delete(id);
     } else {
-      next.add(id);
+      selectedIds.add(id);
     }
-    selectedIds = next;
   }
 
   function toggleAll(): void {
     if (selectedIds.size === preview.pending.length) {
-      selectedIds = new Set();
+      selectedIds.clear();
     } else {
-      selectedIds = new Set(preview.pending.map((c) => c.sourceEntry.id));
+      for (const c of preview.pending) {
+        selectedIds.add(c.sourceEntry.id);
+      }
     }
   }
 
@@ -82,10 +79,6 @@
     }
   }
 
-  function getSourceLabel(candidate: SyncCandidate): string {
-    return getEntrySourceLabel(candidate.sourceEntry);
-  }
-
   // Auto-open
   $effect(() => {
     if (defaultOpen && !open) open = true;
@@ -110,7 +103,7 @@
               targets
             </span>
           </div>
-          {#each preview.staleRules as rule}
+          {#each preview.staleRules as rule (rule.id)}
             <p class="text-[10px] text-warning-text/80 pl-5">
               "{rule.name}" — {rule.target.mocoTaskName} no longer available
             </p>
@@ -149,7 +142,7 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-1.5">
                     <span class="text-sm font-medium text-foreground truncate">
-                      {getSourceLabel(candidate)}
+                      {getEntrySourceLabel(candidate.sourceEntry)}
                     </span>
                     <span class="text-xs text-muted-foreground/50">→</span>
                     <span class="text-xs text-muted-foreground truncate">
@@ -187,7 +180,7 @@
             Skipped ({preview.skipped.length})
           </span>
           <div class="space-y-0.5">
-            {#each preview.skipped as skipped}
+            {#each preview.skipped as skipped (skipped.sourceEntry.id)}
               <div class="flex items-center gap-2 px-2.5 py-1 text-xs text-muted-foreground/60">
                 <span class="truncate">{skipped.sourceEntry.title}</span>
                 <span class="flex-shrink-0 text-[10px]">
@@ -210,7 +203,7 @@
             <AlertTriangle class="size-3" />
             Blocked ({preview.errors.length})
           </span>
-          {#each preview.errors as error}
+          {#each preview.errors as error (error.sourceEntry.id)}
             <div class="flex items-center gap-2 px-2.5 py-1 text-xs text-danger-text/70">
               <span class="truncate">{error.sourceEntry.title}</span>
               <span class="flex-shrink-0 text-[10px]">{error.reason}</span>

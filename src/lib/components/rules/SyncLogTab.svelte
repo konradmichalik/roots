@@ -2,7 +2,6 @@
   import { syncRecordsState, removeSyncRecord } from '../../stores/syncRecords.svelte';
   import { rulesState } from '../../stores/rules.svelte';
   import { formatHours } from '../../utils/time-format';
-  import type { SyncRecord } from '../../types';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import Check from '@lucide/svelte/icons/check';
   import X from '@lucide/svelte/icons/x';
@@ -43,10 +42,9 @@
   let hasMore = $derived(visibleCount < filteredRecords.length);
 
   // Reset pagination when filters change
+  let filterKey = $derived(`${filterRuleId}-${filterSourceType}-${filterStatus}`);
   $effect(() => {
-    filterRuleId;
-    filterSourceType;
-    filterStatus;
+    void filterKey;
     visibleCount = PAGE_SIZE;
   });
 
@@ -134,7 +132,7 @@
           focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all"
       >
         <option value="">All Rules</option>
-        {#each availableRules as rule}
+        {#each availableRules as rule (rule.id)}
           <option value={rule.id}>{rule.name}</option>
         {/each}
       </select>

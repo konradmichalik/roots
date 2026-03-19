@@ -9,7 +9,7 @@
   import { toast } from '../../stores/toast.svelte';
   import { formatHours } from '../../utils/time-format';
   import { today, addDays, getWeekStart } from '../../utils/date-helpers';
-  import type { SyncCandidate } from '../../types';
+  import { SvelteSet } from 'svelte/reactivity';
   import Zap from '@lucide/svelte/icons/zap';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -52,7 +52,7 @@
   type Phase = 'select' | 'loading' | 'preview' | 'syncing' | 'done';
   let phase = $state<Phase>('select');
   let bulkPreview = $state<BulkSyncPreview | null>(null);
-  let selectedDates = $state<Set<string>>(new Set());
+  let selectedDates = new SvelteSet<string>();
   let syncResultCount = $state({ created: 0, failed: 0 });
 
   let allCandidates = $derived.by(() => {
@@ -79,29 +79,26 @@
 
     try {
       bulkPreview = await syncDateRange(dateRange.from, dateRange.to);
-      selectedDates = new Set(bulkPreview.days.map((d) => d.date));
+      selectedDates.clear();
+      for (const d of bulkPreview.days) selectedDates.add(d.date);
       phase = 'preview';
-    } catch (error) {
-      toast.error(
-        'Failed to load entries: ' + (error instanceof Error ? error.message : 'Unknown')
-      );
+    } catch (e) {
+      toast.error('Failed to load entries: ' + (e instanceof Error ? e.message : 'Unknown'));
       phase = 'select';
     }
   }
 
   function toggleDate(date: string): void {
-    const next = new Set(selectedDates);
-    if (next.has(date)) next.delete(date);
-    else next.add(date);
-    selectedDates = next;
+    if (selectedDates.has(date)) selectedDates.delete(date);
+    else selectedDates.add(date);
   }
 
   function toggleAll(): void {
     if (!bulkPreview) return;
     if (selectedDates.size === bulkPreview.days.length) {
-      selectedDates = new Set();
+      selectedDates.clear();
     } else {
-      selectedDates = new Set(bulkPreview.days.map((d) => d.date));
+      for (const d of bulkPreview.days) selectedDates.add(d.date);
     }
   }
 
@@ -120,7 +117,7 @@
         toast.error(`Bulk sync: ${result.failed.length} entries failed`);
       }
       phase = 'done';
-    } catch (error) {
+    } catch {
       toast.error('Bulk sync failed');
       phase = 'preview';
     }
@@ -290,7 +287,7 @@
                     </span>
                   </div>
                   <div class="flex flex-wrap gap-1 mt-0.5">
-                    {#each day.preview.pending.slice(0, 3) as candidate}
+                    {#each day.preview.pending.slice(0, 3) as candidate (candidate.sourceEntry.id)}
                       <span class="text-[10px] text-muted-foreground truncate max-w-[120px]">
                         {getEntrySourceLabel(candidate.sourceEntry)}
                       </span>

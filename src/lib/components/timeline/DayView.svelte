@@ -296,7 +296,7 @@
           hours
         </span>
         <div class="mt-0.5 space-y-0.5">
-          {#each hoursChanges.slice(0, 3) as change}
+          {#each hoursChanges.slice(0, 3) as change (change.sourceKey)}
             <p class="text-[10px] text-discovery-text/80">
               {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(
                 change.currentHours

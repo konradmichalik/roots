@@ -388,7 +388,7 @@
               focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
           />
           <div class="flex flex-wrap gap-1 mt-1">
-            {#each templateVars as v}
+            {#each templateVars as v (v.name)}
               <button
                 type="button"
                 onclick={() => insertVariable(v.name)}
