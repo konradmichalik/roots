@@ -57,10 +57,7 @@
   // Count pending entries (matched by rules but not yet synced)
   let pendingCount = $derived.by(() => {
     if (!hasRules) return 0;
-    const sourceEntries: UnifiedTimeEntry[] = [
-      ...entries.jira,
-      ...entries.outlook
-    ];
+    const sourceEntries: UnifiedTimeEntry[] = [...entries.jira, ...entries.outlook];
     let count = 0;
     for (const entry of sourceEntries) {
       if (entry.hours <= 0) continue;
@@ -162,7 +159,9 @@
           <Tooltip.Provider delayDuration={200}>
             <Tooltip.Root>
               <Tooltip.Trigger>
-                <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-warning-subtle text-warning-text">
+                <span
+                  class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-warning-subtle text-warning-text"
+                >
                   <AlertTriangle class="size-3 mr-0.5" />
                   {staleRules.length}
                 </span>
@@ -180,8 +179,11 @@
                 type="button"
                 onclick={handleApplyRules}
                 disabled={isBuildingPreview}
-                class="relative rounded-lg p-1.5 text-warning hover:text-warning hover:bg-warning/10
-                  disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150
+                class="relative rounded-lg p-1.5 transition-colors duration-150
+                  {pendingCount > 0
+                  ? 'text-warning hover:text-warning hover:bg-warning/10'
+                  : 'text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent'}
+                  disabled:opacity-50 disabled:cursor-not-allowed
                   focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                 aria-label="Apply Rules"
               >
@@ -191,16 +193,16 @@
                   <Zap class="size-4" />
                 {/if}
                 {#if pendingCount > 0}
-                  <span class="absolute -top-1 -right-1 inline-flex items-center justify-center h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                  <span
+                    class="absolute -top-1 -right-1 inline-flex items-center justify-center h-4 min-w-4 px-0.5 rounded-full bg-primary text-[9px] font-bold text-primary-foreground"
+                  >
                     {pendingCount}
                   </span>
                 {/if}
               </button>
             </Tooltip.Trigger>
             <Tooltip.Content side="bottom" sideOffset={4}>
-              {pendingCount > 0
-                ? `Apply Rules (${pendingCount} pending)`
-                : 'Apply Rules'}
+              {pendingCount > 0 ? `Apply Rules (${pendingCount} pending)` : 'Apply Rules'}
             </Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
@@ -276,23 +278,29 @@
     >
       <Zap class="size-3" />
       <span>
-        {pendingCount} {pendingCount === 1 ? 'entry' : 'entries'} ready for sync
+        {pendingCount}
+        {pendingCount === 1 ? 'entry' : 'entries'} ready for sync
       </span>
     </button>
   {/if}
 
   <!-- Hours change detection -->
   {#if hoursChanges.length > 0}
-    <div class="w-full flex items-start gap-2 rounded-lg border border-discovery/20 bg-discovery-subtle/30 px-3 py-1.5 text-xs text-discovery-text">
+    <div
+      class="w-full flex items-start gap-2 rounded-lg border border-discovery/20 bg-discovery-subtle/30 px-3 py-1.5 text-xs text-discovery-text"
+    >
       <TriangleAlert class="size-3 mt-0.5 flex-shrink-0" />
       <div>
         <span class="font-medium">
-          {hoursChanges.length} synced {hoursChanges.length === 1 ? 'entry has' : 'entries have'} changed hours
+          {hoursChanges.length} synced {hoursChanges.length === 1 ? 'entry has' : 'entries have'} changed
+          hours
         </span>
         <div class="mt-0.5 space-y-0.5">
           {#each hoursChanges.slice(0, 3) as change}
             <p class="text-[10px] text-discovery-text/80">
-              {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(change.currentHours)}
+              {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(
+                change.currentHours
+              )}
             </p>
           {/each}
           {#if hoursChanges.length > 3}
