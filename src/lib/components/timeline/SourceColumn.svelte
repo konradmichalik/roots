@@ -64,8 +64,8 @@
 </script>
 
 <div
-  class="flex flex-col rounded-xl border border-border bg-card overflow-hidden transition-all duration-200
-    {emphasized ? 'shadow-lg ring-1 ring-border z-10' : 'shadow-sm opacity-95'}"
+  class="flex flex-col rounded-xl border overflow-hidden transition-all duration-200
+    {emphasized ? 'border-border shadow-md ring-1 ring-border z-10 bg-card' : 'border-border/70 bg-card/80'}"
 >
   <!-- Source header -->
   <div class="px-4 py-3 border-b border-border {colorClasses.bg}">

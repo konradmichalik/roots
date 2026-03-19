@@ -100,7 +100,7 @@
   });
 </script>
 
-<div class="mx-auto max-w-6xl space-y-4">
+<div class="mx-auto max-w-6xl space-y-3">
   <!-- Day header with presence bar -->
   <div class="flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
     <!-- Absence badge (if any) -->

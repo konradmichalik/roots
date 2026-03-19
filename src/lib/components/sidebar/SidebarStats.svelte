@@ -99,7 +99,7 @@
   let isStatsLoading = $derived(monthCacheState.loading && !monthCacheState.cache[monthStart]);
 </script>
 
-<div class="border-t border-border pt-3 space-y-2">
+<div class="pt-2 space-y-2">
   <div class="flex items-center gap-2">
     <BarChart3 class="size-4 text-muted-foreground" />
     <h3 class="text-sm font-semibold text-foreground">Statistics</h3>
