@@ -136,7 +136,7 @@
       {/snippet}
     </Dialog.Trigger>
   {/if}
-  <Dialog.Content class="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+  <Dialog.Content class="sm:max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden">
     <Dialog.Header>
       <div class="flex items-center gap-2">
         <Dialog.Title>Rules</Dialog.Title>

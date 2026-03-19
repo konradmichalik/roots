@@ -60,7 +60,7 @@
 </script>
 
 <div
-  class="group/rule relative rounded-lg border bg-card transition-all duration-150
+  class="group/rule relative overflow-hidden rounded-lg border bg-card transition-all duration-150
     {isDragged
     ? 'opacity-50 border-dashed border-primary'
     : isDragOver
