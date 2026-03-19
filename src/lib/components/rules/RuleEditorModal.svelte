@@ -21,6 +21,7 @@
     DEFAULT_OUTLOOK_TEMPLATE
   } from '../../utils/description-template';
   import type { Rule, SourceMatcher, OutlookSourceMatcher } from '../../types';
+  import { Switch } from '../ui/switch';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import { onMount } from 'svelte';
 
@@ -321,110 +322,120 @@
           />
         </div>
 
-        <!-- Source Type -->
-        <div>
-          <!-- svelte-ignore a11y_label_has_associated_control -->
-          <label class="block text-sm font-medium text-foreground mb-1">Source</label>
-          <div class="flex gap-1 p-0.5 rounded-lg bg-secondary">
-            <button
-              type="button"
-              onclick={() => handleSourceTypeChange('jira')}
-              class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors
-                {sourceType === 'jira'
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'}"
-            >
-              Jira
-            </button>
-            <button
-              type="button"
-              onclick={() => handleSourceTypeChange('outlook')}
-              class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors
-                {sourceType === 'outlook'
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'}"
-            >
-              Outlook
-            </button>
-          </div>
-        </div>
+        <!-- Trigger Section -->
+        <div class="rounded-lg bg-secondary/40 p-3 space-y-3">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Trigger</p>
 
-        <!-- Source-specific forms -->
-        {#if sourceType === 'jira'}
-          <JiraSourceForm bind:projectKey={jiraProjectKey} bind:issuePattern={jiraIssuePattern} />
-        {/if}
-        {#if sourceType === 'outlook'}
-          <OutlookSourceForm
-            bind:pattern={outlookPattern}
-            bind:matchType={outlookMatchType}
-            bind:overrideHours
-          />
-        {/if}
-
-        <!-- Moco Target -->
-        <div>
-          <!-- svelte-ignore a11y_label_has_associated_control -->
-          <label class="block text-sm font-medium text-foreground mb-1">Moco Project</label>
-          <ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
-        </div>
-
-        <div>
-          <!-- svelte-ignore a11y_label_has_associated_control -->
-          <label class="block text-sm font-medium text-foreground mb-1">Moco Task</label>
-          <TaskCombobox projectId={selectedProjectId} bind:value={taskValue} />
-        </div>
-
-        <!-- Description Template -->
-        <div>
-          <label for="rule-template" class="block text-sm font-medium text-foreground mb-1"
-            >Description Template</label
-          >
-          <input
-            id="rule-template"
-            type="text"
-            bind:value={descriptionTemplate}
-            placeholder={sourceType === 'jira' ? DEFAULT_JIRA_TEMPLATE : DEFAULT_OUTLOOK_TEMPLATE}
-            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground font-mono
-              focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
-          />
-          <div class="flex flex-wrap gap-1 mt-1">
-            {#each templateVars as v (v.name)}
+          <!-- Source Type -->
+          <div>
+            <!-- svelte-ignore a11y_label_has_associated_control -->
+            <label class="block text-sm font-medium text-foreground mb-1">Source</label>
+            <div class="flex gap-1 p-0.5 rounded-lg bg-secondary">
               <button
                 type="button"
-                onclick={() => insertVariable(v.name)}
-                class="rounded px-1.5 py-0.5 text-[10px] font-mono bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                onclick={() => handleSourceTypeChange('jira')}
+                class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors
+                  {sourceType === 'jira'
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'}"
               >
-                {`{${v.name}}`}
+                Jira
               </button>
-            {/each}
+              <button
+                type="button"
+                onclick={() => handleSourceTypeChange('outlook')}
+                class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors
+                  {sourceType === 'outlook'
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'}"
+              >
+                Outlook
+              </button>
+            </div>
           </div>
-          {#if templatePreview}
-            <p class="text-xs text-muted-foreground mt-1">
-              Preview: <span class="text-foreground">{templatePreview}</span>
-            </p>
+
+          <!-- Source-specific forms -->
+          {#if sourceType === 'jira'}
+            <JiraSourceForm bind:projectKey={jiraProjectKey} bind:issuePattern={jiraIssuePattern} />
           {/if}
+          {#if sourceType === 'outlook'}
+            <OutlookSourceForm
+              bind:pattern={outlookPattern}
+              bind:matchType={outlookMatchType}
+              bind:overrideHours
+            />
+          {/if}
+        </div>
+
+        <!-- Action Section -->
+        <div class="rounded-lg bg-secondary/40 p-3 space-y-3">
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Action</p>
+
+          <!-- Moco Target -->
+          <div>
+            <!-- svelte-ignore a11y_label_has_associated_control -->
+            <label class="block text-sm font-medium text-foreground mb-1">Moco Project</label>
+            <ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
+          </div>
+
+          <div>
+            <!-- svelte-ignore a11y_label_has_associated_control -->
+            <label class="block text-sm font-medium text-foreground mb-1">Moco Task</label>
+            <TaskCombobox projectId={selectedProjectId} bind:value={taskValue} />
+          </div>
+
+          <!-- Description Template -->
+          <div>
+            <label for="rule-template" class="block text-sm font-medium text-foreground mb-1"
+              >Description Template</label
+            >
+            <input
+              id="rule-template"
+              type="text"
+              bind:value={descriptionTemplate}
+              placeholder={sourceType === 'jira' ? DEFAULT_JIRA_TEMPLATE : DEFAULT_OUTLOOK_TEMPLATE}
+              class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground font-mono
+                focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
+            />
+            <div class="flex flex-wrap gap-1 mt-1">
+              {#each templateVars as v (v.name)}
+                <button
+                  type="button"
+                  onclick={() => insertVariable(v.name)}
+                  class="rounded px-1.5 py-0.5 text-[10px] font-mono bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  {`{${v.name}}`}
+                </button>
+              {/each}
+            </div>
+            {#if templatePreview}
+              <p class="text-xs text-muted-foreground mt-1 font-mono">
+                Preview: <span class="text-foreground">{templatePreview}</span>
+              </p>
+            {/if}
+          </div>
         </div>
 
         <!-- Enabled + Auto-Sync Toggles -->
         <div class="space-y-2">
-          <label class="flex items-start gap-2 cursor-pointer">
-            <input type="checkbox" bind:checked={enabled} class="accent-primary mt-0.5" />
+          <label class="flex items-center justify-between cursor-pointer">
             <div>
               <span class="text-sm text-foreground">Enabled</span>
               <p class="text-[10px] text-muted-foreground">
                 When disabled, this rule is paused and won't match any entries.
               </p>
             </div>
+            <Switch bind:checked={enabled} />
           </label>
 
-          <label class="flex items-start gap-2 cursor-pointer">
-            <input type="checkbox" bind:checked={autoSync} class="accent-primary mt-0.5" />
+          <label class="flex items-center justify-between cursor-pointer">
             <div>
               <span class="text-sm text-foreground">Auto-sync</span>
               <p class="text-[10px] text-muted-foreground">
                 Automatically transfer new entries when opening the day.
               </p>
             </div>
+            <Switch bind:checked={autoSync} />
           </label>
         </div>
 
