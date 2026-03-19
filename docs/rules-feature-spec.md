@@ -1,5 +1,7 @@
 # Rules Feature — Anforderungs- & Umsetzungsdokument
 
+> **Status: Experimental** — This feature is functional but under active development. Interfaces and behavior may change.
+
 ## 1. Vision
 
 **Ziel:** Zeitbuchungen nur noch in Jira erfassen und automatisch nach Moco übertragen. Rules definieren, welches Jira-Projekt/Ticket auf welche Moco-Buchungsposition (Project + Task) gebucht wird. Outlook-Termine können ebenfalls über Rules automatisch übertragen werden.
@@ -10,13 +12,13 @@
 
 ## 2. Begriffe
 
-| Begriff | Bedeutung |
-|---------|-----------|
-| **Rule** | Mapping-Definition: Quelle (Jira/Outlook) → Ziel (Moco Project + Task) |
-| **Source Matcher** | Kriterium, das bestimmt welche Einträge eine Rule matcht |
-| **Target** | Moco-Buchungsposition (Project ID + Task ID) |
-| **Sync Record** | Verknüpfung zwischen Quell-Eintrag und erzeugtem Moco-Eintrag |
-| **Stale Target** | Moco-Task, die nicht mehr aktiv/verfügbar ist |
+| Begriff            | Bedeutung                                                              |
+| ------------------ | ---------------------------------------------------------------------- |
+| **Rule**           | Mapping-Definition: Quelle (Jira/Outlook) → Ziel (Moco Project + Task) |
+| **Source Matcher** | Kriterium, das bestimmt welche Einträge eine Rule matcht               |
+| **Target**         | Moco-Buchungsposition (Project ID + Task ID)                           |
+| **Sync Record**    | Verknüpfung zwischen Quell-Eintrag und erzeugtem Moco-Eintrag          |
+| **Stale Target**   | Moco-Task, die nicht mehr aktiv/verfügbar ist                          |
 
 ---
 
@@ -26,46 +28,47 @@
 
 #### 3.1.1 Source Matcher — Jira
 
-| Feld | Beschreibung |
-|------|-------------|
-| `sourceType` | `'jira'` |
-| `jiraProjectKey` | Jira-Projekt-Key (z.B. `"SUP"`, `"DEV"`) — matcht alle Worklogs in diesem Projekt |
+| Feld               | Beschreibung                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| `sourceType`       | `'jira'`                                                                           |
+| `jiraProjectKey`   | Jira-Projekt-Key (z.B. `"SUP"`, `"DEV"`) — matcht alle Worklogs in diesem Projekt  |
 | `jiraIssuePattern` | Optional: Spezifischeres Matching auf Issue-Key-Ebene (z.B. `"SUP-*"`, `"DEV-42"`) |
-| `jiraConnectionId` | Referenz auf die verwendete Jira-Verbindung (multi-connection-fähig) |
+| `jiraConnectionId` | Referenz auf die verwendete Jira-Verbindung (multi-connection-fähig)               |
 
 **Matching-Logik (Priorität):**
+
 1. Exakter Issue-Key-Match (`DEV-42`) — höchste Priorität
 2. Projekt-Key-Match (`SUP`) — matcht alle Issues im Projekt
 3. Bei Overlap gewinnt die spezifischere Rule
 
 #### 3.1.2 Source Matcher — Outlook
 
-| Feld | Beschreibung |
-|------|-------------|
-| `sourceType` | `'outlook'` |
-| `eventPattern` | Text-Pattern für Event-Titel |
-| `matchType` | `'contains'` \| `'exact'` \| `'startsWith'` |
+| Feld           | Beschreibung                                |
+| -------------- | ------------------------------------------- |
+| `sourceType`   | `'outlook'`                                 |
+| `eventPattern` | Text-Pattern für Event-Titel                |
+| `matchType`    | `'contains'` \| `'exact'` \| `'startsWith'` |
 
 > Entspricht dem bestehenden `FavoriteEventMatch`-Konzept, wird aber in Rules integriert.
 
 #### 3.1.3 Target (Moco)
 
-| Feld | Beschreibung |
-|------|-------------|
-| `mocoProjectId` | Moco Project ID |
-| `mocoTaskId` | Moco Task ID |
+| Feld              | Beschreibung               |
+| ----------------- | -------------------------- |
+| `mocoProjectId`   | Moco Project ID            |
+| `mocoTaskId`      | Moco Task ID               |
 | `mocoProjectName` | Denormalisiert für Anzeige |
-| `mocoTaskName` | Denormalisiert für Anzeige |
-| `customerName` | Denormalisiert für Anzeige |
+| `mocoTaskName`    | Denormalisiert für Anzeige |
+| `customerName`    | Denormalisiert für Anzeige |
 
 #### 3.1.4 Optionale Felder
 
-| Feld | Beschreibung |
-|------|-------------|
-| `name` | Benutzerfreundlicher Name der Rule |
+| Feld                  | Beschreibung                                                             |
+| --------------------- | ------------------------------------------------------------------------ |
+| `name`                | Benutzerfreundlicher Name der Rule                                       |
 | `descriptionTemplate` | Template für die Moco-Beschreibung, z.B. `"{issueKey} – {issueSummary}"` |
-| `enabled` | Rule an/aus |
-| `autoSync` | Automatisch übertragen oder nur vorschlagen |
+| `enabled`             | Rule an/aus                                                              |
+| `autoSync`            | Automatisch übertragen oder nur vorschlagen                              |
 
 ### 3.2 Deduplizierung (Sync Records)
 
@@ -75,16 +78,16 @@
 
 ```typescript
 interface SyncRecord {
-  id: string                    // UUID
-  ruleId: string                // Welche Rule hat die Übertragung ausgelöst
-  sourceType: 'jira' | 'outlook'
-  sourceId: string              // Jira: worklogId, Outlook: eventId
-  sourceKey: string             // Jira: issueKey, Outlook: eventTitle
-  mocoActivityId: number        // Erzeugte Moco Activity ID
-  mocoDate: string              // YYYY-MM-DD
-  hours: number
-  syncedAt: string              // ISO timestamp
-  autoSynced: boolean           // true = automatisch, false = manuell ausgelöst
+  id: string; // UUID
+  ruleId: string; // Welche Rule hat die Übertragung ausgelöst
+  sourceType: 'jira' | 'outlook';
+  sourceId: string; // Jira: worklogId, Outlook: eventId
+  sourceKey: string; // Jira: issueKey, Outlook: eventTitle
+  mocoActivityId: number; // Erzeugte Moco Activity ID
+  mocoDate: string; // YYYY-MM-DD
+  hours: number;
+  syncedAt: string; // ISO timestamp
+  autoSynced: boolean; // true = automatisch, false = manuell ausgelöst
 }
 ```
 
@@ -106,6 +109,7 @@ interface SyncRecord {
    - `unknown` — Projekts nicht geladen (offline etc.)
 
 **UI-Anzeige:**
+
 - Stale Rules werden mit Warn-Badge angezeigt
 - Toast-Notification bei Erkennung einer stale Rule
 - Quick-Action: "Task aktualisieren" öffnet Task-Picker mit dem gleichen Projekt vorausgewählt
@@ -153,13 +157,13 @@ Moco-Einträge, die durch Rules erstellt wurden, erhalten:
 
 **Reguläre Favorites (ohne Event-Match) bleiben erhalten** als Quick-Book-Buttons für manuelle Buchungen ohne Quell-Eintrag.
 
-| Feature | Reguläre Favorites | Rules |
-|---------|-------------------|-------|
-| Zweck | Quick-Book-Button (kein Quell-Eintrag) | Übertragung von Quell-Einträgen nach Moco |
-| Quellen | Keine | Jira-Worklogs + Outlook-Events |
-| Ausführung | Manuell (Klick) | Manuell oder automatisch |
-| Deduplizierung | Keine (nicht nötig) | Sync Records |
-| Lifecycle-Mgmt | Keine | Stale-Target-Alarm |
+| Feature        | Reguläre Favorites                     | Rules                                     |
+| -------------- | -------------------------------------- | ----------------------------------------- |
+| Zweck          | Quick-Book-Button (kein Quell-Eintrag) | Übertragung von Quell-Einträgen nach Moco |
+| Quellen        | Keine                                  | Jira-Worklogs + Outlook-Events            |
+| Ausführung     | Manuell (Klick)                        | Manuell oder automatisch                  |
+| Deduplizierung | Keine (nicht nötig)                    | Sync Records                              |
+| Lifecycle-Mgmt | Keine                                  | Stale-Target-Alarm                        |
 
 **Migration:** Beim ersten Start nach dem Update werden bestehende Event-Favorites automatisch in Outlook-Rules konvertiert. Reguläre Favorites bleiben unverändert.
 
@@ -183,6 +187,7 @@ Moco-Einträge, die durch Rules erstellt wurden, erhalten:
 #### Stunden-Überschreibung
 
 Outlook-Rules haben ein optionales Feld `overrideHours`:
+
 - **Nicht gesetzt:** Event-Dauer wird übernommen (Berechnung wie bisher über `calculateEventHours`)
 - **Gesetzt:** Fester Wert überschreibt die Event-Dauer (z.B. "Team Weekly ist 1h, ich buche nur 0.5h")
 
@@ -194,45 +199,45 @@ Outlook-Rules haben ein optionales Feld `overrideHours`:
 
 ```typescript
 interface Rule {
-  id: string                     // UUID
-  name: string                   // z.B. "Support-Tickets → Moco Support"
-  enabled: boolean
-  autoSync: boolean              // Automatisch oder nur Vorschlag
+  id: string; // UUID
+  name: string; // z.B. "Support-Tickets → Moco Support"
+  enabled: boolean;
+  autoSync: boolean; // Automatisch oder nur Vorschlag
 
   // Source
-  source: JiraSourceMatcher | OutlookSourceMatcher
+  source: JiraSourceMatcher | OutlookSourceMatcher;
 
   // Target
   target: {
-    mocoProjectId: number
-    mocoTaskId: number
-    mocoProjectName: string      // Denormalisiert
-    mocoTaskName: string         // Denormalisiert
-    customerName: string         // Denormalisiert
-  }
+    mocoProjectId: number;
+    mocoTaskId: number;
+    mocoProjectName: string; // Denormalisiert
+    mocoTaskName: string; // Denormalisiert
+    customerName: string; // Denormalisiert
+  };
 
   // Beschreibung
-  descriptionTemplate: string    // z.B. "{issueKey} – {issueSummary}"
+  descriptionTemplate: string; // z.B. "{issueKey} – {issueSummary}"
 
   // Metadata
-  sortOrder: number
-  createdAt: string
-  updatedAt: string
-  targetStatus: 'valid' | 'stale' | 'unknown'
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+  targetStatus: 'valid' | 'stale' | 'unknown';
 }
 
 interface JiraSourceMatcher {
-  type: 'jira'
-  connectionId: string           // Referenz auf Jira-Connection
-  projectKey: string             // z.B. "SUP"
-  issuePattern?: string          // Optional: "SUP-*", "SUP-42"
+  type: 'jira';
+  connectionId: string; // Referenz auf Jira-Connection
+  projectKey: string; // z.B. "SUP"
+  issuePattern?: string; // Optional: "SUP-*", "SUP-42"
 }
 
 interface OutlookSourceMatcher {
-  type: 'outlook'
-  eventPattern: string
-  matchType: 'contains' | 'exact' | 'startsWith'
-  overrideHours?: number          // Optional: fester Stundenwert statt Event-Dauer
+  type: 'outlook';
+  eventPattern: string;
+  matchType: 'contains' | 'exact' | 'startsWith';
+  overrideHours?: number; // Optional: fester Stundenwert statt Event-Dauer
 }
 ```
 
@@ -240,19 +245,19 @@ interface OutlookSourceMatcher {
 
 ```typescript
 interface SyncRecord {
-  id: string
-  ruleId: string
-  sourceType: 'jira' | 'outlook'
-  sourceId: string               // worklogId oder eventId
-  sourceKey: string              // issueKey oder eventTitle
-  mocoActivityId?: number        // Optional: nur bei status 'success'
-  mocoDate: string               // YYYY-MM-DD
-  hours: number
-  description: string
-  syncedAt: string               // ISO timestamp
-  autoSynced: boolean
-  status: 'success' | 'failed'
-  errorReason?: string           // z.B. "stale_target", "api_error", "rate_limit"
+  id: string;
+  ruleId: string;
+  sourceType: 'jira' | 'outlook';
+  sourceId: string; // worklogId oder eventId
+  sourceKey: string; // issueKey oder eventTitle
+  mocoActivityId?: number; // Optional: nur bei status 'success'
+  mocoDate: string; // YYYY-MM-DD
+  hours: number;
+  description: string;
+  syncedAt: string; // ISO timestamp
+  autoSynced: boolean;
+  status: 'success' | 'failed';
+  errorReason?: string; // z.B. "stale_target", "api_error", "rate_limit"
 }
 ```
 
@@ -260,8 +265,8 @@ interface SyncRecord {
 
 ```typescript
 // In STORAGE_KEYS erweitern:
-RULES: 'roots:rules'
-SYNC_RECORDS: 'roots:syncRecords'
+RULES: 'roots:rules';
+SYNC_RECORDS: 'roots:syncRecords';
 ```
 
 ---
@@ -272,78 +277,83 @@ SYNC_RECORDS: 'roots:syncRecords'
 
 ```typescript
 export const rulesState = $state<{
-  rules: Rule[]
-}>({ rules: [] })
+  rules: Rule[];
+}>({ rules: [] });
 
 // Initializer
-export async function initializeRules(): Promise<void>
+export async function initializeRules(): Promise<void>;
 
 // CRUD
-export function addRule(rule: Omit<Rule, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder' | 'targetStatus'>): void
-export function updateRule(id: string, updates: Partial<Rule>): void
-export function removeRule(id: string): void
-export function reorderRules(ids: string[]): void
+export function addRule(
+  rule: Omit<Rule, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder' | 'targetStatus'>
+): void;
+export function updateRule(id: string, updates: Partial<Rule>): void;
+export function removeRule(id: string): void;
+export function reorderRules(ids: string[]): void;
 
 // Matching
-export function findMatchingRules(entry: UnifiedTimeEntry): Rule[]
-export function getUnmatchedEntries(entries: UnifiedTimeEntry[]): UnifiedTimeEntry[]
+export function findMatchingRules(entry: UnifiedTimeEntry): Rule[];
+export function getUnmatchedEntries(entries: UnifiedTimeEntry[]): UnifiedTimeEntry[];
 
 // Validation
-export function validateRuleTargets(): void  // Prüft alle Rules gegen mocoProjectsState
-export function getRulesWithStatus(status: Rule['targetStatus']): Rule[]
+export function validateRuleTargets(): void; // Prüft alle Rules gegen mocoProjectsState
+export function getRulesWithStatus(status: Rule['targetStatus']): Rule[];
 ```
 
 ### 5.2 `syncRecords.svelte.ts`
 
 ```typescript
 export const syncRecordsState = $state<{
-  records: SyncRecord[]
-}>({ records: [] })
+  records: SyncRecord[];
+}>({ records: [] });
 
-export async function initializeSyncRecords(): Promise<void>
+export async function initializeSyncRecords(): Promise<void>;
 
 // Dedup
-export function isSynced(sourceType: string, sourceId: string): boolean
-export function getSyncRecord(sourceType: string, sourceId: string): SyncRecord | undefined
+export function isSynced(sourceType: string, sourceId: string): boolean;
+export function getSyncRecord(sourceType: string, sourceId: string): SyncRecord | undefined;
 
 // CRUD
-export function addSyncRecord(record: Omit<SyncRecord, 'id' | 'syncedAt'>): void
-export function removeSyncRecord(id: string): void
-export function getSyncRecordsForDate(date: string): SyncRecord[]
-export function getSyncRecordsForRule(ruleId: string): SyncRecord[]
+export function addSyncRecord(record: Omit<SyncRecord, 'id' | 'syncedAt'>): void;
+export function removeSyncRecord(id: string): void;
+export function getSyncRecordsForDate(date: string): SyncRecord[];
+export function getSyncRecordsForRule(ruleId: string): SyncRecord[];
 
 // Statistik
-export function getLastSyncForRule(ruleId: string): { date: string; count: number } | null
-export function getSyncCountForRule(ruleId: string): number
+export function getLastSyncForRule(ruleId: string): { date: string; count: number } | null;
+export function getSyncCountForRule(ruleId: string): number;
 
 // Cleanup
-export function pruneOldRecords(olderThan: string): void  // Alte Records aufräumen
+export function pruneOldRecords(olderThan: string): void; // Alte Records aufräumen
 ```
 
 ### 5.3 `ruleSync.svelte.ts` (Orchestrierung)
 
 ```typescript
 // Kernfunktion: Führt Rules für einen Tag aus
-export async function syncDay(date: string, options: {
-  dryRun?: boolean      // true = nur Preview, keine Buchung
-  autoOnly?: boolean    // true = nur autoSync-Rules
-}): Promise<SyncPreview>
+export async function syncDay(
+  date: string,
+  options: {
+    dryRun?: boolean; // true = nur Preview, keine Buchung
+    autoOnly?: boolean; // true = nur autoSync-Rules
+  }
+): Promise<SyncPreview>;
 
 interface SyncPreview {
-  pending: SyncCandidate[]      // Neue Einträge zum Erstellen
-  skipped: SkippedEntry[]       // Bereits synchronisiert
-  staleRules: Rule[]            // Rules mit ungültiger Buchungsposition
-  errors: SyncError[]           // Fehler bei Validierung
+  pending: SyncCandidate[]; // Neue Einträge zum Erstellen
+  skipped: SkippedEntry[]; // Bereits synchronisiert
+  staleRules: Rule[]; // Rules mit ungültiger Buchungsposition
+  errors: SyncError[]; // Fehler bei Validierung
 }
 
 interface SyncCandidate {
-  rule: Rule
-  sourceEntry: UnifiedTimeEntry
-  mocoPayload: MocoCreateActivity
+  rule: Rule;
+  sourceEntry: UnifiedTimeEntry;
+  mocoPayload: MocoCreateActivity;
 }
 
 // Ausführung nach Preview-Bestätigung
-export async function executeSyncCandidates(candidates: SyncCandidate[]): Promise<SyncResult>
+export async function executeSyncCandidates(candidates: SyncCandidate[]): Promise<SyncResult>;
 ```
 
 ---
@@ -353,19 +363,21 @@ export async function executeSyncCandidates(candidates: SyncCandidate[]): Promis
 Für die Moco-Beschreibung unterstützen Rules Templates mit Platzhaltern:
 
 ### Jira-Variablen
-| Variable | Wert |
-|----------|------|
-| `{issueKey}` | z.B. `"SUP-123"` |
-| `{issueSummary}` | z.B. `"Login broken on Safari"` |
-| `{issueType}` | z.B. `"Bug"`, `"Task"` |
-| `{projectKey}` | z.B. `"SUP"` |
-| `{worklogComment}` | Kommentar des Worklogs |
+
+| Variable           | Wert                            |
+| ------------------ | ------------------------------- |
+| `{issueKey}`       | z.B. `"SUP-123"`                |
+| `{issueSummary}`   | z.B. `"Login broken on Safari"` |
+| `{issueType}`      | z.B. `"Bug"`, `"Task"`          |
+| `{projectKey}`     | z.B. `"SUP"`                    |
+| `{worklogComment}` | Kommentar des Worklogs          |
 
 ### Outlook-Variablen
-| Variable | Wert |
-|----------|------|
-| `{eventTitle}` | Termin-Titel |
-| `{eventLocation}` | Ort |
+
+| Variable          | Wert         |
+| ----------------- | ------------ |
+| `{eventTitle}`    | Termin-Titel |
+| `{eventLocation}` | Ort          |
 
 **Default-Template Jira:** `"{issueKey} – {issueSummary}"`
 **Default-Template Outlook:** `"{eventTitle}"`
@@ -379,6 +391,7 @@ Für die Moco-Beschreibung unterstützen Rules Templates mit Platzhaltern:
 Rules werden vollständig über ein Modal verwaltet — analog zum bestehenden `FavoriteModal`-Pattern. Kein eigener Settings-Screen.
 
 **RulesModal** (Liste + CRUD):
+
 - Öffenbar aus: Sidebar-Button, Settings, Day-View (Stale-Alert), Sync-Preview
 - Liste aller Rules mit Status-Badge (aktiv/pausiert/stale)
 - Pro Rule: Letzte Aktivität anzeigen (z.B. "Zuletzt: heute, 3 Einträge" oder "Zuletzt: vor 12 Tagen" oder "Noch nie ausgeführt"). Abgeleitet aus `syncRecordsState` via `ruleId`
@@ -387,6 +400,7 @@ Rules werden vollständig über ein Modal verwaltet — analog zum bestehenden `
 - Add/Edit/Delete Actions pro Rule
 
 **RuleEditorModal** (Einzelne Rule bearbeiten):
+
 - Öffnet sich über RulesModal oder direkt (z.B. Quick-Fix bei Stale-Target)
 - Source-Typ wählen (Jira / Outlook)
 - Source-Kriterien konfigurieren (Jira: Connection + Projekt-Key + optionaler Issue-Pattern)
@@ -400,21 +414,25 @@ Rules werden vollständig über ein Modal verwaltet — analog zum bestehenden `
 Leitprinzip: **Jede automatische Aktion muss nachvollziehbar sein, bevor sie passiert und nachdem sie passiert ist.**
 
 #### Vor dem Sync: Pending-Indicator
+
 - Jira-Worklogs, die eine Rule matchen aber noch nicht übertragen sind, zeigen inline die zugeordnete Moco-Position als Ghost/Preview (Projekt + Task, leicht ausgegraut)
 - Kompakte Info-Leiste: "3 Worklogs bereit zur Übertragung" → Klick öffnet Preview mit Details
 
 #### Während des Sync: Preview-Dialog (manueller Modus)
+
 - Tabellarische Vorschau: Quell-Eintrag → Ziel-Position → Stunden → Beschreibung
 - Einzeln abwählbar — User hat volle Kontrolle
 - "Alle übertragen" oder einzeln bestätigen
 
 #### Nach dem Sync: Feedback + Nachvollziehbarkeit
+
 - Toast: "3 Einträge übertragen via Rules" (nicht nur eine Zahl, sondern klickbar zur Detail-Ansicht)
 - Übertragene Moco-Einträge tragen ein dezentes Badge-Icon (z.B. `zap`) + Tooltip: "Übertragen via Rule '{name}'"
 - Bei Auto-Sync: Gleicher Toast, damit der User sieht was automatisch passiert ist
 - Bei Fehlern: Roter Toast mit konkretem Grund ("Moco-Task 'Support März' nicht mehr verfügbar")
 
 #### Stale-Alerts
+
 - "1 Rule hat eine ungültige Buchungsposition" → Klick öffnet direkt den RuleEditorModal mit vorausgewähltem Projekt
 
 ### 7.3 Stale-Target-Handling
@@ -469,8 +487,8 @@ Basiert auf `syncRecordsState.records` — keine zusätzliche Datenstruktur nöt
 ```typescript
 interface SyncRecord {
   // ... bestehende Felder ...
-  status: 'success' | 'failed'
-  errorReason?: string            // z.B. "stale_target", "api_error", "rate_limit"
+  status: 'success' | 'failed';
+  errorReason?: string; // z.B. "stale_target", "api_error", "rate_limit"
 }
 ```
 
@@ -545,13 +563,13 @@ Rules sollen selbsterklärend sein — keine separate Dokumentation, sondern kon
 
 ## 9. Entschiedene Fragen
 
-| # | Frage | Entscheidung |
-|---|-------|-------------|
-| 1 | **Geänderte Worklogs** | Phase 1: Nur Neuanlage. Sync Record speichert `hours` — bei Abweichung wird ein Hinweis angezeigt ("Worklog SUP-123 wurde von 2h auf 3h geändert"), aber kein Auto-Update. Grund: User könnte Moco-Beschreibung zwischenzeitlich angepasst haben. Change-Detection als Phase-2-Feature. |
-| 2 | **Multi-Rule-Konflikt** | Warnung bereits bei Rule-Erstellung im Editor, wenn eine überlappende Rule existiert ("Überschneidung mit Rule 'Support-Tickets'"). Zur Laufzeit: Spezifischere Rule gewinnt (Issue-Key > Projekt-Key), bei gleicher Spezifität die höher priorisierte. |
-| 3 | **Auto-Sync Zeitraum** | Nur für **heute**. Vergangene Tage ausschließlich über manuellen Trigger mit Preview. Bei ungebuchten vergangenen Tagen: Hinweis "3 ungebuchte Tage mit matchenden Worklogs", aber keine automatische Buchung. |
-| 4 | **Remote-Fields bei Moco** | Ja — `remote_service: 'jira'` + `remote_id: issueKey` setzen. Vorteile: Klickbarer Jira-Link in Moco UI + zusätzlicher Dedup-Check über Moco-API. Manuell erstellte Einträge mit gleichem `remote_id` werden korrekt als "bereits gebucht" erkannt und übersprungen. |
-| 5 | **Retention von Sync Records** | 6 Monate, danach automatisches Pruning bei App-Start via `pruneOldRecords()`. Kein Konfigurations-Overhead. |
+| #   | Frage                          | Entscheidung                                                                                                                                                                                                                                                                            |
+| --- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Geänderte Worklogs**         | Phase 1: Nur Neuanlage. Sync Record speichert `hours` — bei Abweichung wird ein Hinweis angezeigt ("Worklog SUP-123 wurde von 2h auf 3h geändert"), aber kein Auto-Update. Grund: User könnte Moco-Beschreibung zwischenzeitlich angepasst haben. Change-Detection als Phase-2-Feature. |
+| 2   | **Multi-Rule-Konflikt**        | Warnung bereits bei Rule-Erstellung im Editor, wenn eine überlappende Rule existiert ("Überschneidung mit Rule 'Support-Tickets'"). Zur Laufzeit: Spezifischere Rule gewinnt (Issue-Key > Projekt-Key), bei gleicher Spezifität die höher priorisierte.                                 |
+| 3   | **Auto-Sync Zeitraum**         | Nur für **heute**. Vergangene Tage ausschließlich über manuellen Trigger mit Preview. Bei ungebuchten vergangenen Tagen: Hinweis "3 ungebuchte Tage mit matchenden Worklogs", aber keine automatische Buchung.                                                                          |
+| 4   | **Remote-Fields bei Moco**     | Ja — `remote_service: 'jira'` + `remote_id: issueKey` setzen. Vorteile: Klickbarer Jira-Link in Moco UI + zusätzlicher Dedup-Check über Moco-API. Manuell erstellte Einträge mit gleichem `remote_id` werden korrekt als "bereits gebucht" erkannt und übersprungen.                    |
+| 5   | **Retention von Sync Records** | 6 Monate, danach automatisches Pruning bei App-Start via `pruneOldRecords()`. Kein Konfigurations-Overhead.                                                                                                                                                                             |
 
 | 6 | **Rules pro Jira-Connection oder global?** | Pro Connection. `connectionId` ist Pflichtfeld in `JiraSourceMatcher`. Bei nur einer Connection wird das Feld im Editor automatisch befüllt. Verhindert Konflikte bei mehreren Jira-Instanzen mit gleichen Projekt-Keys. |
 | 7 | **Description-Template in Moco überschreibbar?** | Ja — Moco-Beschreibung gehört dem User. Template wird nur bei Neuanlage angewendet. Nachträgliche manuelle Änderungen in Moco bleiben erhalten. Change-Detection (Phase 2) prüft nur Stunden, nicht Beschreibungen. |
@@ -561,10 +579,10 @@ Rules sollen selbsterklärend sein — keine separate Dokumentation, sondern kon
 
 ## 10. Technische Risiken
 
-| Risiko | Mitigation |
-|--------|-----------|
-| **Doppelbuchung bei Race Condition** | Sync Records vor und nach Moco-API-Call prüfen, optimistic locking |
-| **Moco API Rate Limits bei Bulk-Sync** | Sequential mit Delay, max 10 Einträge pro Batch |
-| **Stale denormalisierte Projekt-/Task-Namen** | Bei Projekt-Refresh auch Rule-Targets aktualisieren |
-| **Sync Records wachsen unbegrenzt** | Automatisches Pruning nach 6 Monaten bei App-Start |
-| **Offline-Szenario** | Rules nur ausführen wenn alle beteiligten Services erreichbar sind |
+| Risiko                                        | Mitigation                                                         |
+| --------------------------------------------- | ------------------------------------------------------------------ |
+| **Doppelbuchung bei Race Condition**          | Sync Records vor und nach Moco-API-Call prüfen, optimistic locking |
+| **Moco API Rate Limits bei Bulk-Sync**        | Sequential mit Delay, max 10 Einträge pro Batch                    |
+| **Stale denormalisierte Projekt-/Task-Namen** | Bei Projekt-Refresh auch Rule-Targets aktualisieren                |
+| **Sync Records wachsen unbegrenzt**           | Automatisches Pruning nach 6 Monaten bei App-Start                 |
+| **Offline-Szenario**                          | Rules nur ausführen wenn alle beteiligten Services erreichbar sind |

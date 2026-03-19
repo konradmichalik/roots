@@ -135,7 +135,14 @@
   {/if}
   <Dialog.Content class="sm:max-w-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
     <Dialog.Header>
-      <Dialog.Title>Rules</Dialog.Title>
+      <div class="flex items-center gap-2">
+        <Dialog.Title>Rules</Dialog.Title>
+        <span
+          class="rounded-full bg-discovery-subtle px-2 py-0.5 text-[10px] font-semibold text-discovery-text"
+        >
+          Experimental
+        </span>
+      </div>
       <Dialog.Description>
         Map Jira projects and Outlook events to Moco booking positions.
       </Dialog.Description>
