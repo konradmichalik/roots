@@ -76,7 +76,7 @@
           alt={label}
           class="size-4 opacity-50 grayscale dark:invert dark:opacity-40"
         />
-        <span class="text-sm font-semibold text-foreground uppercase tracking-wide">{label}</span>
+        <span class="text-sm font-bold text-foreground uppercase tracking-wider">{label}</span>
       </div>
       <div class="flex items-center gap-2">
         <span class="font-mono text-sm font-medium text-foreground">

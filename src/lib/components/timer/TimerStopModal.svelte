@@ -144,7 +144,7 @@
     <div class="space-y-4 py-4">
       <!-- Time display -->
       <div class="text-center">
-        <div class="text-4xl font-mono font-semibold text-foreground tabular-nums">
+        <div class="text-4xl font-mono font-semibold text-foreground">
           {formatElapsedTime(elapsedSeconds)}
         </div>
         <div class="text-sm text-muted-foreground mt-1">

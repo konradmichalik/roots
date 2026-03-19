@@ -373,7 +373,7 @@
     <div class="flex-1 min-w-0">
       <!-- Primary context (top-left): time for Outlook, customer for Moco, ticket badge for Jira -->
       {#if outlookMeta && entry.startTime && entry.endTime}
-        <span class="text-[11px] font-medium text-muted-foreground leading-tight">
+        <span class="text-[11px] font-mono font-medium text-muted-foreground leading-tight">
           {entry.startTime}–{entry.endTime}
         </span>
       {:else if mocoMeta?.customerName}
@@ -407,7 +407,7 @@
       {/if}
 
       <!-- Title -->
-      <span class="text-sm font-medium text-foreground line-clamp-2">
+      <span class="text-sm font-semibold text-foreground leading-snug line-clamp-2">
         {entry.title}
       </span>
 
@@ -421,10 +421,10 @@
               {organizerInitials}
             </span>
           {/if}
-          <p class="text-xs text-muted-foreground/70 truncate">{displayDescription}</p>
+          <p class="text-xs font-medium text-muted-foreground/70 truncate">{displayDescription}</p>
         </div>
       {:else if displayDescription}
-        <p class="text-xs text-muted-foreground/70 truncate">
+        <p class="text-xs font-medium text-muted-foreground/70 truncate">
           {displayDescription}
         </p>
       {/if}
