@@ -9,7 +9,9 @@ import {
   isToday as checkIsToday,
   getDayOfWeekIndex,
   getMonthStart,
-  getMonthEnd
+  getMonthEnd,
+  getMonthWorkingDays,
+  today
 } from '../utils/date-helpers';
 import { getStorageItemAsync, setStorageItemAsync, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
@@ -234,6 +236,28 @@ export function hasCachedDataForDate(date: string, monthStart: string): boolean 
   if (cached.mocoEntries.some((e) => e.date === date)) return true;
   if (getPresenceForDate(date)) return true;
   return false;
+}
+
+// ---------------------------------------------------------------------------
+// Open hours (days with unbooked presence time)
+// ---------------------------------------------------------------------------
+export function getOpenHoursDays(): Array<{ date: string; overview: DayOverview }> {
+  const todayStr = today();
+  const result: Array<{ date: string; overview: DayOverview }> = [];
+  for (const cachedMonthStart of Object.keys(monthCacheState.cache)) {
+    const workingDays = getMonthWorkingDays(cachedMonthStart).filter((d) => d < todayStr);
+    for (const date of workingDays) {
+      if (!hasCachedDataForDate(date, cachedMonthStart)) continue;
+      const overview = getCachedDayOverview(date, cachedMonthStart);
+      if (!overview.presence || overview.presence.to === null) continue;
+      if (overview.presenceBalance !== undefined && overview.presenceBalance < -0.01) {
+        result.push({ date, overview });
+      }
+    }
+  }
+  return result.sort(
+    (a, b) => (a.overview.presenceBalance ?? 0) - (b.overview.presenceBalance ?? 0)
+  );
 }
 
 // ---------------------------------------------------------------------------
