@@ -1,3 +1,5 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -124,6 +126,8 @@ html[data-color-mode='dark'] {
 }
 
 @theme inline {
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -194,9 +198,11 @@ html[data-color-mode='dark'] {
   * {
     @apply border-border outline-ring/50;
   }
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
   body {
-    @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    @apply bg-background text-foreground font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin: 0;
@@ -352,7 +358,7 @@ html[data-demo]::after {
   position: fixed;
   bottom: 8px;
   right: 8px;
-  font-family: ui-monospace, monospace !important;
+  font-family: var(--font-mono) !important;
   font-size: 10px;
   font-weight: 600;
   color: var(--ds-text-brand);
