@@ -37,7 +37,10 @@ export const STORAGE_KEYS = {
   RECENT_PAIRS: 'recent-pairs',
   PERSONIO_CONFIG: 'personio-config',
   PERSONIO_TOKEN: 'personio-token',
-  MORNING_GREETING: 'morning-greeting'
+  MORNING_GREETING: 'morning-greeting',
+  RULES: 'rules',
+  SYNC_RECORDS: 'sync-records',
+  RULES_MIGRATED: 'rules-migrated'
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
