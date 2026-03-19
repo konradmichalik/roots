@@ -133,7 +133,7 @@
       {/snippet}
     </Dialog.Trigger>
   {/if}
-  <Dialog.Content class="sm:max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden">
+  <Dialog.Content class="sm:max-w-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
     <Dialog.Header>
       <Dialog.Title>Rules</Dialog.Title>
       <Dialog.Description>
