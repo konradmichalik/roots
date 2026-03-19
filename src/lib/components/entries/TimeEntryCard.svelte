@@ -394,13 +394,10 @@
         <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
       {/if}
     </div>
-    <div
-      class="relative flex flex-col items-end justify-between flex-shrink-0 min-w-8 self-stretch"
-    >
+    <div class="relative flex flex-col items-end flex-shrink-0 min-w-8">
       <span class="text-sm font-mono font-medium text-foreground group-hover:invisible">
         {formatHours(entry.hours)}
       </span>
-      <!-- Bottom-right: status badges -->
       {#if syncRecord || mocoMeta?.billable}
         <div class="flex items-center gap-0.5">
           {#if syncRecord}
