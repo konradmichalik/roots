@@ -9,7 +9,7 @@
     getTasksForProject
   } from '../../stores/mocoProjects.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import type { Favorite, FavoriteEventMatch } from '../../types';
+  import type { Favorite } from '../../types';
 
   let {
     onSave,
@@ -27,10 +27,6 @@
   let selectedProjectId = $state<number | null>(null);
   let defaultHours = $state(0);
   let description = $state('');
-  let enableEventMatch = $state(false);
-  let matchPattern = $state('');
-  let matchType = $state<FavoriteEventMatch['matchType']>('contains');
-
   // Initialize form state from editFavorite prop
   $effect.pre(() => {
     const fav = editFavorite;
@@ -40,9 +36,6 @@
     selectedProjectId = fav?.projectId ?? null;
     defaultHours = fav?.defaultHours ?? 0;
     description = fav?.description ?? '';
-    enableEventMatch = !!fav?.eventMatch;
-    matchPattern = fav?.eventMatch?.pattern ?? '';
-    matchType = (fav?.eventMatch?.matchType ?? 'contains') as FavoriteEventMatch['matchType'];
   });
 
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
@@ -75,35 +68,21 @@
     const task = tasks.find((t) => t.id === Number(taskValue));
     if (!task) return;
 
-    const eventMatch: FavoriteEventMatch | undefined =
-      enableEventMatch && matchPattern.trim()
-        ? { pattern: matchPattern.trim(), matchType }
-        : undefined;
+    const data = {
+      name: name.trim(),
+      projectId: project.id,
+      taskId: task.id,
+      projectName: project.name,
+      taskName: task.name,
+      customerName: project.customer.name,
+      defaultHours: defaultHours > 0 ? defaultHours : undefined,
+      description: description.trim() || undefined
+    };
 
     if (editFavorite) {
-      updateFavorite(editFavorite.id, {
-        name: name.trim(),
-        projectId: project.id,
-        taskId: task.id,
-        projectName: project.name,
-        taskName: task.name,
-        customerName: project.customer.name,
-        defaultHours: defaultHours > 0 ? defaultHours : undefined,
-        description: description.trim() || undefined,
-        eventMatch
-      });
+      updateFavorite(editFavorite.id, data);
     } else {
-      addFavorite({
-        name: name.trim(),
-        projectId: project.id,
-        taskId: task.id,
-        projectName: project.name,
-        taskName: task.name,
-        customerName: project.customer.name,
-        defaultHours: defaultHours > 0 ? defaultHours : undefined,
-        description: description.trim() || undefined,
-        eventMatch
-      });
+      addFavorite(data);
     }
 
     onSave();
@@ -170,44 +149,6 @@
         />
       </div>
     </div>
-
-    <label class="flex items-center gap-2 cursor-pointer">
-      <input type="checkbox" bind:checked={enableEventMatch} class="accent-primary" />
-      <span class="text-xs text-foreground">Match Outlook events</span>
-    </label>
-
-    {#if enableEventMatch}
-      <div class="space-y-2 pl-4 border-l-2 border-warning/30">
-        <div>
-          <label for="fav-pattern" class="block text-xs font-medium text-foreground mb-1"
-            >Pattern</label
-          >
-          <input
-            id="fav-pattern"
-            type="text"
-            bind:value={matchPattern}
-            placeholder="e.g. Daily"
-            class="w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground
-							focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
-          />
-        </div>
-        <div>
-          <label for="fav-match-type" class="block text-xs font-medium text-foreground mb-1"
-            >Match type</label
-          >
-          <select
-            id="fav-match-type"
-            bind:value={matchType}
-            class="w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm text-foreground
-							focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
-          >
-            <option value="contains">Contains</option>
-            <option value="exact">Exact match</option>
-            <option value="startsWith">Starts with</option>
-          </select>
-        </div>
-      </div>
-    {/if}
 
     <div class="flex gap-2">
       <button

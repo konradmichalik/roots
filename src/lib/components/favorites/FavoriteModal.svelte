@@ -11,7 +11,7 @@
     getTasksForProject
   } from '../../stores/mocoProjects.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import type { Favorite, FavoriteEventMatch } from '../../types';
+  import type { Favorite } from '../../types';
   import type { Snippet } from 'svelte';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
 
@@ -35,9 +35,6 @@
   let selectedProjectId = $state<number | null>(null);
   let defaultHours = $state(0);
   let description = $state('');
-  let enableEventMatch = $state(false);
-  let matchPattern = $state('');
-  let matchType = $state<FavoriteEventMatch['matchType']>('contains');
 
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
 
@@ -49,9 +46,6 @@
       selectedProjectId = editFavorite.projectId;
       defaultHours = editFavorite.defaultHours ?? 0;
       description = editFavorite.description ?? '';
-      enableEventMatch = !!editFavorite.eventMatch;
-      matchPattern = editFavorite.eventMatch?.pattern ?? '';
-      matchType = editFavorite.eventMatch?.matchType ?? 'contains';
     } else {
       name = '';
       projectValue = '';
@@ -59,9 +53,6 @@
       selectedProjectId = null;
       defaultHours = 0;
       description = '';
-      enableEventMatch = false;
-      matchPattern = '';
-      matchType = 'contains';
     }
     showDeleteConfirm = false;
   }
@@ -100,35 +91,21 @@
     const task = tasks.find((t) => t.id === Number(taskValue));
     if (!task) return;
 
-    const eventMatch: FavoriteEventMatch | undefined =
-      enableEventMatch && matchPattern.trim()
-        ? { pattern: matchPattern.trim(), matchType }
-        : undefined;
+    const data = {
+      name: name.trim(),
+      projectId: project.id,
+      taskId: task.id,
+      projectName: project.name,
+      taskName: task.name,
+      customerName: project.customer.name,
+      defaultHours: defaultHours > 0 ? defaultHours : undefined,
+      description: description.trim() || undefined
+    };
 
     if (mode === 'edit' && editFavorite) {
-      updateFavorite(editFavorite.id, {
-        name: name.trim(),
-        projectId: project.id,
-        taskId: task.id,
-        projectName: project.name,
-        taskName: task.name,
-        customerName: project.customer.name,
-        defaultHours: defaultHours > 0 ? defaultHours : undefined,
-        description: description.trim() || undefined,
-        eventMatch
-      });
+      updateFavorite(editFavorite.id, data);
     } else {
-      addFavorite({
-        name: name.trim(),
-        projectId: project.id,
-        taskId: task.id,
-        projectName: project.name,
-        taskName: task.name,
-        customerName: project.customer.name,
-        defaultHours: defaultHours > 0 ? defaultHours : undefined,
-        description: description.trim() || undefined,
-        eventMatch
-      });
+      addFavorite(data);
     }
 
     open = false;
@@ -248,44 +225,6 @@
             />
           </div>
         </div>
-
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" bind:checked={enableEventMatch} class="accent-primary" />
-          <span class="text-sm text-foreground">Auto-match Outlook events</span>
-        </label>
-
-        {#if enableEventMatch}
-          <div class="space-y-3 pl-4 border-l-2 border-warning/30">
-            <div>
-              <label for="fav-pattern" class="block text-sm font-medium text-foreground mb-1"
-                >Pattern</label
-              >
-              <input
-                id="fav-pattern"
-                type="text"
-                bind:value={matchPattern}
-                placeholder="e.g. Daily"
-                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground
-                  focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
-              />
-            </div>
-            <div>
-              <label for="fav-match-type" class="block text-sm font-medium text-foreground mb-1"
-                >Match type</label
-              >
-              <select
-                id="fav-match-type"
-                bind:value={matchType}
-                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground
-                  focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
-              >
-                <option value="contains">Contains</option>
-                <option value="exact">Exact match</option>
-                <option value="startsWith">Starts with</option>
-              </select>
-            </div>
-          </div>
-        {/if}
 
         <div class="flex items-center gap-2">
           <button
