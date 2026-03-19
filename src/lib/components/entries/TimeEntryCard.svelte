@@ -90,13 +90,16 @@
     return null;
   });
 
+  function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   // Clean description: remove ticket key to avoid duplication with badge
   let displayDescription = $derived.by(() => {
     if (!entry.description) return null;
     if (mocoMeta?.remoteTicketKey) {
-      const cleaned = entry.description
-        .replace(new RegExp(`#?${mocoMeta.remoteTicketKey}\\s*`), '')
-        .trim();
+      const ticketKey = escapeRegExp(mocoMeta.remoteTicketKey);
+      const cleaned = entry.description.replace(new RegExp(`#?${ticketKey}\\s*`), '').trim();
       return cleaned || null;
     }
     return entry.description;
@@ -372,7 +375,9 @@
   <div class="relative flex items-start justify-between gap-2">
     <div class="flex-1 min-w-0">
       <!-- Primary context (top-left): time for Outlook, customer for Moco, ticket badge for Jira -->
-      {#if outlookMeta && entry.startTime && entry.endTime}
+      {#if outlookMeta?.isAllDay}
+        <span class="text-[11px] font-medium text-muted-foreground leading-tight">All day</span>
+      {:else if outlookMeta && entry.startTime && entry.endTime}
         <span class="text-[11px] font-mono font-medium text-muted-foreground leading-tight">
           {entry.startTime}–{entry.endTime}
         </span>
@@ -393,7 +398,9 @@
               {jiraMeta.issueKey}
             </a>
           {:else}
-            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text">
+            <span
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text"
+            >
               {jiraMeta.issueKey}
             </span>
           {/if}
@@ -421,7 +428,9 @@
               {organizerInitials}
             </span>
           {/if}
-          <p class="text-xs font-medium text-muted-foreground/70 truncate">{displayDescription}</p>
+          <p class="min-w-0 flex-1 text-xs font-medium text-muted-foreground/70 truncate">
+            {displayDescription}
+          </p>
         </div>
       {:else if displayDescription}
         <p class="text-xs font-medium text-muted-foreground/70 truncate">
@@ -431,7 +440,9 @@
 
       <!-- Ticket badge for Moco entries with linked Jira ticket -->
       {#if mocoMeta?.remoteTicketKey}
-        <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text mt-0.5">
+        <span
+          class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text mt-0.5"
+        >
           {mocoMeta.remoteTicketKey}
         </span>
       {/if}
