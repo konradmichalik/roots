@@ -12,8 +12,11 @@ import { getMocoClient, getJiraClient, getOutlookClient } from './connections.sv
 import { connectionsState } from './connections.svelte';
 import { hoursToSeconds } from '../utils/time-format';
 import { logger } from '../utils/logger';
-import { anonymizeEntriesIfDemoMode } from '../utils/demo-data';
+import { anonymizeEntriesIfDemoMode, isDemoMode } from '../utils/demo-data';
 import { toast } from './toast.svelte';
+import { rulesState } from './rules.svelte';
+import { syncDay, executeSyncCandidates } from './ruleSync.svelte';
+import { today } from '../utils/date-helpers';
 import {
   mapMocoActivity,
   mapJiraWorklog,
@@ -89,6 +92,16 @@ export async function fetchDayEntries(date: string): Promise<void> {
   await Promise.allSettled(fetches);
   timeEntriesState.lastFetched = new Date().toISOString();
   timeEntriesState.fetchedDate = date;
+
+  // Auto-sync: only for today, only if rules exist with autoSync enabled
+  if (
+    date === today() &&
+    !isDemoMode() &&
+    connectionsState.moco.isConnected &&
+    rulesState.rules.some((r) => r.enabled && r.autoSync)
+  ) {
+    runAutoSync(date);
+  }
 }
 
 /**
@@ -97,6 +110,39 @@ export async function fetchDayEntries(date: string): Promise<void> {
 export async function refreshDayEntries(date: string): Promise<void> {
   timeEntriesState.fetchedDate = null;
   await fetchDayEntries(date);
+}
+
+// ---------------------------------------------------------------------------
+// Auto-Sync (Rules with autoSync=true, today only)
+// ---------------------------------------------------------------------------
+let autoSyncRunning = false;
+
+async function runAutoSync(date: string): Promise<void> {
+  if (autoSyncRunning) return;
+  autoSyncRunning = true;
+
+  try {
+    const preview = await syncDay(date, { autoOnly: true });
+
+    if (preview.pending.length === 0) return;
+
+    const result = await executeSyncCandidates(preview.pending, true);
+
+    if (result.created.length > 0) {
+      toast.success(
+        `${result.created.length} ${result.created.length === 1 ? 'entry' : 'entries'} auto-synced via Rules`
+      );
+    }
+    if (result.failed.length > 0) {
+      toast.error(
+        `${result.failed.length} auto-sync ${result.failed.length === 1 ? 'entry' : 'entries'} failed`
+      );
+    }
+  } catch (error) {
+    logger.error('Auto-sync failed', error);
+  } finally {
+    autoSyncRunning = false;
+  }
 }
 
 // ---------------------------------------------------------------------------

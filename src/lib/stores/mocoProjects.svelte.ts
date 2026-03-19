@@ -1,6 +1,8 @@
 import type { MocoProjectAssigned, MocoTask, MocoProjectReport } from '../types';
 import { getMocoClient } from './connections.svelte';
 import { logger } from '../utils/logger';
+import { validateRuleTargets, rulesState } from './rules.svelte';
+import { toast } from './toast.svelte';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -31,6 +33,14 @@ export async function fetchAssignedProjects(): Promise<void> {
     mocoProjectsState.projects = projects;
     mocoProjectsState.lastFetched = Date.now();
     logger.store('mocoProjects', `Loaded ${projects.length} assigned projects`);
+
+    // Validate rule targets after project refresh
+    if (rulesState.rules.length > 0) {
+      const newlyStale = validateRuleTargets();
+      for (const rule of newlyStale) {
+        toast.error(`Rule "${rule.name}" — task "${rule.target.mocoTaskName}" is no longer available`);
+      }
+    }
   } catch (error) {
     logger.error('Failed to fetch Moco projects', error);
   } finally {
