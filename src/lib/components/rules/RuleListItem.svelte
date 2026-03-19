@@ -58,7 +58,7 @@
 </script>
 
 <div
-  class="group/rule relative overflow-hidden rounded-lg border bg-card transition-all duration-150
+  class="group/rule relative rounded-lg border bg-card transition-all duration-150
     {isDragged
     ? 'opacity-50 border-dashed border-primary'
     : isDragOver
@@ -83,64 +83,59 @@
     <GripVertical class="size-3 text-muted-foreground" />
   </div>
 
-  <div class="p-2.5 pl-5 overflow-hidden">
-    <div class="flex items-start justify-between gap-2">
-      <div class="flex-1 min-w-0 overflow-hidden">
-        <div class="flex items-center gap-1.5">
-          {#if isStale}
-            <AlertTriangle class="size-3 text-warning flex-shrink-0" />
-          {:else}
-            <Zap
-              class="size-3 {rule.enabled ? 'text-warning' : 'text-muted-foreground'} flex-shrink-0"
-            />
-          {/if}
-          <span class="text-sm font-medium text-foreground truncate">{rule.name}</span>
-        </div>
-        <p class="text-xs text-muted-foreground truncate">{sourceLabel}</p>
-        <p class="text-xs text-muted-foreground truncate">
-          {rule.target.customerName} — {rule.target.mocoProjectName} / {rule.target.mocoTaskName}
-        </p>
-        {#if isStale}
-          <p class="text-xs text-warning truncate">Task no longer available</p>
-        {:else}
-          <p class="text-[10px] text-muted-foreground/60 truncate">{lastSyncLabel}</p>
-        {/if}
-      </div>
+  <!-- Toggles (absolute, top-right) -->
+  <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
+    <button
+      type="button"
+      onclick={toggleEnabled}
+      class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
+        {rule.enabled
+        ? 'bg-success-subtle text-success-text'
+        : 'bg-secondary text-muted-foreground'}"
+      title={rule.enabled ? 'Rule is active' : 'Rule is paused'}
+    >
+      {rule.enabled ? 'On' : 'Off'}
+    </button>
 
-      <!-- Toggles -->
-      <div class="flex flex-col items-end gap-1 shrink-0">
-        <button
-          type="button"
-          onclick={toggleEnabled}
-          class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
-            {rule.enabled
-            ? 'bg-success-subtle text-success-text'
-            : 'bg-secondary text-muted-foreground'}"
-          title={rule.enabled ? 'Rule is active' : 'Rule is paused'}
-        >
-          {rule.enabled ? 'On' : 'Off'}
-        </button>
-
-        {#if rule.enabled}
-          <button
-            type="button"
-            onclick={toggleAutoSync}
-            class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
-              {rule.autoSync
-              ? 'bg-information-subtle text-brand-text'
-              : 'bg-secondary text-muted-foreground'}"
-            title={rule.autoSync
-              ? 'Entries are synced automatically'
-              : 'Entries require manual sync'}
-          >
-            {rule.autoSync ? 'Auto' : 'Manual'}
-          </button>
-        {/if}
-      </div>
-    </div>
+    {#if rule.enabled}
+      <button
+        type="button"
+        onclick={toggleAutoSync}
+        class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
+          {rule.autoSync
+          ? 'bg-information-subtle text-brand-text'
+          : 'bg-secondary text-muted-foreground'}"
+        title={rule.autoSync ? 'Entries are synced automatically' : 'Entries require manual sync'}
+      >
+        {rule.autoSync ? 'Auto' : 'Manual'}
+      </button>
+    {/if}
   </div>
 
-  <!-- Edit overlay -->
+  <!-- Content (padded right for toggles) -->
+  <div class="p-2.5 pl-5 pr-16">
+    <div class="flex items-center gap-1.5">
+      {#if isStale}
+        <AlertTriangle class="size-3 text-warning flex-shrink-0" />
+      {:else}
+        <Zap
+          class="size-3 {rule.enabled ? 'text-warning' : 'text-muted-foreground'} flex-shrink-0"
+        />
+      {/if}
+      <span class="text-sm font-medium text-foreground truncate">{rule.name}</span>
+    </div>
+    <p class="text-xs text-muted-foreground truncate">{sourceLabel}</p>
+    <p class="text-xs text-muted-foreground truncate">
+      {rule.target.customerName} — {rule.target.mocoProjectName} / {rule.target.mocoTaskName}
+    </p>
+    {#if isStale}
+      <p class="text-xs text-warning truncate">Task no longer available</p>
+    {:else}
+      <p class="text-[10px] text-muted-foreground/60 truncate">{lastSyncLabel}</p>
+    {/if}
+  </div>
+
+  <!-- Edit overlay (hover) -->
   <div
     class="absolute top-1.5 right-1.5 opacity-0 group-hover/rule:opacity-100 flex items-center gap-0.5 transition-opacity duration-150"
   >
