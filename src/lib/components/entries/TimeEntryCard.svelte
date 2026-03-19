@@ -445,7 +445,7 @@
   </div>
   <!-- Bottom-right badges (outside the hours container so edit button doesn't cover them) -->
   {#if syncRecord || mocoMeta?.billable}
-    <div class="absolute bottom-1.5 right-2 flex items-center gap-0.5">
+    <div class="absolute bottom-2.5 right-3 flex items-center gap-1.5">
       {#if syncRecord}
         <SyncBadge {syncRecord} />
       {/if}
