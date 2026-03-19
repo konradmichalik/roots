@@ -70,9 +70,7 @@
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
   let isJiraConnected = $derived(connectionsState.jira.isConnected);
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
-  let syncRecord = $derived(
-    mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined
-  );
+  let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
   // Detect Jira issue key in Moco entry description or remoteTicketKey
   let mocoIssueKey = $derived.by(() => {
@@ -396,26 +394,30 @@
         <span class="text-xs text-muted-foreground">{entry.startTime}–{entry.endTime}</span>
       {/if}
     </div>
-    <div class="relative flex flex-col items-end flex-shrink-0 min-w-8">
+    <div
+      class="relative flex flex-col items-end justify-between flex-shrink-0 min-w-8 self-stretch"
+    >
       <span class="text-sm font-mono font-medium text-foreground group-hover:invisible">
         {formatHours(entry.hours)}
       </span>
-      <!-- Hover action: overlays hours display -->
-      <div class="flex items-center gap-0.5">
-        {#if syncRecord}
-          <SyncBadge {syncRecord} />
-        {/if}
-        {#if mocoMeta?.billable}
-          <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
-              </Tooltip.Trigger>
-              <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        {/if}
-      </div>
+      <!-- Bottom-right: status badges -->
+      {#if syncRecord || mocoMeta?.billable}
+        <div class="flex items-center gap-0.5">
+          {#if syncRecord}
+            <SyncBadge {syncRecord} />
+          {/if}
+          {#if mocoMeta?.billable}
+            <Tooltip.Provider delayDuration={200}>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
+                </Tooltip.Trigger>
+                <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          {/if}
+        </div>
+      {/if}
       {#if mocoMeta && isMocoConnected}
         <button
           type="button"
