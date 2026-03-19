@@ -148,15 +148,6 @@ export function getRuleAnalytics(ruleId: string): RuleAnalytics {
   };
 }
 
-export function getAllAnalytics(): Map<string, RuleAnalytics> {
-  const ruleIds = new Set(syncRecordsState.records.map((r) => r.ruleId));
-  const result = new Map<string, RuleAnalytics>();
-  for (const ruleId of ruleIds) {
-    result.set(ruleId, getRuleAnalytics(ruleId));
-  }
-  return result;
-}
-
 // ---------------------------------------------------------------------------
 // Cleanup
 // ---------------------------------------------------------------------------

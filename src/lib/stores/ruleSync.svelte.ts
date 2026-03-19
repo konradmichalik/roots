@@ -344,7 +344,6 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
 
 export interface HoursChange {
   syncRecord: SyncRecord;
-  ruleName: string;
   currentHours: number;
   syncedHours: number;
   sourceKey: string;
@@ -369,7 +368,6 @@ export function detectHoursChanges(
     if (diff >= 0.01) {
       changes.push({
         syncRecord: record,
-        ruleName: record.sourceKey,
         currentHours: entry.hours,
         syncedHours: record.hours,
         sourceKey: record.sourceKey,
