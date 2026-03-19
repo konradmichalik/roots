@@ -398,23 +398,6 @@
       <span class="text-sm font-mono font-medium text-foreground group-hover:invisible">
         {formatHours(entry.hours)}
       </span>
-      {#if syncRecord || mocoMeta?.billable}
-        <div class="flex items-center gap-0.5">
-          {#if syncRecord}
-            <SyncBadge {syncRecord} />
-          {/if}
-          {#if mocoMeta?.billable}
-            <Tooltip.Provider delayDuration={200}>
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
-                </Tooltip.Trigger>
-                <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          {/if}
-        </div>
-      {/if}
       {#if mocoMeta && isMocoConnected}
         <button
           type="button"
@@ -460,4 +443,22 @@
       {/if}
     </div>
   </div>
+  <!-- Bottom-right badges (outside the hours container so edit button doesn't cover them) -->
+  {#if syncRecord || mocoMeta?.billable}
+    <div class="absolute bottom-1.5 right-2 flex items-center gap-0.5">
+      {#if syncRecord}
+        <SyncBadge {syncRecord} />
+      {/if}
+      {#if mocoMeta?.billable}
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>
+              <CircleDollarSign class="size-3 text-success/60" aria-label="Billable" />
+            </Tooltip.Trigger>
+            <Tooltip.Content side="top" sideOffset={4}>Billable</Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      {/if}
+    </div>
+  {/if}
 {/snippet}
