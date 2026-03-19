@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { updateRule } from '../../stores/rules.svelte';
-  import { getLastSyncForRule, getSyncCountForRule } from '../../stores/syncRecords.svelte';
+  import { getLastSyncForRule } from '../../stores/syncRecords.svelte';
   import type { Rule } from '../../types';
   import GripVertical from '@lucide/svelte/icons/grip-vertical';
   import Pencil from '@lucide/svelte/icons/pencil';
@@ -30,7 +29,6 @@
   } = $props();
 
   let lastSync = $derived(getLastSyncForRule(rule.id));
-  let totalSyncs = $derived(getSyncCountForRule(rule.id));
   let isStale = $derived(rule.targetStatus === 'stale');
 
   let sourceLabel = $derived.by(() => {
@@ -48,13 +46,17 @@
     return `${lastSync.date}, ${lastSync.count} entries`;
   });
 
-  function toggleEnabled(): void {
-    updateRule(rule.id, { enabled: !rule.enabled });
-  }
+  let statusLabel = $derived.by(() => {
+    if (!rule.enabled) return 'Paused';
+    if (rule.autoSync) return 'Auto';
+    return 'Manual';
+  });
 
-  function toggleAutoSync(): void {
-    updateRule(rule.id, { autoSync: !rule.autoSync });
-  }
+  let statusClass = $derived.by(() => {
+    if (!rule.enabled) return 'bg-secondary text-muted-foreground';
+    if (rule.autoSync) return 'bg-information-subtle text-brand-text';
+    return 'bg-success-subtle text-success-text';
+  });
 </script>
 
 <div
@@ -83,37 +85,8 @@
     <GripVertical class="size-3 text-muted-foreground" />
   </div>
 
-  <!-- Toggles (absolute, top-right) -->
-  <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
-    <button
-      type="button"
-      onclick={toggleEnabled}
-      class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
-        {rule.enabled
-        ? 'bg-success-subtle text-success-text'
-        : 'bg-secondary text-muted-foreground'}"
-      title={rule.enabled ? 'Rule is active' : 'Rule is paused'}
-    >
-      {rule.enabled ? 'On' : 'Off'}
-    </button>
-
-    {#if rule.enabled}
-      <button
-        type="button"
-        onclick={toggleAutoSync}
-        class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
-          {rule.autoSync
-          ? 'bg-information-subtle text-brand-text'
-          : 'bg-secondary text-muted-foreground'}"
-        title={rule.autoSync ? 'Entries are synced automatically' : 'Entries require manual sync'}
-      >
-        {rule.autoSync ? 'Auto' : 'Manual'}
-      </button>
-    {/if}
-  </div>
-
-  <!-- Content (padded right for toggles) -->
-  <div class="p-2.5 pl-5 pr-16">
+  <!-- Content -->
+  <div class="p-2.5 pl-5 pr-8">
     <div class="flex items-center gap-1.5">
       {#if isStale}
         <AlertTriangle class="size-3 text-warning flex-shrink-0" />
@@ -123,6 +96,9 @@
         />
       {/if}
       <span class="text-sm font-medium text-foreground truncate">{rule.name}</span>
+      <span class="rounded-full px-1.5 py-0.5 text-[10px] font-medium shrink-0 {statusClass}">
+        {statusLabel}
+      </span>
     </div>
     <p class="text-xs text-muted-foreground truncate">{sourceLabel}</p>
     <p class="text-xs text-muted-foreground truncate">

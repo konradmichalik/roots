@@ -405,16 +405,30 @@
           {/if}
         </div>
 
-        <!-- Auto-Sync Toggle -->
-        <label class="flex items-start gap-2 cursor-pointer">
-          <input type="checkbox" bind:checked={autoSync} class="accent-primary mt-0.5" />
-          <div>
-            <span class="text-sm text-foreground">Auto-sync</span>
-            <p class="text-[10px] text-muted-foreground">
-              When enabled, new entries are automatically transferred when opening the day.
-            </p>
-          </div>
-        </label>
+        <!-- Enabled + Auto-Sync Toggles -->
+        <div class="space-y-2">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="checkbox" bind:checked={enabled} class="accent-primary mt-0.5" />
+            <div>
+              <span class="text-sm text-foreground">Enabled</span>
+              <p class="text-[10px] text-muted-foreground">
+                When disabled, this rule is paused and won't match any entries.
+              </p>
+            </div>
+          </label>
+
+          {#if enabled}
+            <label class="flex items-start gap-2 cursor-pointer pl-5">
+              <input type="checkbox" bind:checked={autoSync} class="accent-primary mt-0.5" />
+              <div>
+                <span class="text-sm text-foreground">Auto-sync</span>
+                <p class="text-[10px] text-muted-foreground">
+                  Automatically transfer new entries when opening the day.
+                </p>
+              </div>
+            </label>
+          {/if}
+        </div>
 
         <!-- Overlap Warning -->
         {#if overlappingRules.length > 0}
