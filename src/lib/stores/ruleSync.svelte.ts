@@ -54,7 +54,7 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
   // Set remote fields for linking and dedup
   if (rule.source.type === 'jira' && entry.metadata.source === 'jira') {
     payload.remote_service = 'jira';
-    payload.remote_id = entry.metadata.issueKey;
+    payload.remote_id = `${entry.metadata.issueKey}#${entry.metadata.worklogId}`;
   } else if (rule.source.type === 'outlook' && entry.metadata.source === 'outlook') {
     payload.remote_service = 'outlook';
     payload.remote_id = entry.metadata.eventId;
@@ -235,10 +235,12 @@ export async function executeSyncCandidates(
     }
   }
 
-  // Refresh entries if anything was created
-  if (created.length > 0 && candidates.length > 0) {
-    const date = candidates[0].mocoPayload.date;
-    await Promise.allSettled([refreshDayEntries(date), refreshMonthCacheForDate(date)]);
+  // Refresh entries for all affected dates
+  if (created.length > 0) {
+    const affectedDates = [...new Set(created.map((r) => r.mocoDate))];
+    await Promise.allSettled(
+      affectedDates.flatMap((date) => [refreshDayEntries(date), refreshMonthCacheForDate(date)])
+    );
   }
 
   return { created, failed };
@@ -253,6 +255,7 @@ export interface BulkSyncPreview {
   totalPending: number;
   totalSkipped: number;
   totalErrors: number;
+  fetchErrors: string[];
 }
 
 export async function syncDateRange(from: string, to: string): Promise<BulkSyncPreview> {
@@ -269,6 +272,7 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
   let jiraWorklogs: UnifiedTimeEntry[] = [];
   let outlookEvents: UnifiedTimeEntry[] = [];
   let mocoActivities: UnifiedTimeEntry[] = [];
+  const fetchErrors: string[] = [];
 
   const fetches: Promise<void>[] = [];
 
@@ -280,6 +284,7 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
           jiraWorklogs = worklogs.map((w) => mapJiraWorklog(w, jiraClient));
         })
         .catch((e) => {
+          fetchErrors.push(`Jira: ${e instanceof Error ? e.message : 'Failed to fetch worklogs'}`);
           logger.error('Bulk sync: Failed to fetch Jira worklogs', e);
         })
     );
@@ -293,6 +298,7 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
           outlookEvents = events.map(mapOutlookEvent);
         })
         .catch((e) => {
+          fetchErrors.push(`Outlook: ${e instanceof Error ? e.message : 'Failed to fetch events'}`);
           logger.error('Bulk sync: Failed to fetch Outlook events', e);
         })
     );
@@ -306,6 +312,9 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
           mocoActivities = activities.map(mapMocoActivity);
         })
         .catch((e) => {
+          fetchErrors.push(
+            `Moco: ${e instanceof Error ? e.message : 'Failed to fetch activities'}`
+          );
           logger.error('Bulk sync: Failed to fetch Moco activities', e);
         })
     );
@@ -335,7 +344,7 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
     current = addDays(current, 1);
   }
 
-  return { days, totalPending, totalSkipped, totalErrors };
+  return { days, totalPending, totalSkipped, totalErrors, fetchErrors };
 }
 
 // ---------------------------------------------------------------------------

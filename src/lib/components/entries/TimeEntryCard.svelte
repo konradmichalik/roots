@@ -234,7 +234,8 @@
       source: {
         type: 'jira',
         connectionId: 'default',
-        projectKey: jiraMeta.projectKey ?? jiraMeta.issueKey.split('-')[0]
+        projectKey: jiraMeta.projectKey ?? jiraMeta.issueKey.split('-')[0],
+        issuePattern: jiraMeta.issueKey
       }
     }}
     defaultOpen={true}

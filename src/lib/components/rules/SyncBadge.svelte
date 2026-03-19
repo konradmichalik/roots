@@ -11,7 +11,7 @@
   );
 
   let syncDate = $derived(
-    new Date(syncRecord.syncedAt).toLocaleDateString('de-DE', {
+    new Date(syncRecord.syncedAt).toLocaleDateString(undefined, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'

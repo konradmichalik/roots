@@ -93,8 +93,11 @@ export async function fetchDayEntries(date: string): Promise<void> {
   timeEntriesState.lastFetched = new Date().toISOString();
   timeEntriesState.fetchedDate = date;
 
-  // Auto-sync: only for today, only if rules exist with autoSync enabled
+  // Auto-sync: only for today, only if all fetches succeeded
+  const hasErrors =
+    timeEntriesState.errors.moco || timeEntriesState.errors.jira || timeEntriesState.errors.outlook;
   if (
+    !hasErrors &&
     date === today() &&
     !isDemoMode() &&
     connectionsState.moco.isConnected &&

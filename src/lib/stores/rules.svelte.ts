@@ -42,9 +42,19 @@ export function addRule(
 }
 
 export function updateRule(id: string, updates: Partial<Omit<Rule, 'id' | 'createdAt'>>): void {
-  rulesState.rules = rulesState.rules.map((r) =>
-    r.id === id ? { ...r, ...updates, updatedAt: new Date().toISOString() } : r
-  );
+  rulesState.rules = rulesState.rules.map((r) => {
+    if (r.id !== id) return r;
+    const targetChanged =
+      updates.target &&
+      (updates.target.mocoProjectId !== r.target.mocoProjectId ||
+        updates.target.mocoTaskId !== r.target.mocoTaskId);
+    return {
+      ...r,
+      ...updates,
+      updatedAt: new Date().toISOString(),
+      targetStatus: targetChanged ? ('unknown' as const) : (updates.targetStatus ?? r.targetStatus)
+    };
+  });
   persist();
   logger.store('rules', 'Updated', { id });
 }
@@ -187,6 +197,13 @@ export function validateRuleTargets(): Rule[] {
   const newlyStale: Rule[] = [];
 
   rulesState.rules = rulesState.rules.map((rule) => {
+    // Skip validation if the project isn't in the loaded list (avoid false stale)
+    const project = mocoProjectsState.projects.find((p) => p.id === rule.target.mocoProjectId);
+    if (!project) {
+      if (rule.targetStatus !== 'unknown') return { ...rule, targetStatus: 'unknown' as const };
+      return rule;
+    }
+
     const tasks = getTasksForProject(rule.target.mocoProjectId);
     const taskExists = tasks.some((t) => t.id === rule.target.mocoTaskId);
 
