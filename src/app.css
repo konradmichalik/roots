@@ -302,7 +302,11 @@ html[data-color-mode='dark'] {
 }
 
 .dot-grid-bg {
-  background-image: radial-gradient(circle, color-mix(in srgb, var(--ds-border) 40%, transparent) 1px, transparent 1px);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ds-border) 40%, transparent) 1px,
+    transparent 1px
+  );
   background-size: 16px 16px;
 }
 
