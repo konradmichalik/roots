@@ -79,10 +79,6 @@
     }
   }
 
-  // Auto-open
-  $effect(() => {
-    if (defaultOpen && !open) open = true;
-  });
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpen}>
