@@ -1,8 +1,6 @@
 <script lang="ts">
-  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
   import { updateRule } from '../../stores/rules.svelte';
   import { getLastSyncForRule, getSyncCountForRule } from '../../stores/syncRecords.svelte';
-  import { formatHours } from '../../utils/time-format';
   import type { Rule } from '../../types';
   import GripVertical from '@lucide/svelte/icons/grip-vertical';
   import Pencil from '@lucide/svelte/icons/pencil';
@@ -110,47 +108,33 @@
       </div>
 
       <!-- Toggles -->
-      <div class="flex flex-col items-end gap-1 flex-shrink-0">
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <button
-                type="button"
-                onclick={toggleEnabled}
-                class="rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors
-                  {rule.enabled
-                  ? 'bg-success-subtle text-success-text'
-                  : 'bg-secondary text-muted-foreground'}"
-              >
-                {rule.enabled ? 'On' : 'Off'}
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Content side="left" sideOffset={4}>
-              {rule.enabled ? 'Rule is active' : 'Rule is paused'}
-            </Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+      <div class="flex flex-col items-end gap-1 shrink-0">
+        <button
+          type="button"
+          onclick={toggleEnabled}
+          class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
+            {rule.enabled
+            ? 'bg-success-subtle text-success-text'
+            : 'bg-secondary text-muted-foreground'}"
+          title={rule.enabled ? 'Rule is active' : 'Rule is paused'}
+        >
+          {rule.enabled ? 'On' : 'Off'}
+        </button>
 
         {#if rule.enabled}
-          <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root>
-              <Tooltip.Trigger>
-                <button
-                  type="button"
-                  onclick={toggleAutoSync}
-                  class="rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors
-                    {rule.autoSync
-                    ? 'bg-information-subtle text-brand-text'
-                    : 'bg-secondary text-muted-foreground'}"
-                >
-                  {rule.autoSync ? 'Auto' : 'Manual'}
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Content side="left" sideOffset={4}>
-                {rule.autoSync ? 'Entries are synced automatically' : 'Entries require manual sync'}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+          <button
+            type="button"
+            onclick={toggleAutoSync}
+            class="rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap transition-colors
+              {rule.autoSync
+              ? 'bg-information-subtle text-brand-text'
+              : 'bg-secondary text-muted-foreground'}"
+            title={rule.autoSync
+              ? 'Entries are synced automatically'
+              : 'Entries require manual sync'}
+          >
+            {rule.autoSync ? 'Auto' : 'Manual'}
+          </button>
         {/if}
       </div>
     </div>
