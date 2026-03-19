@@ -37,6 +37,23 @@
     filterRuleId !== '' || filterSourceType !== 'all' || filterStatus !== 'all'
   );
 
+  const PAGE_SIZE = 50;
+  let visibleCount = $state(PAGE_SIZE);
+  let visibleRecords = $derived(filteredRecords.slice(0, visibleCount));
+  let hasMore = $derived(visibleCount < filteredRecords.length);
+
+  // Reset pagination when filters change
+  $effect(() => {
+    filterRuleId;
+    filterSourceType;
+    filterStatus;
+    visibleCount = PAGE_SIZE;
+  });
+
+  function loadMore(): void {
+    visibleCount += PAGE_SIZE;
+  }
+
   let showFilters = $state(false);
   let confirmDeleteId = $state<string | null>(null);
 
@@ -143,7 +160,7 @@
   {/if}
 
   <div class="space-y-1 max-h-[50vh] overflow-y-auto">
-    {#each filteredRecords as record (record.id)}
+    {#each visibleRecords as record (record.id)}
       <div
         class="flex items-start gap-2 rounded-lg px-2.5 py-2 text-xs transition-colors hover:bg-accent/50
           {record.status === 'failed' ? 'bg-danger-subtle/30' : ''}"
@@ -216,6 +233,15 @@
       <p class="text-xs text-muted-foreground text-center py-4">
         No records match the current filters.
       </p>
+    {/if}
+    {#if hasMore}
+      <button
+        type="button"
+        onclick={loadMore}
+        class="w-full py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-colors"
+      >
+        Show more ({filteredRecords.length - visibleCount} remaining)
+      </button>
     {/if}
   </div>
 {/if}
