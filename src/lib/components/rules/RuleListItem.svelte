@@ -85,9 +85,9 @@
     <GripVertical class="size-3 text-muted-foreground" />
   </div>
 
-  <div class="p-2.5 pl-5">
+  <div class="p-2.5 pl-5 overflow-hidden">
     <div class="flex items-start justify-between gap-2">
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-w-0 overflow-hidden">
         <div class="flex items-center gap-1.5">
           {#if isStale}
             <AlertTriangle class="size-3 text-warning flex-shrink-0" />

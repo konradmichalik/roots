@@ -14,9 +14,6 @@
   import History from '@lucide/svelte/icons/history';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import Layers from '@lucide/svelte/icons/layers';
-  import Info from '@lucide/svelte/icons/info';
-  import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-
   let {
     children,
     defaultOpen = false,
@@ -138,19 +135,7 @@
   {/if}
   <Dialog.Content class="sm:max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden">
     <Dialog.Header>
-      <div class="flex items-center gap-2">
-        <Dialog.Title>Rules</Dialog.Title>
-        <Tooltip.Provider delayDuration={200}>
-          <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Info class="size-3.5 text-muted-foreground" />
-            </Tooltip.Trigger>
-            <Tooltip.Content side="right" sideOffset={4} class="max-w-[250px]">
-              Rules transfer Jira worklogs and Outlook events to Moco automatically.
-            </Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      </div>
+      <Dialog.Title>Rules</Dialog.Title>
       <Dialog.Description>
         Map Jira projects and Outlook events to Moco booking positions.
       </Dialog.Description>
