@@ -168,7 +168,11 @@
       {:else}
         <div class="py-4 text-center">
           <Check class="size-6 text-success mx-auto mb-1" />
-          <p class="text-sm text-muted-foreground">All matching entries are already synced.</p>
+          <p class="text-sm text-muted-foreground">
+            {preview.errors.length > 0
+              ? 'No entries available for transfer.'
+              : 'All matching entries are already synced.'}
+          </p>
         </div>
       {/if}
 

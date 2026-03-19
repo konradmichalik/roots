@@ -98,15 +98,20 @@ function buildPreview(
   const seenStaleRuleIds = new Set<string>();
 
   for (const entry of sourceEntries) {
-    if (entry.hours <= 0) {
-      skipped.push({ sourceEntry: entry, reason: 'zero_hours' });
-      continue;
-    }
-
     const matchingRules = findMatchingRules(entry);
     if (matchingRules.length === 0) continue;
 
     const rule = matchingRules[0];
+
+    // Check zero hours after matching — overrideHours can make 0h events billable
+    const effectiveHours =
+      rule.source.type === 'outlook' && rule.source.overrideHours !== undefined
+        ? rule.source.overrideHours
+        : entry.hours;
+    if (effectiveHours <= 0) {
+      skipped.push({ sourceEntry: entry, reason: 'zero_hours' });
+      continue;
+    }
 
     if (options.autoOnly && !rule.autoSync) continue;
 
