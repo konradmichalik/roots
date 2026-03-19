@@ -44,7 +44,7 @@
     </div>
     <div class="flex items-center justify-between text-sm text-muted-foreground">
       <span
-        >Booked: <span class="font-mono font-medium text-foreground"
+        >Booked: <span class="font-mono text-base font-bold text-foreground"
           >{formatHours(weekTotals.actual)}</span
         ></span
       >
@@ -60,21 +60,21 @@
         style="width: {getProgressPercent(weekTotals.actual, weekTotals.required)}%"
       ></div>
     </div>
-    <p class="text-xs text-muted-foreground">
+    <p class="text-xs font-mono text-muted-foreground">
       {getProgressPercent(weekTotals.actual, weekTotals.required)}% of weekly target (Mon-Fri)
     </p>
     {#if weekTotalsUntilYesterday.daysCount > 0 && weekTotalsUntilYesterday.daysCount < 5}
       <div class="pt-2 border-t border-border/50">
         <div class="flex items-center justify-between text-xs">
           <span class="text-muted-foreground"
-            >Until yesterday ({weekTotalsUntilYesterday.daysCount} days):</span
+            >Until yesterday ({weekTotalsUntilYesterday.daysCount} days)</span
           >
           <span class="font-mono font-medium {getBalanceClass(weekTotalsUntilYesterday.balance)}">
             {formatBalance(weekTotalsUntilYesterday.balance)}
           </span>
         </div>
         <div class="flex items-center justify-between text-xs text-muted-foreground mt-1">
-          <span
+          <span class="font-mono"
             >{formatHours(weekTotalsUntilYesterday.actual)} / {formatHours(
               weekTotalsUntilYesterday.required
             )}</span
@@ -95,7 +95,7 @@
     </div>
     <div class="flex items-center justify-between text-sm text-muted-foreground">
       <span
-        >Booked: <span class="font-mono font-medium text-foreground"
+        >Booked: <span class="font-mono text-base font-bold text-foreground"
           >{formatHours(monthTotals.actual)}</span
         ></span
       >
@@ -111,7 +111,7 @@
         style="width: {getProgressPercent(monthTotals.actual, monthTotals.required)}%"
       ></div>
     </div>
-    <p class="text-xs text-muted-foreground">
+    <p class="text-xs font-mono text-muted-foreground">
       {getProgressPercent(monthTotals.actual, monthTotals.required)}% of monthly target ({monthWorkingDaysCount}
       working days)
     </p>
@@ -119,14 +119,14 @@
       <div class="pt-2 border-t border-border/50">
         <div class="flex items-center justify-between text-xs">
           <span class="text-muted-foreground"
-            >Until yesterday ({monthTotalsUntilYesterday.daysCount} days):</span
+            >Until yesterday ({monthTotalsUntilYesterday.daysCount} days)</span
           >
           <span class="font-mono font-medium {getBalanceClass(monthTotalsUntilYesterday.balance)}">
             {formatBalance(monthTotalsUntilYesterday.balance)}
           </span>
         </div>
         <div class="flex items-center justify-between text-xs text-muted-foreground mt-1">
-          <span
+          <span class="font-mono"
             >{formatHours(monthTotalsUntilYesterday.actual)} / {formatHours(
               monthTotalsUntilYesterday.required
             )}</span

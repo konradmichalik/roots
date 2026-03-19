@@ -120,12 +120,12 @@
         <!-- Center text -->
         <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           {#if hoveredSegment !== null}
-            <span class="text-2xl font-mono font-semibold text-foreground">
+            <span class="text-2xl font-mono font-bold text-foreground">
               {Math.round(pieSegments[hoveredSegment].percent)}%
             </span>
           {:else}
             <span class="text-xs text-muted-foreground">Total</span>
-            <span class="text-base font-mono font-semibold text-foreground">
+            <span class="text-xl font-mono font-bold text-foreground">
               {formatHours(stats.total)}
             </span>
           {/if}
@@ -174,11 +174,11 @@
               {project.customerName} — {project.projectName}
             </span>
           </div>
-          <div class="flex items-center gap-2 ml-2 flex-shrink-0">
-            <span class="text-xs text-muted-foreground">
+          <div class="flex items-center ml-2 flex-shrink-0">
+            <span class="font-mono text-xs text-muted-foreground w-10 text-right">
               {getPercent(project.hours, stats.total)}%
             </span>
-            <span class="text-sm font-mono font-semibold text-foreground">
+            <span class="font-mono text-sm font-semibold text-foreground w-[72px] text-right">
               {formatHours(project.hours)}
             </span>
           </div>
@@ -203,21 +203,21 @@
               highlightTaskName !== undefined &&
               task.taskName === highlightTaskName}
             <div
-              class="flex items-center justify-between text-xs gap-2 transition-colors duration-300
+              class="flex items-center text-xs gap-2 transition-colors duration-300
               {isTaskHighlighted ? 'bg-primary/10 rounded px-1 -mx-1' : ''}"
             >
               <span
                 class="{isTaskHighlighted
                   ? 'text-foreground font-medium'
-                  : 'text-muted-foreground'} truncate min-w-0 flex-1"
+                  : 'text-muted-foreground/70'} truncate min-w-0 flex-1"
                 title={task.taskName}
               >
                 {task.taskName}
               </span>
-              <span class="text-muted-foreground/70 flex-shrink-0 w-8 text-right">
+              <span class="font-mono text-muted-foreground/50 flex-shrink-0 w-10 text-right">
                 {getPercent(task.hours, stats.total)}%
               </span>
-              <span class="font-mono text-muted-foreground flex-shrink-0 w-14 text-right">
+              <span class="font-mono text-muted-foreground/70 flex-shrink-0 w-[72px] text-right">
                 {formatHours(task.hours)}
               </span>
             </div>
