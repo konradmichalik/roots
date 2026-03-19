@@ -1,22 +1,30 @@
 <script lang="ts">
   import * as Dialog from '$lib/components/ui/dialog/index.js';
   import { getMatchableEvents } from '../../utils/matchable-events';
-  import { getEntriesForDate, createMocoActivity } from '../../stores/timeEntries.svelte';
+  import {
+    getEntriesForDate,
+    createMocoActivity,
+    getCachedDayOverview
+  } from '../../stores/timeEntries.svelte';
   import { mocoUserName } from '../../stores/connections.svelte';
-  import { settingsState } from '../../stores/settings.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { toast } from '../../stores/toast.svelte';
-  import { today, getDayOfWeekIndex, parseDate } from '../../utils/date-helpers';
-  import { formatHours } from '../../utils/time-format';
+  import {
+    today,
+    getWeekDates,
+    getMonthStart,
+    parseDate
+  } from '../../utils/date-helpers';
+  import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
   import { ABSENCE_LABELS } from '../../types/unified';
   import type { OutlookMetadata, AbsenceType } from '../../types/unified';
   import Sun from '@lucide/svelte/icons/sun';
-  import Sunrise from '@lucide/svelte/icons/sunrise';
   import Check from '@lucide/svelte/icons/check';
   import Video from '@lucide/svelte/icons/video';
   import LoaderCircle from '@lucide/svelte/icons/loader-circle';
   import CalendarDays from '@lucide/svelte/icons/calendar-days';
   import Sparkles from '@lucide/svelte/icons/sparkles';
+  import ArrowRight from '@lucide/svelte/icons/arrow-right';
   import { SvelteSet } from 'svelte/reactivity';
 
   let {
@@ -51,11 +59,19 @@
   let totalUnbookedHours = $derived(unbookedEvents.reduce((sum, e) => sum + e.hours, 0));
 
   // Day context
-  let targetHours = $derived(settingsState.weekdayHours[getDayOfWeekIndex(todayStr)]);
   let absence = $derived(getAbsenceForDate(todayStr));
   let onlineMeetingCount = $derived(
     outlookEvents.filter((e) => (e.metadata as OutlookMetadata).isOnlineMeeting).length
   );
+
+  // Weekly balance (days before today)
+  let weekBalance = $derived.by(() => {
+    const weekDates = getWeekDates(todayStr);
+    const pastDates = weekDates.filter((d) => d < todayStr);
+    return pastDates
+      .map((d) => getCachedDayOverview(d, getMonthStart(d)))
+      .reduce((sum, d) => sum + d.balance, 0);
+  });
 
   // Pre-select all un-booked events only once when modal opens
   $effect(() => {
@@ -89,31 +105,9 @@
     mocoUserName.value ? `${getTimeGreeting()}, ${mocoUserName.value}!` : `${getTimeGreeting()}!`
   );
 
-  let summaryText = $derived.by(() => {
-    if (absence) {
-      const label = ABSENCE_LABELS[(absence as { type: AbsenceType }).type] || 'time off';
-      return `You're on ${label.toLowerCase()} today. Enjoy your day!`;
-    }
-
-    const parts: string[] = [];
-
-    const eventCount = outlookEvents.length;
-    const eventWord = eventCount === 1 ? 'appointment' : 'appointments';
-    if (onlineMeetingCount > 0 && onlineMeetingCount < eventCount) {
-      parts.push(
-        `You have ${eventCount} ${eventWord} today, including ${onlineMeetingCount} online ${onlineMeetingCount === 1 ? 'meeting' : 'meetings'}.`
-      );
-    } else if (onlineMeetingCount === eventCount) {
-      parts.push(`You have ${eventCount} online ${eventWord} today.`);
-    } else {
-      parts.push(`You have ${eventCount} ${eventWord} today.`);
-    }
-
-    if (targetHours > 0) {
-      parts.push(`Your daily target is ${formatHours(targetHours)}.`);
-    }
-
-    return parts.join(' ');
+  let absenceLabel = $derived.by(() => {
+    if (!absence) return null;
+    return ABSENCE_LABELS[(absence as { type: AbsenceType }).type] || 'time off';
   });
 
   function toggleEvent(eventId: string): void {
@@ -168,10 +162,10 @@
 
 <Dialog.Root bind:open>
   <Dialog.Content class="sm:max-w-lg overflow-hidden">
-    <!-- Header: Greeting + Date -->
+    <!-- Header: Greeting + Date (left-aligned, compact icon) -->
     <Dialog.Header class="pb-1">
       <Dialog.Title class="flex items-center gap-2 text-lg">
-        <Sun class="size-5 text-warning" />
+        <Sun class="size-4 text-warning" />
         {greeting}
       </Dialog.Title>
       <p class="text-xs text-muted-foreground">
@@ -179,21 +173,34 @@
       </p>
     </Dialog.Header>
 
-    <!-- Hero icon (two-tone) + Summary prose -->
-    <div
-      class="animate-stagger-in flex flex-col items-center text-center gap-3"
-      style={staggerDelay(0, 120)}
-    >
-      <div class="relative size-12">
-        <Sunrise class="size-12 text-muted-foreground/25 absolute inset-0" />
-        <div class="absolute inset-0 overflow-hidden" style="clip-path: inset(40% 0 0 0)">
-          <Sunrise class="size-12 text-warning absolute inset-0" />
+    <!-- Snackable metrics or absence notice -->
+    {#if absenceLabel}
+      <p
+        class="animate-stagger-in text-sm text-muted-foreground"
+        style={staggerDelay(0, 120)}
+      >
+        You're on {absenceLabel.toLowerCase()} today. Enjoy your day!
+      </p>
+    {:else}
+      <div
+        class="animate-stagger-in grid grid-cols-2 gap-2"
+        style={staggerDelay(0, 120)}
+      >
+        <div class="rounded-lg bg-accent/50 px-3 py-2">
+          <span class="text-lg font-semibold tabular-nums text-foreground">{outlookEvents.length}</span>
+          <span class="ml-1 text-xs text-muted-foreground">
+            {outlookEvents.length === 1 ? 'Appointment' : 'Appointments'}
+            {#if onlineMeetingCount > 0}
+              <span class="text-muted-foreground/70">({onlineMeetingCount} <Video class="inline size-3 -mt-0.5" /> online)</span>
+            {/if}
+          </span>
+        </div>
+        <div class="rounded-lg bg-accent/50 px-3 py-2">
+          <span class="text-lg font-semibold tabular-nums {getBalanceClass(weekBalance)}">{formatBalance(weekBalance)}</span>
+          <span class="ml-1 text-xs text-muted-foreground">Week Balance</span>
         </div>
       </div>
-      <p class="text-sm text-muted-foreground leading-relaxed">
-        {summaryText}
-      </p>
-    </div>
+    {/if}
 
     <!-- Today's Schedule -->
     {#if outlookEvents.length > 0}
@@ -208,7 +215,7 @@
           {#each outlookEvents as event, i (event.id)}
             {@const meta = event.metadata as OutlookMetadata}
             <div
-              class="animate-stagger-in flex items-center gap-3 rounded-md px-3 py-1.5 text-sm min-w-0"
+              class="group animate-stagger-in flex items-center gap-3 rounded-md px-3 py-1.5 text-sm min-w-0"
               style={staggerDelay(i + 2, 60)}
             >
               <span
@@ -224,7 +231,7 @@
               </span>
               <span class="truncate flex-1 min-w-0 text-foreground">{event.title}</span>
               {#if meta.isOnlineMeeting}
-                <Video class="size-3.5 text-muted-foreground shrink-0" />
+                <Video class="size-3.5 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 transition-colors" />
               {/if}
             </div>
           {/each}
@@ -303,15 +310,15 @@
     {/if}
 
     <Dialog.Footer>
-      <button
-        type="button"
-        onclick={onClose}
-        disabled={isBooking}
-        class="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
-      >
-        {unbookedEvents.length > 0 ? 'Skip' : 'Close'}
-      </button>
       {#if unbookedEvents.length > 0}
+        <button
+          type="button"
+          onclick={onClose}
+          disabled={isBooking}
+          class="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors disabled:opacity-50"
+        >
+          Skip
+        </button>
         <button
           type="button"
           onclick={bookSelected}
@@ -322,8 +329,18 @@
             <LoaderCircle class="size-4 animate-spin" />
             Booking...
           {:else}
-            Book
+            Book & Start Day
+            <ArrowRight class="size-4" />
           {/if}
+        </button>
+      {:else}
+        <button
+          type="button"
+          onclick={onClose}
+          class="rounded-lg bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-2"
+        >
+          Start Day
+          <ArrowRight class="size-4" />
         </button>
       {/if}
     </Dialog.Footer>
