@@ -132,11 +132,26 @@
   // Hover action button config (DRY: one button, three variants)
   let hoverAction = $derived.by(() => {
     if (mocoMeta && isMocoConnected)
-      return { onclick: openMocoEdit, title: 'Edit entry', icon: Pencil, color: 'text-muted-foreground hover:text-foreground hover:bg-accent' } as const;
+      return {
+        onclick: openMocoEdit,
+        title: 'Edit entry',
+        icon: Pencil,
+        color: 'text-muted-foreground hover:text-foreground hover:bg-accent'
+      } as const;
     if (jiraMeta && isJiraConnected)
-      return { onclick: openJiraEdit, title: 'Edit worklog', icon: Pencil, color: 'text-muted-foreground hover:text-foreground hover:bg-accent' } as const;
+      return {
+        onclick: openJiraEdit,
+        title: 'Edit worklog',
+        icon: Pencil,
+        color: 'text-muted-foreground hover:text-foreground hover:bg-accent'
+      } as const;
     if (outlookMeta && isMocoConnected)
-      return { onclick: openMocoCreate, title: 'Book in Moco', icon: Plus, color: 'text-success hover:text-success-text hover:bg-success/10' } as const;
+      return {
+        onclick: openMocoCreate,
+        title: 'Book in Moco',
+        icon: Plus,
+        color: 'text-success hover:text-success-text hover:bg-success/10'
+      } as const;
     return null;
   });
 
