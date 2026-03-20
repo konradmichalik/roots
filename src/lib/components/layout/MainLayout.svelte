@@ -17,7 +17,10 @@
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
+  import { isTauri } from '../../utils/storage';
   import { onMount } from 'svelte';
+
+  const isDesktop = isTauri();
 
   let innerWidth = $state(0);
   const isCompact = $derived(innerWidth < 1536);
@@ -110,6 +113,9 @@
 <svelte:window bind:innerWidth />
 
 <div class="flex h-screen flex-col">
+  {#if isDesktop}
+    <div data-tauri-drag-region class="h-3 w-full bg-card shrink-0"></div>
+  {/if}
   <TopBar />
 
   <div class="flex flex-1 overflow-hidden">
