@@ -187,23 +187,20 @@
 
           <!-- Progress bar -->
           <div
-            class="relative h-1.5 flex-1 rounded-full bg-muted/40 group-hover:bg-muted/60 transition-colors"
+            class="relative h-1.5 flex-1 rounded-full bg-muted/30 group-hover:bg-muted/50 transition-colors"
           >
             {#each timeline.segments as segment (`${segment.type}-${segment.start}`)}
               {#if segment.type === 'booked'}
-                <!-- Booked time: full intensity -->
                 <div
                   class="absolute top-0 h-full rounded-full bg-success transition-all duration-300"
                   style={getSegmentStyle(segment)}
                 ></div>
               {:else if segment.type === 'open'}
-                <!-- Open/unbooked time: warning color -->
                 <div
                   class="absolute top-0 h-full rounded-full bg-danger/50 transition-all duration-300"
                   style={getSegmentStyle(segment)}
                 ></div>
               {:else if segment.type === 'gap'}
-                <!-- Break/gap between presences -->
                 <div
                   class="absolute top-0 h-full rounded-full bg-muted transition-all duration-300"
                   style={getSegmentStyle(segment)}
