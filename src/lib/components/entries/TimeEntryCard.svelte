@@ -74,9 +74,7 @@
   let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
   // Jira/Outlook entry not linked to any Moco entry
-  let isUnbooked = $derived(
-    (jiraMeta || outlookMeta) && isMocoConnected && !matchGroupId
-  );
+  let isUnbooked = $derived((jiraMeta || outlookMeta) && isMocoConnected && !matchGroupId);
 
   // Detect Jira issue key in Moco entry description or remoteTicketKey
   let mocoIssueKey = $derived.by(() => {
