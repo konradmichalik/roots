@@ -169,11 +169,15 @@
               <Tooltip.Content side="bottom" sideOffset={4}>
                 <div class="text-xs space-y-1">
                   <p class="font-medium">
-                    {hoursChanges.length} synced {hoursChanges.length === 1 ? 'entry has' : 'entries have'} changed hours
+                    {hoursChanges.length} synced {hoursChanges.length === 1
+                      ? 'entry has'
+                      : 'entries have'} changed hours
                   </p>
                   {#each hoursChanges.slice(0, 5) as change (change.sourceKey)}
                     <p class="text-[10px] opacity-80">
-                      {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(change.currentHours)}
+                      {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(
+                        change.currentHours
+                      )}
                     </p>
                   {/each}
                   {#if hoursChanges.length > 5}
