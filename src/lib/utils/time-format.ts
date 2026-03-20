@@ -46,6 +46,29 @@ export function formatBalance(hours: number): string {
 }
 
 /**
+ * Calculate progress percentage (actual vs full target, capped at 100%)
+ */
+export function getProgressPercent(actual: number, fullTarget: number): number {
+  return fullTarget > 0 ? Math.min((actual / fullTarget) * 100, 100) : 0;
+}
+
+/**
+ * Calculate overtime percentage beyond 100% (capped at 20%)
+ */
+export function getOverPercent(actual: number, fullTarget: number): number {
+  return fullTarget > 0 && actual > fullTarget
+    ? Math.min(((actual - fullTarget) / fullTarget) * 100, 20)
+    : 0;
+}
+
+/**
+ * Calculate pace percentage (elapsed target vs full target)
+ */
+export function getPacePercent(elapsedTarget: number, fullTarget: number): number {
+  return fullTarget > 0 ? Math.min((elapsedTarget / fullTarget) * 100, 100) : 0;
+}
+
+/**
  * Get CSS class for balance coloring
  */
 export function getBalanceClass(hours: number): string {

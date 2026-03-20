@@ -14,9 +14,23 @@
   } from '../../stores/timeEntries.svelte';
   import { getPresenceForDate } from '../../stores/presences.svelte';
   import { statsModalState } from '../../stores/statsModal.svelte';
-  import { getWeekDates, getMonthStart, getMonthWorkingDays } from '../../utils/date-helpers';
+  import {
+    getWeekDates,
+    getMonthStart,
+    getMonthWorkingDays,
+    parseDate
+  } from '../../utils/date-helpers';
+  import { settingsState } from '../../stores/settings.svelte';
   import type { MocoMetadata } from '../../types';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+
+  // Helper: get required hours for a date from weekdayHours setting
+  function getRequiredHoursForDate(dateStr: string): number {
+    const dayOfWeek = parseDate(dateStr).getDay(); // 0=Sun, 1=Mon, ...
+    // weekdayHours is [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+    const index = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    return settingsState.weekdayHours[index] ?? 0;
+  }
 
   let { todayStr }: { todayStr: string } = $props();
 
@@ -81,6 +95,27 @@
       .sort((a, b) => a.date.localeCompare(b.date))
   );
 
+  // Full targets for entire periods (not just up to yesterday)
+  let allMonthWorkingDays = $derived(getMonthWorkingDays(dateNavState.selectedDate));
+  let weekFullTarget = $derived(weekDates.reduce((sum, d) => sum + getRequiredHoursForDate(d), 0));
+  let monthFullTarget = $derived(
+    allMonthWorkingDays.reduce((sum, d) => sum + getRequiredHoursForDate(d), 0)
+  );
+  let yearStats = $derived.by(() => {
+    const year = new Date(todayStr).getFullYear();
+    let fullTarget = 0;
+    let totalDays = 0;
+    let elapsedDays = 0;
+    for (let m = 0; m < 12; m++) {
+      const ms = `${year}-${String(m + 1).padStart(2, '0')}-01`;
+      const days = getMonthWorkingDays(ms);
+      fullTarget += days.reduce((sum, d) => sum + getRequiredHoursForDate(d), 0);
+      totalDays += days.length;
+      elapsedDays += days.filter((d) => d < todayStr).length;
+    }
+    return { fullTarget, totalDays, elapsedDays };
+  });
+
   let isStatsLoading = $derived(monthCacheState.loading && !monthCacheState.cache[monthStart]);
 </script>
 
@@ -107,14 +142,18 @@
       {weekBalance}
       {weekActual}
       {weekTarget}
+      {weekFullTarget}
       daysCount={weekDatesUntilYesterday.length}
     />
     <SidebarStatsMonth
       {monthBalance}
       {monthActual}
       {monthTarget}
+      {monthFullTarget}
       {billablePercent}
       {balancedDays}
+      totalWorkingDays={allMonthWorkingDays?.length ?? 0}
+      elapsedWorkingDays={monthWorkingDaysUntilYesterday.length}
       onBillableClick={() => {
         statsModalState.initialSlide = 'billability';
         statsModalState.highlightProjectId = undefined;
@@ -122,7 +161,12 @@
         statsModalState.open = true;
       }}
     />
-    <SidebarStatsTotal {todayStr} />
+    <SidebarStatsTotal
+      {todayStr}
+      yearFullTarget={yearStats.fullTarget}
+      yearElapsedDays={yearStats.elapsedDays}
+      yearTotalDays={yearStats.totalDays}
+    />
   {/if}
 
   <StatsModal bind:open={statsModalState.open} initialSlide={statsModalState.initialSlide}>
