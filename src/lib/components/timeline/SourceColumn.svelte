@@ -70,18 +70,18 @@
     : 'border-border/70 bg-card/80'}"
 >
   <!-- Source header -->
-  <div class="px-4 py-3 border-b border-border {colorClasses.bg}">
+  <div class="px-3 py-1.5 border-b border-border {colorClasses.bg}">
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <img
           src={LOGOS[source]}
           alt={label}
-          class="size-4 opacity-50 grayscale dark:invert dark:opacity-40"
+          class="size-3.5 opacity-50 grayscale dark:invert dark:opacity-40"
         />
-        <span class="text-sm font-bold text-foreground uppercase tracking-wider">{label}</span>
+        <span class="text-xs font-bold text-foreground uppercase tracking-wider">{label}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-sm font-medium text-foreground">
+      <div class="flex items-center gap-1.5">
+        <span class="font-mono text-xs font-medium text-foreground">
           {formatHours(total)}
         </span>
         {#if headerAction}
