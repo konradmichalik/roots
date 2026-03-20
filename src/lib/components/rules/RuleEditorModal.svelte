@@ -39,7 +39,11 @@
     onClose?: () => void;
   } = $props();
 
-  let open = $state(defaultOpen);
+  // eslint-disable-next-line svelte/prefer-writable-derived -- $derived.writable not available in this Svelte version
+  let open = $state(false);
+  $effect(() => {
+    open = defaultOpen;
+  });
   let showDeleteConfirm = $state(false);
 
   // Form state

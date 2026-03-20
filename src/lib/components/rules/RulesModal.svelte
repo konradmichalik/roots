@@ -24,7 +24,11 @@
     onClose?: () => void;
   } = $props();
 
-  let open = $state(defaultOpen);
+  // eslint-disable-next-line svelte/prefer-writable-derived -- $derived.writable not available in this Svelte version
+  let open = $state(false);
+  $effect(() => {
+    open = defaultOpen;
+  });
   let activeTab = $state<'rules' | 'log' | 'analytics'>('rules');
 
   // Editor state
