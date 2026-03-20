@@ -113,9 +113,6 @@
 <svelte:window bind:innerWidth />
 
 <div class="flex h-screen flex-col">
-  {#if isDesktop}
-    <div data-tauri-drag-region class="h-3 w-full bg-card shrink-0"></div>
-  {/if}
   <TopBar />
 
   <div class="flex flex-1 overflow-hidden">

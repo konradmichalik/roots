@@ -20,6 +20,7 @@
   import { getStaleRules } from '../../stores/rules.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { isTauri } from '../../utils/storage';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
   import PanelLeft from '@lucide/svelte/icons/panel-left';
   import Star from '@lucide/svelte/icons/star';
   import Zap from '@lucide/svelte/icons/zap';
@@ -50,9 +51,19 @@
   function handleRefresh(): void {
     refreshDayEntries(dateNavState.selectedDate);
   }
+
+  const INTERACTIVE = 'button, a, input, select, textarea, [role="button"], [data-no-drag]';
+
+  function handleMouseDown(e: MouseEvent): void {
+    if (!isDesktop) return;
+    const target = e.target as HTMLElement;
+    if (target.closest(INTERACTIVE)) return;
+    getCurrentWindow().startDragging();
+  }
 </script>
 
 <header
+  onmousedown={handleMouseDown}
   class="flex h-14 items-center border-b border-border bg-card shadow-[0_1px_3px_0_rgba(0,0,0,0.1)]"
   style:padding-left={isDesktop ? '80px' : '20px'}
   style:padding-right="20px"
