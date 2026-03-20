@@ -283,12 +283,18 @@
         <Tooltip.Root>
           <Tooltip.Trigger>
             <span
-              class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium cursor-default border
-                {displayBalance >= -0.01
-                ? 'bg-success-subtle text-success-text border-success/20'
-                : 'bg-danger-subtle text-danger-text border-danger/20'}"
+              class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-mono font-medium cursor-default border
+                {displayBalance < -0.01
+                ? 'bg-danger-subtle text-danger-text border-danger/20'
+                : displayBalance > 0.01
+                  ? 'bg-discovery-subtle text-discovery-text border-discovery/20'
+                  : 'bg-success-subtle text-success-text border-success/20'}"
             >
-              {formatBalance(displayBalance)}
+              {#if Math.abs(displayBalance) <= 0.01 && overview.totals.actual > 0}
+                Done
+              {:else}
+                {formatBalance(displayBalance)}
+              {/if}
             </span>
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom" sideOffset={4}>
