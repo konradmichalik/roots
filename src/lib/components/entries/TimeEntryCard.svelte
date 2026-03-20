@@ -129,6 +129,17 @@
   let showJiraSyncModal = $state(false);
   let showRuleEditorModal = $state(false);
 
+  // Hover action button config (DRY: one button, three variants)
+  let hoverAction = $derived.by(() => {
+    if (mocoMeta && isMocoConnected)
+      return { onclick: openMocoEdit, title: 'Edit entry', icon: Pencil, color: 'text-muted-foreground hover:text-foreground hover:bg-accent' } as const;
+    if (jiraMeta && isJiraConnected)
+      return { onclick: openJiraEdit, title: 'Edit worklog', icon: Pencil, color: 'text-muted-foreground hover:text-foreground hover:bg-accent' } as const;
+    if (outlookMeta && isMocoConnected)
+      return { onclick: openMocoCreate, title: 'Book in Moco', icon: Plus, color: 'text-success hover:text-success-text hover:bg-success/10' } as const;
+    return null;
+  });
+
   // Context menu actions
   function openMocoEdit(): void {
     showMocoEditModal = true;
@@ -449,51 +460,23 @@
         </span>
       {/if}
     </div>
-    <div class="relative flex flex-col items-end flex-shrink-0 min-w-8">
+    <div class="relative flex flex-col items-end flex-shrink-0">
       <span class="text-base font-mono font-bold text-foreground group-hover:invisible">
         {formatHours(entry.hours)}
       </span>
-      {#if mocoMeta && isMocoConnected}
+      {#if hoverAction}
         <button
           type="button"
           onclick={(e) => {
             e.stopPropagation();
-            openMocoEdit();
+            hoverAction.onclick();
           }}
-          class="absolute inset-0 hidden group-hover:flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
+          class="absolute top-1/2 right-0 -translate-y-1/2 hidden group-hover:flex items-center justify-center size-7 rounded-md {hoverAction.color} transition-colors
             focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          title="Edit entry"
-          aria-label="Edit entry"
+          title={hoverAction.title}
+          aria-label={hoverAction.title}
         >
-          <Pencil class="size-3.5" />
-        </button>
-      {:else if jiraMeta && isJiraConnected}
-        <button
-          type="button"
-          onclick={(e) => {
-            e.stopPropagation();
-            openJiraEdit();
-          }}
-          class="absolute inset-0 hidden group-hover:flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors
-            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          title="Edit worklog"
-          aria-label="Edit worklog"
-        >
-          <Pencil class="size-3.5" />
-        </button>
-      {:else if outlookMeta && isMocoConnected}
-        <button
-          type="button"
-          onclick={(e) => {
-            e.stopPropagation();
-            openMocoCreate();
-          }}
-          class="absolute inset-0 hidden group-hover:flex items-center justify-center rounded-md text-success hover:text-success-text hover:bg-success/10 transition-colors
-            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-          title="Book in Moco"
-          aria-label="Book in Moco"
-        >
-          <Plus class="size-3.5" />
+          <hoverAction.icon class="size-3.5" />
         </button>
       {/if}
     </div>
