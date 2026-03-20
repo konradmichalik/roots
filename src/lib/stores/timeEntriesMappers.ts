@@ -4,6 +4,7 @@ import type { WorklogWithIssue, JiraWorklogClient } from '../services';
 import { settingsState } from './settings.svelte';
 import { getDayOfWeekIndex } from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';
+import { extractFirstIssueKey } from '../utils/jira-issue-parser';
 
 // ---------------------------------------------------------------------------
 // Moco
@@ -18,7 +19,7 @@ export function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
     taskName: activity.task.name,
     customerName: activity.customer.name,
     billable: activity.billable,
-    remoteTicketKey: activity.remote_id ?? undefined,
+    remoteTicketKey: (activity.remote_id ? extractFirstIssueKey(activity.remote_id) : null) ?? undefined,
     remoteService: activity.remote_service,
     remoteId: activity.remote_id
   };
