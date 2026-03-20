@@ -51,50 +51,55 @@ html[data-color-mode='light'] {
   --ds-blanket: #2e344070;
 }
 
-/* Roots Design Tokens - Dark (Nord) */
+/* Roots Design Tokens - Dark (Premium)
+   Elevation: surface (slate-950) → card/sidebar (slate-900) → raised/overlay (slate-800) */
 html[data-color-mode='dark'] {
   color-scheme: dark;
-  --ds-text: #d8dee9;
-  --ds-text-subtle: #8892a2;
-  --ds-text-subtlest: #6e7a8d;
-  --ds-text-inverse: #2e3440;
+  /* Text: high-contrast primary, legible secondary */
+  --ds-text: #f1f5f9;
+  --ds-text-subtle: #94a3b8;
+  --ds-text-subtlest: #64748b;
+  --ds-text-inverse: #0f172a;
   --ds-text-brand: #88c0d0;
-  --ds-text-danger: #bf616a;
+  --ds-text-danger: #fb7185;
   --ds-text-success: #a3be8c;
-  --ds-text-warning: #ebcb8b;
-  --ds-text-discovery: #b48ead;
-  --ds-border: #d8dee920;
-  --ds-border-bold: #4c566a;
+  --ds-text-warning: #fbbf24;
+  --ds-text-discovery: #c084fc;
+  /* Borders: visible enough to define edges */
+  --ds-border: #ffffff12;
+  --ds-border-bold: #334155;
   --ds-border-focused: #88c0d0;
-  --ds-border-input: #4c566a;
-  --ds-border-danger: #bf616a;
-  --ds-border-warning: #ebcb8b;
+  --ds-border-input: #334155;
+  --ds-border-danger: #fb7185;
+  --ds-border-warning: #fbbf24;
   --ds-border-success: #a3be8c;
-  --ds-surface: #2e3440;
-  --ds-surface-hovered: #3b4252;
-  --ds-surface-raised: #3b4252;
-  --ds-surface-sunken: #272c36;
-  --ds-surface-overlay: #3b4252;
+  /* Surfaces: 3-level elevation with clear separation */
+  --ds-surface: #020617;
+  --ds-surface-hovered: #0f172a;
+  --ds-surface-raised: #1e293b;
+  --ds-surface-sunken: #020617;
+  --ds-surface-overlay: #1e293b;
+  /* Semantic backgrounds */
   --ds-background-brand-bold: #81a1c1;
   --ds-background-brand-bold-hovered: #88c0d0;
-  --ds-background-neutral: #d8dee914;
-  --ds-background-neutral-hovered: #d8dee920;
-  --ds-background-neutral-pressed: #d8dee930;
-  --ds-background-selected: #364455;
-  --ds-background-danger: #4a3538;
-  --ds-background-danger-bold: #d98a91;
-  --ds-background-danger-bold-hovered: #e09da3;
-  --ds-background-success: #3a4438;
-  --ds-background-success-bold: #9dc49a;
-  --ds-background-success-bold-hovered: #aed0ab;
-  --ds-background-warning: #443f32;
-  --ds-background-warning-bold: #e8c17a;
-  --ds-background-discovery: #45384a;
-  --ds-background-discovery-bold: #c9a3c4;
-  --ds-background-information: #38455a;
-  --ds-background-information-bold: #8eb5d4;
-  --ds-background-input: #3b4252;
-  --ds-blanket: #2e344080;
+  --ds-background-neutral: #ffffff08;
+  --ds-background-neutral-hovered: #ffffff10;
+  --ds-background-neutral-pressed: #ffffff1a;
+  --ds-background-selected: #1e293b;
+  --ds-background-danger: #fb71851a;
+  --ds-background-danger-bold: #fb7185;
+  --ds-background-danger-bold-hovered: #fda4af;
+  --ds-background-success: #a3be8c1a;
+  --ds-background-success-bold: #a3be8c;
+  --ds-background-success-bold-hovered: #b5d09e;
+  --ds-background-warning: #fbbf241a;
+  --ds-background-warning-bold: #fbbf24;
+  --ds-background-discovery: #c084fc1a;
+  --ds-background-discovery-bold: #c084fc;
+  --ds-background-information: #88c0d01a;
+  --ds-background-information-bold: #88c0d0;
+  --ds-background-input: #0f172a;
+  --ds-blanket: #00000080;
 }
 
 /* shadcn-svelte variables mapped to Roots tokens */
@@ -304,7 +309,7 @@ html[data-color-mode='dark'] {
 .dot-grid-bg {
   background-image: radial-gradient(
     circle,
-    color-mix(in srgb, var(--ds-border) 40%, transparent) 1px,
+    color-mix(in srgb, var(--ds-border) 60%, transparent) 1px,
     transparent 1px
   );
   background-size: 16px 16px;

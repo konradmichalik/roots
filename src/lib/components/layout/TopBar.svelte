@@ -54,7 +54,7 @@
 
 <header
   data-tauri-drag-region
-  class="flex h-14 items-center border-b border-border bg-card shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]"
+  class="flex h-14 items-center border-b border-border bg-card shadow-[0_1px_3px_0_rgba(0,0,0,0.1)]"
   style:padding-left={isDesktop ? '80px' : '20px'}
   style:padding-right="20px"
 >

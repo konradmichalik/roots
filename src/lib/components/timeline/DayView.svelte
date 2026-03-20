@@ -283,10 +283,10 @@
         <Tooltip.Root>
           <Tooltip.Trigger>
             <span
-              class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium cursor-default
+              class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-mono font-medium cursor-default border
                 {displayBalance >= -0.01
-                ? 'bg-success-subtle text-success-text'
-                : 'bg-danger-subtle text-danger-text'}"
+                ? 'bg-success-subtle text-success-text border-success/20'
+                : 'bg-danger-subtle text-danger-text border-danger/20'}"
             >
               {formatBalance(displayBalance)}
             </span>
@@ -313,7 +313,7 @@
       />
     {/if}
 
-    <!-- Moco (always visible, emphasized when other columns present) -->
+    <!-- Moco (always visible) -->
     {#if connectionsState.moco.isConnected}
       <SourceColumn
         source="moco"
@@ -321,7 +321,6 @@
         loading={timeEntriesState.loading.moco}
         error={timeEntriesState.errors.moco}
         onretry={retryFetch}
-        emphasized={showOutlook || showJira}
         entryGroupMap={matchResult.entryGroupMap}
       >
         {#snippet headerAction()}

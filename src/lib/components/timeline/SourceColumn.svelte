@@ -11,7 +11,6 @@
     source,
     entries,
     loading = false,
-    emphasized = false,
     error = null,
     onretry,
     entryGroupMap,
@@ -20,7 +19,6 @@
     source: 'moco' | 'jira' | 'outlook';
     entries: UnifiedTimeEntry[];
     loading?: boolean;
-    emphasized?: boolean;
     error?: string | null;
     onretry?: () => void;
     entryGroupMap?: Map<string, string>;
@@ -64,10 +62,7 @@
 </script>
 
 <div
-  class="flex flex-col rounded-xl border overflow-hidden transition-all duration-200
-    {emphasized
-    ? 'border-border shadow-md ring-1 ring-border z-10 bg-card'
-    : 'border-border/70 bg-card/80'}"
+  class="flex flex-col rounded-xl border border-border dark:border-white/10 overflow-hidden transition-all duration-200 bg-card"
 >
   <!-- Source header -->
   <div class="px-3 py-1.5 border-b border-border {colorClasses.bg}">
@@ -78,7 +73,9 @@
           alt={label}
           class="size-3.5 opacity-50 grayscale dark:invert dark:opacity-40"
         />
-        <span class="text-xs font-bold text-foreground uppercase tracking-wider">{label}</span>
+        <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+          >{label}</span
+        >
       </div>
       <div class="flex items-center gap-1.5">
         <span class="font-mono text-xs font-medium text-foreground">
@@ -117,7 +114,7 @@
     {:else if loading && entries.length === 0}
       {#each { length: 3 } as _, i (i)}
         <div
-          class="animate-pulse rounded-xl border border-border {colorClasses.border} border-l-[3px] bg-card p-3 pl-4"
+          class="animate-pulse rounded-xl border border-border dark:border-white/10 {colorClasses.border} border-l-[3px] bg-card dark:bg-white/[0.03] p-3 pl-4"
         >
           <div class="flex items-start justify-between gap-2">
             <div class="flex-1 min-w-0">

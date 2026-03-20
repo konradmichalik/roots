@@ -50,7 +50,7 @@ export function formatBalance(hours: number): string {
  */
 export function getBalanceClass(hours: number): string {
   if (hours > 0.1) return 'text-success-text';
-  if (hours < -0.1) return 'text-warning-text';
+  if (hours < -0.1) return 'text-danger-text';
   return 'text-muted-foreground';
 }
 
