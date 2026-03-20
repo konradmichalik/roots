@@ -22,6 +22,7 @@
   import { syncDay, detectHoursChanges } from '../../stores/ruleSync.svelte';
   import { isSynced } from '../../stores/syncRecords.svelte';
   import type { SyncPreview, UnifiedTimeEntry } from '../../types';
+  import { buildMocoPrefill, type MocoPrefill } from '../../utils/moco-prefill';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
   import Zap from '@lucide/svelte/icons/zap';
@@ -90,6 +91,15 @@
     } finally {
       isBuildingPreview = false;
     }
+  }
+
+  // Drag & drop: Jira/Outlook entry dropped onto Moco column
+  let showDropModal = $state(false);
+  let dropPrefill = $state<MocoPrefill>({});
+
+  function handleEntryDrop(droppedEntry: UnifiedTimeEntry): void {
+    dropPrefill = buildMocoPrefill(droppedEntry);
+    showDropModal = true;
   }
 
   let gridCols = $derived.by(() => {
@@ -328,6 +338,7 @@
         error={timeEntriesState.errors.moco}
         onretry={retryFetch}
         entryGroupMap={matchResult.entryGroupMap}
+        ondrop={handleEntryDrop}
       >
         {#snippet headerAction()}
           <MocoEntryModal mode="create" prefill={{ date: dateNavState.selectedDate }}>
@@ -367,6 +378,19 @@
     {/if}
   </div>
 </div>
+
+<!-- Moco Create Modal (from drag & drop) -->
+{#if showDropModal && connectionsState.moco.isConnected}
+  <MocoEntryModal
+    mode="create"
+    prefill={dropPrefill}
+    defaultOpen={true}
+    onClose={() => {
+      showDropModal = false;
+      dropPrefill = {};
+    }}
+  />
+{/if}
 
 <!-- Sync Preview Dialog -->
 {#if showSyncPreview && syncPreview}
