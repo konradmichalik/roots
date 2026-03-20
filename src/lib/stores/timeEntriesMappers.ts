@@ -19,7 +19,8 @@ export function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
     taskName: activity.task.name,
     customerName: activity.customer.name,
     billable: activity.billable,
-    remoteTicketKey: (activity.remote_id ? extractFirstIssueKey(activity.remote_id) : null) ?? undefined,
+    remoteTicketKey:
+      (activity.remote_id ? extractFirstIssueKey(activity.remote_id) : null) ?? undefined,
     remoteService: activity.remote_service,
     remoteId: activity.remote_id
   };
