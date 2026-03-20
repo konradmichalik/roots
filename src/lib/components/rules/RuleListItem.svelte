@@ -100,10 +100,12 @@
         {statusLabel}
       </span>
     </div>
-    <div class="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
-      <span class="truncate">{sourceLabel}</span>
-      <span class="text-muted-foreground/50">→</span>
-      <span class="truncate">{rule.target.customerName} / {rule.target.mocoProjectName}</span>
+    <div class="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+      <span class="shrink-0">{sourceLabel}</span>
+      <span class="text-muted-foreground/50 shrink-0">→</span>
+      <span class="truncate min-w-0"
+        >{rule.target.customerName} / {rule.target.mocoProjectName}</span
+      >
       {#if isStale}
         <span class="text-warning shrink-0">· Stale</span>
       {:else}
