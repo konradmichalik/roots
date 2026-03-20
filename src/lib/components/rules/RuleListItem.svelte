@@ -86,7 +86,7 @@
   </div>
 
   <!-- Content -->
-  <div class="p-2.5 pl-5 pr-8">
+  <div class="p-2 pl-5 pr-8">
     <div class="flex items-center gap-1.5">
       {#if isStale}
         <AlertTriangle class="size-3 text-warning flex-shrink-0" />
@@ -100,16 +100,16 @@
         {statusLabel}
       </span>
     </div>
-    <p class="text-xs text-muted-foreground truncate">
-      {sourceLabel}
-      <span class="text-muted-foreground/50 mx-0.5">→</span>
-      {rule.target.customerName} / {rule.target.mocoProjectName}
-    </p>
-    {#if isStale}
-      <p class="text-xs text-warning truncate">Task no longer available</p>
-    {:else}
-      <p class="text-[10px] text-muted-foreground/60 truncate">{lastSyncLabel}</p>
-    {/if}
+    <div class="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
+      <span class="truncate">{sourceLabel}</span>
+      <span class="text-muted-foreground/50">→</span>
+      <span class="truncate">{rule.target.customerName} / {rule.target.mocoProjectName}</span>
+      {#if isStale}
+        <span class="text-warning shrink-0">· Stale</span>
+      {:else}
+        <span class="text-muted-foreground/40 shrink-0">· {lastSyncLabel}</span>
+      {/if}
+    </div>
   </div>
 
   <!-- Edit overlay (hover) -->
