@@ -21,11 +21,21 @@
     onClose?: () => void;
   } = $props();
 
-  let open = $state(defaultOpen);
+  // eslint-disable-next-line svelte/prefer-writable-derived -- $derived.writable not available in this Svelte version
+  let open = $state(false);
+  $effect(() => {
+    open = defaultOpen;
+  });
   let isSyncing = $state(false);
 
   // Track which candidates are selected (all by default)
-  let selectedIds = new SvelteSet(preview.pending.map((c) => c.sourceEntry.id));
+  const selectedIds = new SvelteSet<string>();
+  $effect(() => {
+    selectedIds.clear();
+    for (const c of preview.pending) {
+      selectedIds.add(c.sourceEntry.id);
+    }
+  });
 
   let selectedCandidates = $derived(
     preview.pending.filter((c) => selectedIds.has(c.sourceEntry.id))

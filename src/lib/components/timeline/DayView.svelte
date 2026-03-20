@@ -152,9 +152,42 @@
       {/if}
     </div>
 
-    <!-- Apply Rules button -->
+    <!-- Apply Rules button + hours change indicator -->
     {#if hasRules}
       <div class="flex items-center gap-1 shrink-0">
+        {#if hoursChanges.length > 0}
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger>
+                <span
+                  class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-discovery-subtle text-discovery-text"
+                >
+                  <TriangleAlert class="size-3 mr-0.5" />
+                  {hoursChanges.length}
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content side="bottom" sideOffset={4}>
+                <div class="text-xs space-y-1">
+                  <p class="font-medium">
+                    {hoursChanges.length} synced {hoursChanges.length === 1
+                      ? 'entry has'
+                      : 'entries have'} changed hours
+                  </p>
+                  {#each hoursChanges.slice(0, 5) as change (change.sourceKey)}
+                    <p class="text-[10px] opacity-80">
+                      {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(
+                        change.currentHours
+                      )}
+                    </p>
+                  {/each}
+                  {#if hoursChanges.length > 5}
+                    <p class="text-[10px] opacity-60">+{hoursChanges.length - 5} more</p>
+                  {/if}
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        {/if}
         {#if staleRules.length > 0}
           <Tooltip.Provider delayDuration={200}>
             <Tooltip.Root>
@@ -265,51 +298,6 @@
       </Tooltip.Provider>
     </div>
   </div>
-
-  <!-- Sync status bar -->
-  {#if hasRules && pendingCount > 0}
-    <button
-      type="button"
-      onclick={handleApplyRules}
-      disabled={isBuildingPreview}
-      class="w-full flex items-center justify-center gap-2 rounded-lg border border-warning/20 bg-warning-subtle/30 px-3 py-1.5
-        text-xs text-warning-text hover:bg-warning-subtle/50 transition-colors cursor-pointer
-        disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <Zap class="size-3" />
-      <span>
-        {pendingCount}
-        {pendingCount === 1 ? 'entry' : 'entries'} ready for sync
-      </span>
-    </button>
-  {/if}
-
-  <!-- Hours change detection -->
-  {#if hoursChanges.length > 0}
-    <div
-      class="w-full flex items-start gap-2 rounded-lg border border-discovery/20 bg-discovery-subtle/30 px-3 py-1.5 text-xs text-discovery-text"
-    >
-      <TriangleAlert class="size-3 mt-0.5 flex-shrink-0" />
-      <div>
-        <span class="font-medium">
-          {hoursChanges.length} synced {hoursChanges.length === 1 ? 'entry has' : 'entries have'} changed
-          hours
-        </span>
-        <div class="mt-0.5 space-y-0.5">
-          {#each hoursChanges.slice(0, 3) as change (change.sourceKey)}
-            <p class="text-[10px] text-discovery-text/80">
-              {change.sourceKey}: {formatHours(change.syncedHours)} → {formatHours(
-                change.currentHours
-              )}
-            </p>
-          {/each}
-          {#if hoursChanges.length > 3}
-            <p class="text-[10px] text-discovery-text/60">+{hoursChanges.length - 3} more</p>
-          {/if}
-        </div>
-      </div>
-    </div>
-  {/if}
 
   <!-- Dynamic column layout based on connected services -->
   <div class="grid {gridCols} gap-4 items-start" style="min-height: 60vh;">
