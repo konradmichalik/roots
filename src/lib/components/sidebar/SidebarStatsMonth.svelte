@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { formatBalance, formatHours, getBalanceClass } from '../../utils/time-format';
+  import {
+    formatBalance,
+    formatHours,
+    getBalanceClass,
+    getProgressPercent,
+    getOverPercent,
+    getPacePercent
+  } from '../../utils/time-format';
   import { formatDateShort } from '../../utils/date-helpers';
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { settingsState } from '../../stores/settings.svelte';
@@ -12,20 +19,30 @@
     monthBalance,
     monthActual,
     monthTarget,
+    monthFullTarget,
     billablePercent,
     balancedDays,
+    totalWorkingDays = 0,
+    elapsedWorkingDays = 0,
     onBillableClick
   }: {
     monthBalance: number;
     monthActual: number;
     monthTarget: number;
+    monthFullTarget: number;
     billablePercent: number;
     balancedDays: Array<{ date: string; overview: DayOverview }>;
+    totalWorkingDays?: number;
+    elapsedWorkingDays?: number;
     onBillableClick?: () => void;
   } = $props();
 
   let isOpen = $state(false);
   let showBalancedDays = $state(true);
+
+  let progressPercent = $derived(getProgressPercent(monthActual, monthFullTarget));
+  let overPercent = $derived(getOverPercent(monthActual, monthFullTarget));
+  let pacePercent = $derived(getPacePercent(monthTarget, monthFullTarget));
 </script>
 
 <div class="rounded-lg border border-border">
@@ -54,18 +71,43 @@
   </button>
   {#if isOpen}
     <div class="px-2.5 pb-2.5 space-y-3 text-xs">
-      <!-- Booked / Target -->
-      <div class="flex items-center justify-between text-muted-foreground">
-        <span
-          >Booked: <span class="font-mono font-medium text-foreground"
-            >{formatHours(monthActual)}</span
-          ></span
-        >
-        <span
-          >Target: <span class="font-mono font-medium text-foreground"
-            >{formatHours(monthTarget)}</span
-          ></span
-        >
+      <!-- Booked / Target with progress bar -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[10px] uppercase tracking-wider text-muted-foreground">Booked</span>
+            <span class="text-sm font-mono font-medium text-foreground"
+              >{formatHours(monthActual)}</span
+            >
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[10px] uppercase tracking-wider text-muted-foreground">Target</span>
+            <span class="font-mono text-muted-foreground">{formatHours(monthFullTarget)}</span>
+          </div>
+        </div>
+
+        <!-- Mini progress bar with pace marker on the bar -->
+        <div class="relative w-full h-1 rounded-full bg-muted/30">
+          <div
+            class="absolute top-0 left-0 h-full rounded-full bg-success transition-all duration-300"
+            style="width: {progressPercent}%;"
+          ></div>
+          {#if overPercent > 0}
+            <div
+              class="absolute top-0 left-0 h-full rounded-full bg-discovery transition-all duration-300"
+              style="width: {overPercent}%;"
+            ></div>
+          {/if}
+          {#if pacePercent > 0 && pacePercent < 100}
+            <div
+              class="absolute top-1/2 -translate-y-1/2 w-0.5 h-2.5 bg-foreground/60 rounded-full"
+              style="left: {pacePercent}%;"
+            ></div>
+          {/if}
+        </div>
+        <p class="text-[10px] text-muted-foreground">
+          {elapsedWorkingDays} of {totalWorkingDays} working days (excl. today)
+        </p>
       </div>
 
       <!-- Billable % -->

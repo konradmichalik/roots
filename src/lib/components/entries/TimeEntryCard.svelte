@@ -274,9 +274,9 @@
     {#snippet child({ props })}
       <div
         {...props}
-        class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card p-3 pl-4 hover:border-border-bold transition-all duration-150
+        class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card dark:bg-white/[0.03] dark:border-white/10 p-3 pl-4 hover:border-border-bold dark:hover:border-white/20 dark:hover:bg-white/[0.05] transition-all duration-150
           {isDimmed ? 'opacity-40' : ''}
-          {isInHoveredGroup ? 'border-border-bold' : ''}"
+          {isInHoveredGroup ? 'border-border-bold dark:border-white/20' : ''}"
         onmouseenter={handleMouseEnter}
         onmouseleave={handleMouseLeave}
       >
@@ -382,7 +382,9 @@
           {entry.startTime}–{entry.endTime}
         </span>
       {:else if mocoMeta?.customerName}
-        <span class="text-[11px] font-medium text-muted-foreground leading-tight">
+        <span
+          class="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider leading-tight"
+        >
           {mocoMeta.customerName}
         </span>
       {:else if jiraMeta}
@@ -392,14 +394,14 @@
               href={jiraIssueUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text hover:bg-brand/20 transition-colors"
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text hover:bg-brand/20 transition-colors"
               onclick={(e) => e.stopPropagation()}
             >
               {jiraMeta.issueKey}
             </a>
           {:else}
             <span
-              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text"
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text"
             >
               {jiraMeta.issueKey}
             </span>
@@ -441,14 +443,14 @@
       <!-- Ticket badge for Moco entries with linked Jira ticket -->
       {#if mocoMeta?.remoteTicketKey}
         <span
-          class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-brand/10 text-brand-text mt-0.5"
+          class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text mt-0.5"
         >
           {mocoMeta.remoteTicketKey}
         </span>
       {/if}
     </div>
     <div class="relative flex flex-col items-end flex-shrink-0 min-w-8">
-      <span class="text-sm font-mono font-medium text-foreground group-hover:invisible">
+      <span class="text-base font-mono font-bold text-foreground group-hover:invisible">
         {formatHours(entry.hours)}
       </span>
       {#if mocoMeta && isMocoConnected}
