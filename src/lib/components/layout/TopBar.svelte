@@ -19,12 +19,15 @@
   import RulesModal from '../rules/RulesModal.svelte';
   import { getStaleRules } from '../../stores/rules.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
+  import { isTauri } from '../../utils/storage';
   import PanelLeft from '@lucide/svelte/icons/panel-left';
   import Star from '@lucide/svelte/icons/star';
   import Zap from '@lucide/svelte/icons/zap';
   import Settings from '@lucide/svelte/icons/settings';
   import CircleHelp from '@lucide/svelte/icons/circle-help';
   import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+
+  const isDesktop = isTauri();
 
   let showRules = $derived(connectionsState.moco.isConnected);
   let staleCount = $derived(getStaleRules().length);
@@ -50,7 +53,10 @@
 </script>
 
 <header
-  class="flex h-14 items-center border-b border-border bg-card px-5 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]"
+  data-tauri-drag-region
+  class="flex h-14 items-center border-b border-border bg-card shadow-[0_1px_3px_0_rgba(0,0,0,0.04)]"
+  style:padding-left={isDesktop ? '80px' : '20px'}
+  style:padding-right="20px"
 >
   <!-- Left section -->
   <div class="flex flex-1 items-center gap-2">

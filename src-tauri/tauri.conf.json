@@ -13,14 +13,16 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Roots - Work Time Overview",
+        "title": "Roots",
         "width": 1280,
         "height": 800,
         "minWidth": 900,
         "minHeight": 600,
         "resizable": true,
         "fullscreen": false,
-        "dragDropEnabled": false
+        "dragDropEnabled": false,
+        "titleBarStyle": "overlay",
+        "hiddenTitle": true
       }
     ],
     "security": {
