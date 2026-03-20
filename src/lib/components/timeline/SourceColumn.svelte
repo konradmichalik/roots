@@ -14,7 +14,8 @@
     error = null,
     onretry,
     entryGroupMap,
-    headerAction
+    headerAction,
+    ondrop: onDropEntry
   }: {
     source: 'moco' | 'jira' | 'outlook';
     entries: UnifiedTimeEntry[];
@@ -23,7 +24,40 @@
     onretry?: () => void;
     entryGroupMap?: Map<string, string>;
     headerAction?: Snippet;
+    ondrop?: (entry: UnifiedTimeEntry) => void;
   } = $props();
+
+  let isDropTarget = $derived(source === 'moco' && !!onDropEntry);
+  let isDragOver = $state(false);
+
+  function handleDragOver(e: DragEvent): void {
+    if (!isDropTarget) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    isDragOver = true;
+  }
+
+  function handleDragLeave(e: DragEvent): void {
+    if (!isDropTarget) return;
+    // Only reset when leaving the column entirely (not entering a child)
+    const related = e.relatedTarget as Node | null;
+    if (related && (e.currentTarget as Node).contains(related)) return;
+    isDragOver = false;
+  }
+
+  function handleDrop(e: DragEvent): void {
+    if (!isDropTarget || !e.dataTransfer) return;
+    e.preventDefault();
+    isDragOver = false;
+    try {
+      const data = JSON.parse(e.dataTransfer.getData('application/json')) as UnifiedTimeEntry;
+      if (data.source === 'jira' || data.source === 'outlook') {
+        onDropEntry?.(data);
+      }
+    } catch {
+      // Invalid drag data — ignore
+    }
+  }
 
   const LABELS: Record<string, string> = {
     moco: 'Moco',
@@ -62,7 +96,13 @@
 </script>
 
 <div
-  class="flex flex-col rounded-xl border border-border dark:border-white/10 overflow-hidden transition-all duration-200 bg-card"
+  class="flex flex-col rounded-xl border overflow-hidden transition-all duration-200 bg-card
+    {isDragOver
+    ? 'border-success border-dashed bg-success/5 ring-2 ring-success/20'
+    : 'border-border dark:border-white/10'}"
+  ondragover={isDropTarget ? handleDragOver : undefined}
+  ondragleave={isDropTarget ? handleDragLeave : undefined}
+  ondrop={isDropTarget ? handleDrop : undefined}
 >
   <!-- Source header -->
   <div class="px-3 py-1.5 border-b border-border {colorClasses.bg}">

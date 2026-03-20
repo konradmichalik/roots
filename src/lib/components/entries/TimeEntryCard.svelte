@@ -7,6 +7,7 @@
   import { extractFirstIssueKey } from '../../utils/jira-issue-parser';
   import { connectionsState, getJiraBaseUrl } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
+  import { buildMocoPrefill } from '../../utils/moco-prefill';
   import { openStatsForTask } from '../../stores/statsModal.svelte';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Plus from '@lucide/svelte/icons/plus';
@@ -121,6 +122,21 @@
     return `${baseUrl}/browse/${jiraMeta.issueKey}`;
   });
 
+  // Drag & drop: allow Jira/Outlook entries to be dragged to Moco column
+  let isDragging = $state(false);
+  let isDraggable = $derived(entry.source === 'jira' || entry.source === 'outlook');
+
+  function handleDragStart(e: DragEvent): void {
+    if (!e.dataTransfer) return;
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('application/json', JSON.stringify(entry));
+    isDragging = true;
+  }
+
+  function handleDragEnd(): void {
+    isDragging = false;
+  }
+
   // Modal states
   let showMocoEditModal = $state(false);
   let showMocoCreateModal = $state(false);
@@ -204,19 +220,7 @@
 {#if (jiraMeta || outlookMeta) && isMocoConnected}
   <MocoEntryModal
     mode="create"
-    prefill={{
-      date: entry.date,
-      hours: matchedFavorite?.defaultHours ?? entry.hours,
-      description:
-        matchedFavorite?.description ??
-        (jiraMeta
-          ? `#${jiraMeta.issueKey} ${entry.description ?? jiraMeta.issueSummary}`
-          : entry.title),
-      projectId: matchedFavorite?.projectId,
-      taskId: matchedFavorite?.taskId,
-      remoteService: jiraMeta ? 'jira' : undefined,
-      remoteId: jiraMeta?.issueKey
-    }}
+    prefill={buildMocoPrefill(entry)}
     defaultOpen={showMocoCreateModal}
     onClose={() => (showMocoCreateModal = false)}
   />
@@ -274,9 +278,14 @@
     {#snippet child({ props })}
       <div
         {...props}
+        draggable={isDraggable}
+        ondragstart={isDraggable ? handleDragStart : undefined}
+        ondragend={isDraggable ? handleDragEnd : undefined}
         class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card dark:bg-white/[0.03] dark:border-white/10 p-3 pl-4 hover:border-border-bold dark:hover:border-white/20 dark:hover:bg-white/[0.05] transition-all duration-150
           {isDimmed ? 'opacity-40' : ''}
-          {isInHoveredGroup ? 'border-border-bold dark:border-white/20' : ''}"
+          {isInHoveredGroup ? 'border-border-bold dark:border-white/20' : ''}
+          {isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}
+          {isDragging ? 'opacity-50' : ''}"
         onmouseenter={handleMouseEnter}
         onmouseleave={handleMouseLeave}
       >
