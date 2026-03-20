@@ -97,7 +97,9 @@
 
 <div
   class="flex flex-col rounded-xl border overflow-hidden transition-all duration-200 bg-card
-    {isDragOver ? 'border-success border-dashed bg-success/5 ring-2 ring-success/20' : 'border-border dark:border-white/10'}"
+    {isDragOver
+    ? 'border-success border-dashed bg-success/5 ring-2 ring-success/20'
+    : 'border-border dark:border-white/10'}"
   ondragover={isDropTarget ? handleDragOver : undefined}
   ondragleave={isDropTarget ? handleDragLeave : undefined}
   ondrop={isDropTarget ? handleDrop : undefined}

@@ -16,8 +16,7 @@ export interface MocoPrefill {
  * Applies favorite matching for Outlook and Jira issue key formatting.
  */
 export function buildMocoPrefill(entry: UnifiedTimeEntry): MocoPrefill {
-  const jiraMeta =
-    entry.metadata.source === 'jira' ? (entry.metadata as JiraMetadata) : null;
+  const jiraMeta = entry.metadata.source === 'jira' ? (entry.metadata as JiraMetadata) : null;
   const matchedFavorite =
     entry.source === 'outlook' ? findMatchingFavorite(entry.title) : undefined;
 
