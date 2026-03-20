@@ -13,13 +13,7 @@
   } from '../../stores/timeEntries.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { presencesState } from '../../stores/presences.svelte';
-  import {
-    today,
-    parseDate,
-    getMonthStart,
-    getWeekStart,
-    addDays
-  } from '../../utils/date-helpers';
+  import { today, parseDate, getMonthStart, getWeekStart, addDays } from '../../utils/date-helpers';
 
   let { expanded = false, todayStr = today() }: { expanded?: boolean; todayStr?: string } =
     $props();
@@ -101,7 +95,6 @@
     const monday = getWeekStart(dateNavState.selectedDate);
     return Array.from({ length: 7 }, (_, i) => addDays(monday, i));
   });
-
 </script>
 
 {#if expanded}
