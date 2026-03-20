@@ -14,6 +14,8 @@
   import History from '@lucide/svelte/icons/history';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
   import Play from '@lucide/svelte/icons/play';
+  import Search from '@lucide/svelte/icons/search';
+  import X from '@lucide/svelte/icons/x';
   let {
     children,
     defaultOpen = false,
@@ -32,7 +34,22 @@
   let editingRule = $state<Rule | undefined>(undefined);
   let editorPrefill = $state<{ source?: SourceMatcher } | undefined>(undefined);
 
+  let filterQuery = $state('');
   let sortedRules = $derived(getSortedRules());
+
+  let filteredRules = $derived.by(() => {
+    const q = filterQuery.trim().toLowerCase();
+    if (!q) return sortedRules;
+    return sortedRules.filter((rule) => {
+      const source =
+        rule.source.type === 'jira'
+          ? `jira ${rule.source.projectKey} ${rule.source.issuePattern ?? ''}`
+          : `outlook ${rule.source.eventPattern}`;
+      const target = `${rule.target.customerName} ${rule.target.mocoProjectName}`;
+      const searchable = `${rule.name} ${source} ${target}`.toLowerCase();
+      return searchable.includes(q);
+    });
+  });
 
   function handleOpen(isOpen: boolean): void {
     open = isOpen;
@@ -40,6 +57,7 @@
       showEditor = false;
       editingRule = undefined;
       editorPrefill = undefined;
+      filterQuery = '';
       onClose?.();
     }
   }
@@ -233,11 +251,41 @@
           </button>
         </div>
       {:else}
-        <div class="space-y-1.5">
-          {#each sortedRules as rule (rule.id)}
-            <RuleListItem {rule} {...dragProps(rule.id)} onEdit={() => openEditor(rule)} />
-          {/each}
-        </div>
+        <!-- Search filter -->
+        {#if sortedRules.length > 5}
+          <div class="relative mb-2">
+            <Search
+              class="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/60 pointer-events-none"
+            />
+            <input
+              type="text"
+              bind:value={filterQuery}
+              placeholder="Filter rules…"
+              class="w-full rounded-md border border-border bg-secondary/50 py-1.5 pl-8 pr-8 text-sm text-foreground placeholder:text-muted-foreground/50
+                focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-primary transition-colors"
+            />
+            {#if filterQuery}
+              <button
+                type="button"
+                onclick={() => (filterQuery = '')}
+                class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Clear filter"
+              >
+                <X class="size-3.5" />
+              </button>
+            {/if}
+          </div>
+        {/if}
+
+        {#if filteredRules.length === 0}
+          <p class="py-4 text-center text-sm text-muted-foreground">No matching rules.</p>
+        {:else}
+          <div class="space-y-1">
+            {#each filteredRules as rule (rule.id)}
+              <RuleListItem {rule} {...dragProps(rule.id)} onEdit={() => openEditor(rule)} />
+            {/each}
+          </div>
+        {/if}
       {/if}
     {/if}
 
