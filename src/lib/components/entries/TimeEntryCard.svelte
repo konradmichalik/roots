@@ -74,6 +74,9 @@
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
   let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
+  // Jira/Outlook entry not linked to any Moco entry
+  let isUnbooked = $derived((jiraMeta || outlookMeta) && isMocoConnected && !matchGroupId);
+
   // Detect Jira issue key in Moco entry description or remoteTicketKey
   let mocoIssueKey = $derived.by(() => {
     if (!mocoMeta) return null;
@@ -507,6 +510,13 @@
       {/if}
     </div>
   </div>
+  <!-- Unbooked indicator for Jira/Outlook entries not linked to Moco -->
+  {#if isUnbooked}
+    <div class="mt-1.5 flex items-center gap-1">
+      <span class="size-1.5 rounded-full bg-warning/60"></span>
+      <span class="text-[10px] text-muted-foreground/50">Not booked</span>
+    </div>
+  {/if}
   <!-- Bottom-right badges (outside the hours container so edit button doesn't cover them) -->
   {#if syncRecord || mocoMeta?.billable}
     <div class="absolute bottom-2.5 right-3 flex items-center gap-1.5">
