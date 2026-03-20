@@ -6,19 +6,20 @@
   import { dateNavState, setDate } from '../../stores/dateNavigation.svelte';
   import { getAbsenceForDate } from '../../stores/absences.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
-  import { formatDateShort, today } from '../../utils/date-helpers';
+  import { formatDateShort, today, parseDate } from '../../utils/date-helpers';
   import {
     ABSENCE_LABELS,
     ABSENCE_COLORS,
     type ManualAbsence,
     type PersonioAbsence
   } from '../../types';
-  import Calendar from '@lucide/svelte/icons/calendar';
   import CalendarOff from '@lucide/svelte/icons/calendar-off';
+  import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import Info from '@lucide/svelte/icons/info';
   import Pencil from '@lucide/svelte/icons/pencil';
 
   let todayStr = $state(today());
+  let calendarExpanded = $state(false);
 
   // Refresh todayStr periodically to handle midnight crossover
   $effect(() => {
@@ -39,6 +40,12 @@
     selectedAbsence && !isPersonioAbsence ? (selectedAbsence as ManualAbsence) : undefined
   );
 
+  // Month/year label for header
+  let monthLabel = $derived.by(() => {
+    const d = parseDate(dateNavState.selectedDate);
+    return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  });
+
   function formatRange(start: string, end: string): string {
     const startFmt = formatDateShort(start);
     if (start === end) return startFmt;
@@ -46,17 +53,30 @@
   }
 </script>
 
-<div class="p-4 space-y-4">
-  <!-- Calendar Header with Today and Absence Buttons -->
+<div class="p-4 space-y-3">
+  <!-- Consolidated header: Month name + nav + today + absence -->
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <Calendar class="size-4 text-muted-foreground" />
-      <h3 class="text-sm font-semibold text-foreground">Calendar</h3>
+    <div class="flex items-center gap-1">
+      <button
+        onclick={() => {
+          calendarExpanded = !calendarExpanded;
+        }}
+        class="flex items-center gap-1 rounded-lg px-1.5 py-1 -ml-1.5 hover:bg-accent transition-colors
+          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+        title={calendarExpanded ? 'Collapse calendar' : 'Expand calendar'}
+      >
+        <span class="text-sm font-semibold text-foreground">{monthLabel}</span>
+        <ChevronDown
+          class="size-3.5 text-muted-foreground transition-transform duration-200 {calendarExpanded
+            ? 'rotate-180'
+            : ''}"
+        />
+      </button>
       <Tooltip.Provider delayDuration={200}>
         <Tooltip.Root>
           <Tooltip.Trigger>
             <Info
-              class="size-3.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-help"
+              class="size-3 text-muted-foreground/40 hover:text-muted-foreground transition-colors cursor-help"
             />
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom" sideOffset={4} class="space-y-1.5 p-2.5">
@@ -80,10 +100,10 @@
         </Tooltip.Root>
       </Tooltip.Provider>
     </div>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-0.5">
       <button
         onclick={() => setDate(todayStr)}
-        class="rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground
+        class="rounded-lg px-2 py-1 text-[11px] font-medium text-muted-foreground
           hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         title="Go to today"
       >
@@ -94,9 +114,9 @@
           <Tooltip.Root>
             <Tooltip.Trigger>
               <div
-                class="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground/40 cursor-default"
+                class="flex items-center justify-center rounded-lg p-1 text-muted-foreground/40 cursor-default"
               >
-                <CalendarOff class="size-4" />
+                <CalendarOff class="size-3.5" />
               </div>
             </Tooltip.Trigger>
             <Tooltip.Content side="bottom" sideOffset={4}>
@@ -107,18 +127,18 @@
       {:else}
         <AbsenceModal mode="create" prefillDate={dateNavState.selectedDate}>
           <button
-            class="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground
+            class="flex items-center justify-center rounded-lg p-1 text-muted-foreground
               hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
             title="Manage absences"
           >
-            <CalendarOff class="size-4" />
+            <CalendarOff class="size-3.5" />
           </button>
         </AbsenceModal>
       {/if}
     </div>
   </div>
 
-  <MiniCalendar />
+  <MiniCalendar expanded={calendarExpanded} {todayStr} />
 
   {#snippet absenceDetail(absence: ManualAbsence | PersonioAbsence, trailing: string | 'pencil')}
     <div class="flex items-center gap-2">
@@ -151,20 +171,20 @@
   {#if selectedAbsence}
     {#if isPersonioAbsence}
       <div
-        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2"
+        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5"
       >
         {@render absenceDetail(selectedAbsence, 'Personio')}
       </div>
     {:else if connectionsState.personio.isConnected}
       <div
-        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2"
+        class="w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5"
       >
         {@render absenceDetail(selectedAbsence, 'Manual')}
       </div>
     {:else}
       <AbsenceModal mode="edit" editAbsence={selectedManualAbsence}>
         <button
-          class="group w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 mb-2 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          class="group w-full text-left rounded-lg border border-border bg-information-subtle px-2.5 py-1.5 hover:bg-information-subtle/80 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         >
           {@render absenceDetail(selectedAbsence, 'pencil')}
         </button>
@@ -172,6 +192,6 @@
     {/if}
   {/if}
 
-  <!-- Statistics Section (extracted) -->
+  <!-- Statistics Section -->
   <SidebarStats {todayStr} />
 </div>
