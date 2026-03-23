@@ -22,17 +22,19 @@
     jql: string;
   } = $props();
 
+  // JQL UI is disabled — clear any leftover JQL to prevent hidden matcher state
+  $effect(() => {
+    if (jql) jql = '';
+  });
+
   let labelInput = $state('');
 
   type FilterType = 'issuePattern' | 'epicKey' | 'component' | 'labels' | 'summaryContains';
 
-  let filtersInitialized = false;
   let activeFilters = new SvelteSet<FilterType>();
 
-  // Initialize active filters once from existing values (edit mode)
+  // Keep UI in sync with externally prefilled values (edit mode / prefill)
   $effect(() => {
-    if (filtersInitialized) return;
-    filtersInitialized = true;
     if (issuePattern) activeFilters.add('issuePattern');
     if (epicKey) activeFilters.add('epicKey');
     if (component) activeFilters.add('component');
@@ -167,151 +169,154 @@
   <div class="rounded-lg bg-information-subtle/50 p-2.5">
     <p class="text-xs text-brand-text flex items-center gap-1.5">
       <Info class="size-3 flex-shrink-0" />
-      All worklogs from this Jira project will be matched.
+      {#if activeFilters.size > 0}
+        Worklogs from this project matching the filters below.
+      {:else}
+        All worklogs from this Jira project will be matched.
+      {/if}
     </p>
   </div>
 
-    <!-- Project Key (always visible) -->
-    <div>
-      <label
-        for="jira-project"
-        class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
-        >Project Key</label
-      >
-      <input
-        id="jira-project"
-        type="text"
-        bind:value={projectKey}
-        placeholder="e.g. SUP"
-        class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground font-mono
+  <!-- Project Key (always visible) -->
+  <div>
+    <label
+      for="jira-project"
+      class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+      >Project Key</label
+    >
+    <input
+      id="jira-project"
+      type="text"
+      bind:value={projectKey}
+      placeholder="e.g. SUP"
+      class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground font-mono
           focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
-      />
-    </div>
+    />
+  </div>
 
-    <!-- Active Text Filters -->
-    {#each TEXT_FILTERS.filter((f) => activeFilters.has(f.type)) as filter (filter.type)}
-      <div class="animate-slide-up">
-        <div class="flex items-center justify-between mb-1.5">
-          <label
-            for={filter.id}
-            class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-            >{filter.label}</label
-          >
-          <button
-            type="button"
-            onclick={() => removeFilter(filter.type)}
-            class="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Remove {filter.label.toLowerCase()} filter"
-          >
-            <X class="size-3" />
-          </button>
-        </div>
-        <input
-          id={filter.id}
-          type="text"
-          value={getFilterValue(filter.type)}
-          oninput={(e) => setFilterValue(filter.type, e.currentTarget.value)}
-          placeholder={filter.placeholder}
-          class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground {filter.mono
-            ? 'font-mono'
-            : ''}
-            focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
-        />
-        {#if filter.hint}
-          <p class="text-[10px] text-muted-foreground mt-0.5">{filter.hint}</p>
-        {/if}
-      </div>
-    {/each}
-
-    <!-- Labels (special case: tag input) -->
-    {#if activeFilters.has('labels')}
-      <div class="animate-slide-up">
-        <div class="flex items-center justify-between mb-1.5">
-          <label
-            for="jira-labels"
-            class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-            >Labels</label
-          >
-          <button
-            type="button"
-            onclick={() => removeFilter('labels')}
-            class="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Remove labels filter"
-          >
-            <X class="size-3" />
-          </button>
-        </div>
-        {#if labels.length > 0}
-          <div class="flex flex-wrap gap-1 mb-1.5">
-            {#each labels as label (label)}
-              <span
-                class="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground"
-              >
-                {label}
-                <button
-                  type="button"
-                  onclick={() => removeLabel(label)}
-                  class="rounded-sm p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Remove label {label}"
-                >
-                  <X class="size-2.5" />
-                </button>
-              </span>
-            {/each}
-          </div>
-        {/if}
-        <div class="flex gap-1.5">
-          <input
-            id="jira-labels"
-            type="text"
-            bind:value={labelInput}
-            onkeydown={handleLabelKeydown}
-            placeholder="Type label and press Enter"
-            class="flex-1 rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground
-              focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
-          />
-          <button
-            type="button"
-            onclick={addLabel}
-            disabled={!labelInput.trim()}
-            class="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground
-              hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
-          >
-            Add
-          </button>
-        </div>
-        <p class="text-[10px] text-muted-foreground mt-0.5">
-          At least one label must match (OR logic).
-        </p>
-      </div>
-    {/if}
-
-    <!-- Add Filter Button -->
-    {#if remainingFilters.length > 0}
-      <div class="relative">
+  <!-- Active Text Filters -->
+  {#each TEXT_FILTERS.filter((f) => activeFilters.has(f.type)) as filter (filter.type)}
+    <div class="animate-slide-up">
+      <div class="flex items-center justify-between mb-1.5">
+        <label
+          for={filter.id}
+          class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+          >{filter.label}</label
+        >
         <button
           type="button"
-          onclick={() => (showFilterMenu = !showFilterMenu)}
-          class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          onclick={() => removeFilter(filter.type)}
+          class="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Remove {filter.label.toLowerCase()} filter"
         >
-          <Plus class="size-3" />
-          Add filter
+          <X class="size-3" />
         </button>
-        {#if showFilterMenu}
-          <div
-            class="absolute left-0 top-full mt-1 z-10 rounded-lg border border-border bg-card shadow-lg py-1 min-w-[160px] animate-slide-up"
-          >
-            {#each remainingFilters as filter (filter.type)}
+      </div>
+      <input
+        id={filter.id}
+        type="text"
+        value={getFilterValue(filter.type)}
+        oninput={(e) => setFilterValue(filter.type, e.currentTarget.value)}
+        placeholder={filter.placeholder}
+        class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground {filter.mono
+          ? 'font-mono'
+          : ''}
+            focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
+      />
+      {#if filter.hint}
+        <p class="text-[10px] text-muted-foreground mt-0.5">{filter.hint}</p>
+      {/if}
+    </div>
+  {/each}
+
+  <!-- Labels (special case: tag input) -->
+  {#if activeFilters.has('labels')}
+    <div class="animate-slide-up">
+      <div class="flex items-center justify-between mb-1.5">
+        <label
+          for="jira-labels"
+          class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Labels</label
+        >
+        <button
+          type="button"
+          onclick={() => removeFilter('labels')}
+          class="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Remove labels filter"
+        >
+          <X class="size-3" />
+        </button>
+      </div>
+      {#if labels.length > 0}
+        <div class="flex flex-wrap gap-1 mb-1.5">
+          {#each labels as label (label)}
+            <span
+              class="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground"
+            >
+              {label}
               <button
                 type="button"
-                onclick={() => addFilter(filter.type)}
-                class="w-full text-left px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
+                onclick={() => removeLabel(label)}
+                class="rounded-sm p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Remove label {label}"
               >
-                {filter.label}
+                <X class="size-2.5" />
               </button>
-            {/each}
-          </div>
-        {/if}
+            </span>
+          {/each}
+        </div>
+      {/if}
+      <div class="flex gap-1.5">
+        <input
+          id="jira-labels"
+          type="text"
+          bind:value={labelInput}
+          onkeydown={handleLabelKeydown}
+          placeholder="Type label and press Enter"
+          class="flex-1 rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground
+              focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
+        />
+        <button
+          type="button"
+          onclick={addLabel}
+          disabled={!labelInput.trim()}
+          class="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground
+              hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+        >
+          Add
+        </button>
       </div>
-    {/if}
+      <p class="text-[10px] text-muted-foreground mt-0.5">
+        At least one label must match (OR logic).
+      </p>
+    </div>
+  {/if}
+
+  <!-- Add Filter Button -->
+  {#if remainingFilters.length > 0}
+    <div class="relative">
+      <button
+        type="button"
+        onclick={() => (showFilterMenu = !showFilterMenu)}
+        class="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <Plus class="size-3" />
+        Add filter
+      </button>
+      {#if showFilterMenu}
+        <div
+          class="absolute left-0 top-full mt-1 z-10 rounded-lg border border-border bg-card shadow-lg py-1 min-w-[160px] animate-slide-up"
+        >
+          {#each remainingFilters as filter (filter.type)}
+            <button
+              type="button"
+              onclick={() => addFilter(filter.type)}
+              class="w-full text-left px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
+            >
+              {filter.label}
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {/if}
 </div>
