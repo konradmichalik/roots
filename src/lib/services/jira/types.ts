@@ -37,6 +37,10 @@ export interface JiraIssue {
     issuetype: { name: string; iconUrl?: string };
     project: { key: string; name: string };
     worklog?: JiraWorklogResponse;
+    parent?: { key: string; fields?: { issuetype?: { name: string } } };
+    components?: Array<{ name: string }>;
+    labels?: string[];
+    customfield_10001?: string | null;
   };
 }
 

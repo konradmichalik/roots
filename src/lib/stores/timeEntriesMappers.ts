@@ -44,7 +44,8 @@ export function mapJiraWorklog(
   item: WorklogWithIssue,
   client: JiraWorklogClient
 ): UnifiedTimeEntry {
-  const { worklog, issueKey, issueSummary, issueType, projectKey } = item;
+  const { worklog, issueKey, issueSummary, issueType, projectKey, epicKey, components, labels } =
+    item;
 
   const metadata: JiraMetadata = {
     source: 'jira',
@@ -52,7 +53,10 @@ export function mapJiraWorklog(
     issueKey,
     issueSummary,
     issueType,
-    projectKey
+    projectKey,
+    epicKey,
+    components,
+    labels
   };
 
   return {

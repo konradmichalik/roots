@@ -34,6 +34,9 @@ export interface JiraMetadata {
   issueSummary: string;
   issueType?: string;
   projectKey?: string;
+  epicKey?: string;
+  components?: string[];
+  labels?: string[];
 }
 
 export interface OutlookMetadata {
