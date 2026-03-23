@@ -3,7 +3,6 @@
   import Info from '@lucide/svelte/icons/info';
   import Plus from '@lucide/svelte/icons/plus';
   import X from '@lucide/svelte/icons/x';
-  import Code from '@lucide/svelte/icons/code';
 
   let {
     projectKey = $bindable(''),
@@ -23,7 +22,6 @@
     jql: string;
   } = $props();
 
-  let isAdvancedMode = $state(!!jql);
   let labelInput = $state('');
 
   type FilterType = 'issuePattern' | 'epicKey' | 'component' | 'labels' | 'summaryContains';
@@ -145,13 +143,6 @@
     }
   }
 
-  function toggleAdvancedMode(): void {
-    isAdvancedMode = !isAdvancedMode;
-    if (!isAdvancedMode) {
-      jql = '';
-    }
-  }
-
   function addLabel(): void {
     const val = labelInput.trim();
     if (val && !labels.includes(val)) {
@@ -173,55 +164,12 @@
 </script>
 
 <div class="space-y-3 pl-3 border-l-2 border-brand/30">
-  {#if isAdvancedMode}
-    <!-- JQL Mode -->
-    <div class="flex items-center justify-between gap-2 rounded-lg bg-information-subtle/50 p-2.5">
-      <p class="text-xs text-brand-text flex items-center gap-1.5">
-        <Code class="size-3 flex-shrink-0" />
-        JQL query — matched issue keys are used for filtering.
-      </p>
-      <button
-        type="button"
-        onclick={toggleAdvancedMode}
-        class="text-[10px] text-brand-text/70 hover:text-brand-text transition-colors shrink-0"
-      >
-        Simple mode
-      </button>
-    </div>
-    <div>
-      <label
-        for="jira-jql"
-        class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
-        >JQL Query</label
-      >
-      <textarea
-        id="jira-jql"
-        bind:value={jql}
-        placeholder="e.g. project = SUP AND fixVersion = '2.0'"
-        rows={3}
-        class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground font-mono resize-y
-          focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
-      ></textarea>
-      <p class="text-[10px] text-muted-foreground mt-0.5">
-        Query is executed server-side. Only issue keys from the result set are matched.
-      </p>
-    </div>
-  {:else}
-    <!-- Simple Mode -->
-    <div class="flex items-center justify-between gap-2 rounded-lg bg-information-subtle/50 p-2.5">
-      <p class="text-xs text-brand-text flex items-center gap-1.5">
-        <Info class="size-3 flex-shrink-0" />
-        All worklogs from this Jira project will be matched.
-      </p>
-      <button
-        type="button"
-        onclick={toggleAdvancedMode}
-        class="text-[10px] text-brand-text/70 hover:text-brand-text transition-colors flex items-center gap-1 shrink-0"
-      >
-        <Code class="size-2.5" />
-        JQL
-      </button>
-    </div>
+  <div class="rounded-lg bg-information-subtle/50 p-2.5">
+    <p class="text-xs text-brand-text flex items-center gap-1.5">
+      <Info class="size-3 flex-shrink-0" />
+      All worklogs from this Jira project will be matched.
+    </p>
+  </div>
 
     <!-- Project Key (always visible) -->
     <div>
@@ -366,5 +314,4 @@
         {/if}
       </div>
     {/if}
-  {/if}
 </div>
