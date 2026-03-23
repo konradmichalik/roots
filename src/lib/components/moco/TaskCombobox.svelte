@@ -12,6 +12,8 @@
 
   let searchValue = $state('');
   let open = $state(false);
+  let openUpward = $state(false);
+  let inputEl = $state<HTMLInputElement | null>(null);
 
   let tasks = $derived(projectId ? getTasksForProject(projectId) : []);
 
@@ -65,11 +67,25 @@
     open = false;
   }
 
+  function checkDropdownDirection(): void {
+    if (!inputEl) return;
+    const rect = inputEl.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    openUpward = spaceBelow < 200;
+  }
+
+  function scrollInputIntoView(): void {
+    if (!inputEl) return;
+    inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   function handleClick(): void {
     if (isDisabled) return;
     searchValue = '';
     displayValue = '';
+    checkDropdownDirection();
     open = true;
+    scrollInputIntoView();
   }
 
   function handleBlur(): void {
@@ -82,12 +98,14 @@
   function handleInput(e: Event): void {
     searchValue = (e.target as HTMLInputElement).value;
     displayValue = searchValue;
+    if (!open) checkDropdownDirection();
     open = true;
   }
 </script>
 
 <div class="relative">
   <input
+    bind:this={inputEl}
     type="text"
     value={displayValue}
     placeholder={projectId ? 'Search task...' : 'Select a project first'}
@@ -102,7 +120,8 @@
   />
   {#if open && filtered.length > 0}
     <div
-      class="absolute z-50 mt-1 max-h-44 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg"
+      class="absolute z-50 max-h-44 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg
+        {openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}"
     >
       {#each filtered as item (item.value)}
         <button
@@ -131,7 +150,10 @@
     </div>
   {/if}
   {#if open && filtered.length === 0 && searchValue.trim()}
-    <div class="absolute z-50 mt-1 w-full rounded-lg border border-border bg-card shadow-lg">
+    <div
+      class="absolute z-50 w-full rounded-lg border border-border bg-card shadow-lg
+        {openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}"
+    >
       <div class="px-3 py-2 text-sm text-muted-foreground">No tasks found</div>
     </div>
   {/if}
