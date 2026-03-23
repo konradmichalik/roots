@@ -70,7 +70,18 @@
       rules = rules.filter((rule) => {
         const source =
           rule.source.type === 'jira'
-            ? `jira ${rule.source.projectKey} ${rule.source.issuePattern ?? ''}`
+            ? [
+                'jira',
+                rule.source.projectKey,
+                rule.source.issuePattern,
+                rule.source.epicKey,
+                rule.source.component,
+                rule.source.summaryContains,
+                rule.source.jql,
+                rule.source.labels?.join(' ')
+              ]
+                .filter(Boolean)
+                .join(' ')
             : `outlook ${rule.source.eventPattern}`;
         const target = `${rule.target.customerName} ${rule.target.mocoProjectName}`;
         return `${rule.name} ${source} ${target}`.toLowerCase().includes(q);
