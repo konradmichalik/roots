@@ -3,6 +3,11 @@ export interface JiraSourceMatcher {
   connectionId: string;
   projectKey: string;
   issuePattern?: string;
+  epicKey?: string;
+  component?: string;
+  labels?: string[];
+  summaryContains?: string;
+  jql?: string;
 }
 
 export interface OutlookSourceMatcher {
