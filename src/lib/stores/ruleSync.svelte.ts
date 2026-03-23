@@ -51,13 +51,10 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
     description
   };
 
-  // Set remote fields for linking and dedup
+  // Set remote fields for linking and dedup (Jira only — Moco doesn't recognize 'outlook' as remote_service)
   if (rule.source.type === 'jira' && entry.metadata.source === 'jira') {
     payload.remote_service = 'jira';
     payload.remote_id = `${entry.metadata.issueKey}#${entry.metadata.worklogId}`;
-  } else if (rule.source.type === 'outlook' && entry.metadata.source === 'outlook') {
-    payload.remote_service = 'outlook';
-    payload.remote_id = entry.metadata.eventId;
   }
 
   return payload;
@@ -147,7 +144,10 @@ function buildPreview(
       }
     }
 
-    pending.push({ rule, sourceEntry: entry, mocoPayload: payload });
+    const competingRuleIds =
+      matchingRules.length > 1 ? matchingRules.slice(1).map((r) => r.id) : undefined;
+
+    pending.push({ rule, sourceEntry: entry, mocoPayload: payload, competingRuleIds });
   }
 
   return { pending, skipped, staleRules, errors };
@@ -210,7 +210,8 @@ export async function executeSyncCandidates(
         hours: candidate.mocoPayload.hours,
         description: candidate.mocoPayload.description ?? '',
         autoSynced,
-        status: 'success'
+        status: 'success',
+        competingRuleIds: candidate.competingRuleIds
       });
       created.push(record);
 

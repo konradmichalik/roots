@@ -99,15 +99,15 @@
     <button
       type="button"
       onclick={() => (showFilters = !showFilters)}
-      class="flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors
+      class="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors
         {hasActiveFilters
         ? 'text-brand-text bg-information-subtle'
         : 'text-muted-foreground hover:text-foreground hover:bg-accent'}"
     >
-      <Filter class="size-3" />
+      <Filter class="size-3.5" />
       Filter
       {#if hasActiveFilters}
-        <span class="font-mono">({filteredRecords.length})</span>
+        <span class="text-[10px] font-mono">({filteredRecords.length})</span>
       {/if}
     </button>
     {#if hasActiveFilters}
@@ -125,35 +125,65 @@
   </div>
 
   {#if showFilters}
-    <div class="grid grid-cols-3 gap-2 mb-3 p-2 rounded-lg bg-secondary/50">
-      <select
-        bind:value={filterRuleId}
-        class="rounded-md border border-input bg-background px-2 py-1 text-[11px] text-foreground
-          focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all"
-      >
-        <option value="">All Rules</option>
-        {#each availableRules as rule (rule.id)}
-          <option value={rule.id}>{rule.name}</option>
-        {/each}
-      </select>
-      <select
-        bind:value={filterSourceType}
-        class="rounded-md border border-input bg-background px-2 py-1 text-[11px] text-foreground
-          focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all"
-      >
-        <option value="all">All Sources</option>
-        <option value="jira">Jira</option>
-        <option value="outlook">Outlook</option>
-      </select>
-      <select
-        bind:value={filterStatus}
-        class="rounded-md border border-input bg-background px-2 py-1 text-[11px] text-foreground
-          focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all"
-      >
-        <option value="all">All Status</option>
-        <option value="success">Success</option>
-        <option value="failed">Failed</option>
-      </select>
+    <div class="grid grid-cols-3 gap-2 mb-3 p-2.5 rounded-lg bg-secondary/50 animate-slide-up">
+      <!-- Rule -->
+      <div>
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+          Rule
+        </p>
+        <select
+          bind:value={filterRuleId}
+          class="w-full rounded-md border border-input bg-background px-2 py-1 text-xs
+            focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-primary transition-colors"
+        >
+          <option value="">All</option>
+          {#each availableRules as rule (rule.id)}
+            <option value={rule.id}>{rule.name}</option>
+          {/each}
+        </select>
+      </div>
+
+      <!-- Source -->
+      <div>
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+          Source
+        </p>
+        <div class="flex gap-0.5 p-0.5 rounded-md bg-secondary">
+          {#each [['all', 'All'], ['jira', 'Jira'], ['outlook', 'Outlook']] as [val, label] (val)}
+            <button
+              type="button"
+              onclick={() => (filterSourceType = val as typeof filterSourceType)}
+              class="flex-1 rounded px-2 py-1 text-xs font-medium transition-colors
+                {filterSourceType === val
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'}"
+            >
+              {label}
+            </button>
+          {/each}
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div>
+        <p class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+          Status
+        </p>
+        <div class="flex gap-0.5 p-0.5 rounded-md bg-secondary">
+          {#each [['all', 'All'], ['success', 'Success'], ['failed', 'Failed']] as [val, label] (val)}
+            <button
+              type="button"
+              onclick={() => (filterStatus = val as typeof filterStatus)}
+              class="flex-1 rounded px-2 py-1 text-xs font-medium transition-colors
+                {filterStatus === val
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'}"
+            >
+              {label}
+            </button>
+          {/each}
+        </div>
+      </div>
     </div>
   {/if}
 

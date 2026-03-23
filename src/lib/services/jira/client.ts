@@ -27,6 +27,9 @@ export interface WorklogWithIssue {
   issueSummary: string;
   issueType?: string;
   projectKey?: string;
+  epicKey?: string;
+  components?: string[];
+  labels?: string[];
 }
 
 export abstract class JiraWorklogClient extends ApiClient {
@@ -70,13 +73,21 @@ export abstract class JiraWorklogClient extends ApiClient {
         return worklogDate >= from && worklogDate <= to && this.isCurrentUser(w.author);
       });
 
+      // Resolve epic key: prefer parent with issuetype 'Epic', fallback to customfield_10001
+      const epicKey = this.resolveEpicKey(issue);
+      const components = issue.fields.components?.map((c) => c.name);
+      const labels = issue.fields.labels;
+
       for (const worklog of filtered) {
         allWorklogs.push({
           worklog,
           issueKey: issue.key,
           issueSummary: issue.fields.summary,
           issueType: issue.fields.issuetype?.name,
-          projectKey: issue.fields.project?.key
+          projectKey: issue.fields.project?.key,
+          epicKey,
+          components: components?.length ? components : undefined,
+          labels: labels?.length ? labels : undefined
         });
       }
     }
@@ -101,7 +112,16 @@ export abstract class JiraWorklogClient extends ApiClient {
           jql,
           startAt,
           maxResults,
-          fields: ['summary', 'issuetype', 'project', 'worklog']
+          fields: [
+            'summary',
+            'issuetype',
+            'project',
+            'worklog',
+            'parent',
+            'components',
+            'labels',
+            'customfield_10001'
+          ]
         }
       );
       const response = validateResponse(jiraSearchResponseSchema, raw, 'Jira search');
@@ -149,6 +169,19 @@ export abstract class JiraWorklogClient extends ApiClient {
     }
 
     return allWorklogs;
+  }
+
+  private resolveEpicKey(issue: JiraIssue): string | undefined {
+    // Cloud: parent with issuetype 'Epic'
+    const parent = issue.fields.parent;
+    if (parent?.fields?.issuetype?.name === 'Epic') {
+      return parent.key;
+    }
+    // Server fallback: customfield_10001 (Epic Link)
+    if (issue.fields.customfield_10001) {
+      return issue.fields.customfield_10001;
+    }
+    return undefined;
   }
 
   extractWorklogComment(comment: JiraWorklog['comment']): string | undefined {

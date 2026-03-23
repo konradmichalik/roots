@@ -45,7 +45,20 @@ export const jiraIssueSchema = z.object({
       key: z.string(),
       name: z.string()
     }),
-    worklog: jiraWorklogResponseSchema.optional()
+    worklog: jiraWorklogResponseSchema.optional(),
+    parent: z
+      .object({
+        key: z.string(),
+        fields: z
+          .object({
+            issuetype: z.object({ name: z.string() }).optional()
+          })
+          .optional()
+      })
+      .optional(),
+    components: z.array(z.object({ name: z.string() })).optional(),
+    labels: z.array(z.string()).optional(),
+    customfield_10001: z.string().nullish()
   })
 });
 

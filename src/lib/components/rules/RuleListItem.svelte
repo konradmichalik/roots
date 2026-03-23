@@ -1,40 +1,31 @@
 <script lang="ts">
-  import { getLastSyncForRule } from '../../stores/syncRecords.svelte';
+  import { getLastSyncForRule, getConflictCountForRule } from '../../stores/syncRecords.svelte';
   import type { Rule } from '../../types';
-  import GripVertical from '@lucide/svelte/icons/grip-vertical';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Zap from '@lucide/svelte/icons/zap';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
+  import GitBranch from '@lucide/svelte/icons/git-branch';
 
   let {
     rule,
-    isDragged = false,
-    isDragOver = false,
-    ondragstart,
-    ondragover,
-    ondragleave,
-    ondrop,
-    ondragend,
     onEdit
   }: {
     rule: Rule;
-    isDragged?: boolean;
-    isDragOver?: boolean;
-    ondragstart?: (e: DragEvent) => void;
-    ondragover?: (e: DragEvent) => void;
-    ondragleave?: () => void;
-    ondrop?: (e: DragEvent) => void;
-    ondragend?: () => void;
     onEdit?: () => void;
   } = $props();
 
   let lastSync = $derived(getLastSyncForRule(rule.id));
   let isStale = $derived(rule.targetStatus === 'stale');
+  let conflictCount = $derived(getConflictCountForRule(rule.id));
 
   let sourceLabel = $derived.by(() => {
     if (rule.source.type === 'jira') {
-      const pattern = rule.source.issuePattern;
-      return pattern ? `Jira: ${pattern}` : `Jira: ${rule.source.projectKey}`;
+      if (rule.source.jql) return 'Jira: JQL';
+      const parts = [rule.source.issuePattern || rule.source.projectKey];
+      if (rule.source.epicKey) parts.push(`Epic: ${rule.source.epicKey}`);
+      if (rule.source.component) parts.push(rule.source.component);
+      if (rule.source.labels?.length) parts.push(`#${rule.source.labels.join(' #')}`);
+      return `Jira: ${parts.join(' · ')}`;
     }
     return `Outlook: "${rule.source.eventPattern}"`;
   });
@@ -61,32 +52,15 @@
 
 <div
   class="group/rule relative rounded-lg border bg-card transition-all duration-150
-    {isDragged
-    ? 'opacity-50 border-dashed border-primary'
-    : isDragOver
-      ? 'border-primary bg-primary/5'
-      : isStale
-        ? 'border-warning/50'
-        : !rule.enabled
-          ? 'border-border/50 opacity-60'
-          : 'border-border hover:border-border-bold'}"
-  draggable="true"
-  {ondragstart}
-  {ondragover}
-  {ondragleave}
-  {ondrop}
-  {ondragend}
+    {isStale
+    ? 'border-warning/50'
+    : !rule.enabled
+      ? 'border-border/50 opacity-60'
+      : 'border-border hover:border-border-bold'}"
   role="listitem"
 >
-  <!-- Drag Handle -->
-  <div
-    class="absolute left-0 top-0 bottom-0 w-5 flex items-center justify-center cursor-grab active:cursor-grabbing opacity-0 group-hover/rule:opacity-100 transition-opacity"
-  >
-    <GripVertical class="size-3 text-muted-foreground" />
-  </div>
-
   <!-- Content -->
-  <div class="p-2 pl-5 pr-8">
+  <div class="p-2 pl-3 pr-8">
     <div class="flex items-center gap-1.5">
       {#if isStale}
         <AlertTriangle class="size-3 text-warning flex-shrink-0" />
@@ -110,6 +84,15 @@
         <span class="text-warning shrink-0">· Stale</span>
       {:else}
         <span class="text-muted-foreground/40 shrink-0">· {lastSyncLabel}</span>
+      {/if}
+      {#if conflictCount > 0}
+        <span
+          class="inline-flex items-center gap-0.5 shrink-0 text-warning-text"
+          title="{conflictCount} synced entries had competing rules"
+        >
+          <GitBranch class="size-2.5" />
+          <span class="text-[10px]">{conflictCount}</span>
+        </span>
       {/if}
     </div>
   </div>
