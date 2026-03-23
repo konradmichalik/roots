@@ -379,11 +379,20 @@ export function detectHoursChanges(
     const record = getSyncRecord(sourceType, sourceId);
     if (!record) continue;
 
-    const diff = Math.abs(entry.hours - record.hours);
+    // Apply the same overrideHours logic used during sync so that
+    // fixed-duration rules don't trigger false "hours changed" warnings.
+    const matchingRules = findMatchingRules(entry);
+    const rule = matchingRules.find((r) => r.id === record.ruleId);
+    let effectiveHours = entry.hours;
+    if (rule?.source.type === 'outlook' && rule.source.overrideHours !== undefined) {
+      effectiveHours = rule.source.overrideHours;
+    }
+
+    const diff = Math.abs(effectiveHours - record.hours);
     if (diff >= 0.01) {
       changes.push({
         syncRecord: record,
-        currentHours: entry.hours,
+        currentHours: effectiveHours,
         syncedHours: record.hours,
         sourceKey: record.sourceKey,
         date: record.mocoDate
