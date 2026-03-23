@@ -51,10 +51,29 @@
     hint?: string;
     mono?: boolean;
   }> = [
-    { type: 'issuePattern', label: 'Issue Pattern', id: 'jira-pattern', placeholder: 'e.g. SUP-42 or SUP-*', hint: 'Use * for wildcard (e.g. SUP-*).', mono: true },
-    { type: 'epicKey', label: 'Epic', id: 'jira-epic', placeholder: 'e.g. SUP-100', hint: 'Match all issues under this epic.', mono: true },
+    {
+      type: 'issuePattern',
+      label: 'Issue Pattern',
+      id: 'jira-pattern',
+      placeholder: 'e.g. SUP-42 or SUP-*',
+      hint: 'Use * for wildcard (e.g. SUP-*).',
+      mono: true
+    },
+    {
+      type: 'epicKey',
+      label: 'Epic',
+      id: 'jira-epic',
+      placeholder: 'e.g. SUP-100',
+      hint: 'Match all issues under this epic.',
+      mono: true
+    },
     { type: 'component', label: 'Component', id: 'jira-component', placeholder: 'e.g. Backend' },
-    { type: 'summaryContains', label: 'Summary Contains', id: 'jira-summary', placeholder: 'e.g. meeting' }
+    {
+      type: 'summaryContains',
+      label: 'Summary Contains',
+      id: 'jira-summary',
+      placeholder: 'e.g. meeting'
+    }
   ];
 
   const AVAILABLE_FILTERS: Array<{ type: FilterType; label: string }> = [
@@ -65,26 +84,37 @@
   // Bindable value getter/setter by filter type
   function getFilterValue(type: FilterType): string {
     switch (type) {
-      case 'issuePattern': return issuePattern;
-      case 'epicKey': return epicKey;
-      case 'component': return component;
-      case 'summaryContains': return summaryContains;
-      default: return '';
+      case 'issuePattern':
+        return issuePattern;
+      case 'epicKey':
+        return epicKey;
+      case 'component':
+        return component;
+      case 'summaryContains':
+        return summaryContains;
+      default:
+        return '';
     }
   }
 
   function setFilterValue(type: FilterType, value: string): void {
     switch (type) {
-      case 'issuePattern': issuePattern = value; break;
-      case 'epicKey': epicKey = value; break;
-      case 'component': component = value; break;
-      case 'summaryContains': summaryContains = value; break;
+      case 'issuePattern':
+        issuePattern = value;
+        break;
+      case 'epicKey':
+        epicKey = value;
+        break;
+      case 'component':
+        component = value;
+        break;
+      case 'summaryContains':
+        summaryContains = value;
+        break;
     }
   }
 
-  let remainingFilters = $derived(
-    AVAILABLE_FILTERS.filter((f) => !activeFilters.has(f.type))
-  );
+  let remainingFilters = $derived(AVAILABLE_FILTERS.filter((f) => !activeFilters.has(f.type)));
 
   let showFilterMenu = $state(false);
 
@@ -159,7 +189,11 @@
       </button>
     </div>
     <div>
-      <label for="jira-jql" class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">JQL Query</label>
+      <label
+        for="jira-jql"
+        class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+        >JQL Query</label
+      >
       <textarea
         id="jira-jql"
         bind:value={jql}
@@ -191,7 +225,9 @@
 
     <!-- Project Key (always visible) -->
     <div>
-      <label for="jira-project" class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+      <label
+        for="jira-project"
+        class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
         >Project Key</label
       >
       <input
@@ -208,7 +244,11 @@
     {#each TEXT_FILTERS.filter((f) => activeFilters.has(f.type)) as filter (filter.type)}
       <div class="animate-slide-up">
         <div class="flex items-center justify-between mb-1.5">
-          <label for={filter.id} class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{filter.label}</label>
+          <label
+            for={filter.id}
+            class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+            >{filter.label}</label
+          >
           <button
             type="button"
             onclick={() => removeFilter(filter.type)}
@@ -224,7 +264,9 @@
           value={getFilterValue(filter.type)}
           oninput={(e) => setFilterValue(filter.type, e.currentTarget.value)}
           placeholder={filter.placeholder}
-          class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground {filter.mono ? 'font-mono' : ''}
+          class="w-full rounded-lg border border-input bg-secondary/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground {filter.mono
+            ? 'font-mono'
+            : ''}
             focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring focus:bg-background transition-all duration-150"
         />
         {#if filter.hint}
@@ -237,7 +279,11 @@
     {#if activeFilters.has('labels')}
       <div class="animate-slide-up">
         <div class="flex items-center justify-between mb-1.5">
-          <label for="jira-labels" class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Labels</label>
+          <label
+            for="jira-labels"
+            class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+            >Labels</label
+          >
           <button
             type="button"
             onclick={() => removeFilter('labels')}

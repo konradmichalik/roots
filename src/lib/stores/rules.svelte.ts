@@ -2,7 +2,13 @@ import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage
 import { logger } from '../utils/logger';
 import { isDemoMode } from '../utils/demo-data';
 import { mocoProjectsState, getTasksForProject } from './mocoProjects.svelte';
-import type { Rule, JiraSourceMatcher, OutlookSourceMatcher, SourceMatcher, UnifiedTimeEntry } from '../types';
+import type {
+  Rule,
+  JiraSourceMatcher,
+  OutlookSourceMatcher,
+  SourceMatcher,
+  UnifiedTimeEntry
+} from '../types';
 
 export const rulesState = $state<{ rules: Rule[] }>({
   rules: []
@@ -65,7 +71,6 @@ export function removeRule(id: string): void {
   logger.store('rules', 'Removed', { id });
 }
 
-
 export function getSortedRules(): Rule[] {
   return [...rulesState.rules].sort((a, b) => a.sortOrder - b.sortOrder);
 }
@@ -120,7 +125,10 @@ function matchesJiraSource(entry: UnifiedTimeEntry, source: JiraSourceMatcher): 
 
   // Labels (OR logic — at least one must match)
   if (source.labels && source.labels.length > 0) {
-    if (!meta.labels || !source.labels.some((l) => meta.labels!.some((ml) => ml.toLowerCase() === l.toLowerCase())))
+    if (
+      !meta.labels ||
+      !source.labels.some((l) => meta.labels!.some((ml) => ml.toLowerCase() === l.toLowerCase()))
+    )
       return false;
   }
 
@@ -320,10 +328,20 @@ export function findOverlappingRules(source: Rule['source'], excludeId?: string)
       if (source.projectKey.toLowerCase() !== rule.source.projectKey.toLowerCase()) return false;
 
       // Different epic → no overlap
-      if (source.epicKey && rule.source.epicKey && source.epicKey.toLowerCase() !== rule.source.epicKey.toLowerCase()) return false;
+      if (
+        source.epicKey &&
+        rule.source.epicKey &&
+        source.epicKey.toLowerCase() !== rule.source.epicKey.toLowerCase()
+      )
+        return false;
 
       // Different component → no overlap
-      if (source.component && rule.source.component && source.component.toLowerCase() !== rule.source.component.toLowerCase()) return false;
+      if (
+        source.component &&
+        rule.source.component &&
+        source.component.toLowerCase() !== rule.source.component.toLowerCase()
+      )
+        return false;
 
       // Different labels (no intersection) → no overlap
       if (source.labels?.length && rule.source.labels?.length) {

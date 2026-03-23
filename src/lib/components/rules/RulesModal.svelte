@@ -153,7 +153,6 @@
     editingRule = undefined;
     editorPrefill = undefined;
   }
-
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpen}>
@@ -194,7 +193,10 @@
         <List class="size-3.5" />
         Rules
         {#if sortedRules.length > 0}
-          <span class="rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">{sortedRules.length}</span>
+          <span
+            class="rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground"
+            >{sortedRules.length}</span
+          >
         {/if}
       </button>
       <button

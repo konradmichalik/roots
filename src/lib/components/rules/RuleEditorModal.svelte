@@ -504,7 +504,10 @@
             <!-- Source Type -->
             <div>
               <!-- svelte-ignore a11y_label_has_associated_control -->
-              <label class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Source</label>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+                >Source</label
+              >
               <div class="flex gap-1 p-0.5 rounded-lg bg-secondary">
                 <button
                   type="button"
@@ -553,7 +556,8 @@
             {#if matchedEntries.length > 0}
               <div class="rounded-lg bg-success-subtle/50 px-3 py-2">
                 <p class="text-xs text-success-text font-medium">
-                  Would match {matchedEntries.length} {matchedEntries.length === 1 ? 'entry' : 'entries'}
+                  Would match {matchedEntries.length}
+                  {matchedEntries.length === 1 ? 'entry' : 'entries'}
                   from today
                 </p>
                 {#if matchedEntries.length <= 5}
@@ -567,9 +571,7 @@
                 {/if}
               </div>
             {:else if isStep1Valid}
-              <p class="text-xs text-muted-foreground">
-                No matching entries from today.
-              </p>
+              <p class="text-xs text-muted-foreground">No matching entries from today.</p>
             {/if}
           </div>
         {/if}
@@ -583,19 +585,27 @@
             <!-- Moco Target -->
             <div>
               <!-- svelte-ignore a11y_label_has_associated_control -->
-              <label class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Moco Project</label>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+                >Moco Project</label
+              >
               <ProjectCombobox bind:value={projectValue} onSelect={handleProjectSelect} />
             </div>
 
             <div>
               <!-- svelte-ignore a11y_label_has_associated_control -->
-              <label class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Moco Task</label>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+                >Moco Task</label
+              >
               <TaskCombobox projectId={selectedProjectId} bind:value={taskValue} />
             </div>
 
             <!-- Description Template -->
             <div>
-              <label for="rule-template" class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+              <label
+                for="rule-template"
+                class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
                 >Description Template</label
               >
               <input
@@ -637,7 +647,9 @@
           >
             <!-- Name -->
             <div>
-              <label for="rule-name" class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+              <label
+                for="rule-name"
+                class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
                 >Name</label
               >
               <input
@@ -690,19 +702,25 @@
                 Summary
               </p>
               <div class="grid grid-cols-[72px_1fr] gap-x-3 gap-y-1.5 text-xs">
-                <span class="text-muted-foreground uppercase font-semibold text-[10px]">Source</span>
+                <span class="text-muted-foreground uppercase font-semibold text-[10px]">Source</span
+                >
                 <span class="text-foreground font-medium">
                   {#if sourceType === 'jira'}
                     {#if jiraJql}
                       Jira: JQL
                     {:else}
-                      Jira: {jiraIssuePattern || jiraProjectKey}{jiraEpicKey ? ` (Epic: ${jiraEpicKey})` : ''}{jiraComponent ? ` [${jiraComponent}]` : ''}{jiraLabels.length > 0 ? ` #${jiraLabels.join(' #')}` : ''}
+                      Jira: {jiraIssuePattern || jiraProjectKey}{jiraEpicKey
+                        ? ` (Epic: ${jiraEpicKey})`
+                        : ''}{jiraComponent ? ` [${jiraComponent}]` : ''}{jiraLabels.length > 0
+                        ? ` #${jiraLabels.join(' #')}`
+                        : ''}
                     {/if}
                   {:else}
                     Outlook: "{outlookPattern}"
                   {/if}
                 </span>
-                <span class="text-muted-foreground uppercase font-semibold text-[10px]">Target</span>
+                <span class="text-muted-foreground uppercase font-semibold text-[10px]">Target</span
+                >
                 <span class="text-foreground font-medium">
                   {#if projectValue}
                     {getProjectById(Number(projectValue))?.customer.name} / {getProjectById(
@@ -710,7 +728,9 @@
                     )?.name}
                   {/if}
                 </span>
-                <span class="text-muted-foreground uppercase font-semibold text-[10px]">Template</span>
+                <span class="text-muted-foreground uppercase font-semibold text-[10px]"
+                  >Template</span
+                >
                 <span class="text-foreground font-mono text-[11px] truncate"
                   >{descriptionTemplate || '—'}</span
                 >
