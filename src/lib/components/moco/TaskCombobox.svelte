@@ -83,9 +83,11 @@
     if (isDisabled) return;
     searchValue = '';
     displayValue = '';
-    checkDropdownDirection();
-    open = true;
     scrollInputIntoView();
+    open = true;
+    requestAnimationFrame(() => {
+      checkDropdownDirection();
+    });
   }
 
   function handleBlur(): void {
