@@ -2,8 +2,16 @@
   import FavoriteItem from './FavoriteItem.svelte';
   import FavoriteModal from '../favorites/FavoriteModal.svelte';
   import { getSortedFavorites, reorderFavorites } from '../../stores/favorites.svelte';
+  import { settingsState, updateSettings } from '../../stores/settings.svelte';
   import Star from '@lucide/svelte/icons/star';
   import Plus from '@lucide/svelte/icons/plus';
+  import ChevronRight from '@lucide/svelte/icons/chevron-right';
+
+  let collapsed = $derived(settingsState.favoritesSidebarCollapsed);
+
+  function toggleCollapsed(): void {
+    updateSettings({ favoritesSidebarCollapsed: !collapsed });
+  }
 
   let favorites = $derived(getSortedFavorites());
 
@@ -78,10 +86,18 @@
 
 <div class="space-y-3">
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
+    <button
+      class="flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-foreground/80 transition-colors duration-150"
+      onclick={toggleCollapsed}
+      aria-expanded={!collapsed}
+      aria-label={collapsed ? 'Expand favorites' : 'Collapse favorites'}
+    >
+      <ChevronRight
+        class="size-3.5 text-muted-foreground transition-transform duration-150 {collapsed ? '' : 'rotate-90'}"
+      />
       <Star class="size-4 text-warning" />
-      <h3 class="text-sm font-semibold text-foreground">Favorites</h3>
-    </div>
+      <span>Favorites</span>
+    </button>
     <FavoriteModal mode="create">
       <button
         class="rounded p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
@@ -93,13 +109,15 @@
     </FavoriteModal>
   </div>
 
-  {#if favorites.length === 0}
-    <p class="text-xs text-muted-foreground">No favorites yet. Click + to add one.</p>
-  {:else}
-    <div class="space-y-1.5">
-      {#each favorites as favorite (favorite.id)}
-        <FavoriteItem {favorite} {...dragProps(favorite.id)} />
-      {/each}
-    </div>
+  {#if !collapsed}
+    {#if favorites.length === 0}
+      <p class="text-xs text-muted-foreground">No favorites yet. Click + to add one.</p>
+    {:else}
+      <div class="space-y-1.5">
+        {#each favorites as favorite (favorite.id)}
+          <FavoriteItem {favorite} {...dragProps(favorite.id)} />
+        {/each}
+      </div>
+    {/if}
   {/if}
 </div>
