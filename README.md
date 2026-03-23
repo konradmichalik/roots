@@ -28,6 +28,7 @@ Roots aggregates your work time from multiple services into a single desktop app
 - **Multi-Service Integration** — Connect Moco, Jira (Cloud & Server), Outlook and Personio
 - **Unified Timeline** — Day, week and month views across all connected services
 - **Confidence-Based Reconciliation** — Automatic matching and comparison between services
+- **Smart Booking Suggestions** — Suggests Moco project + task based on recent booking history when creating entries from Jira worklogs or Outlook events
 - **Personio Sync** — Work schedule and absence import with automatic weekday-hours update
 - **Native Desktop App** — Lightweight Tauri 2 app; no browser CORS issues
 - **Dark / Light Mode** — Nord-palette design tokens with full theme support

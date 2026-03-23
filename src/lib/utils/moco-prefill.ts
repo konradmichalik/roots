@@ -9,6 +9,7 @@ export interface MocoPrefill {
   taskId?: number;
   remoteService?: string;
   remoteId?: string;
+  sourceEntry?: UnifiedTimeEntry;
 }
 
 /**
@@ -31,6 +32,7 @@ export function buildMocoPrefill(entry: UnifiedTimeEntry): MocoPrefill {
     projectId: matchedFavorite?.projectId,
     taskId: matchedFavorite?.taskId,
     remoteService: jiraMeta ? 'jira' : undefined,
-    remoteId: jiraMeta?.issueKey
+    remoteId: jiraMeta?.issueKey,
+    sourceEntry: entry
   };
 }

@@ -31,7 +31,7 @@ The day view displays entries in columns — one per connected service. Each car
 Cards are color-coded by service and show action icons on hover:
 
 - **Pencil** — edit the entry (Moco, Jira)
-- **Plus** — book an Outlook event as a Moco entry
+- **Plus** — book an Outlook event or Jira worklog as a Moco entry (with smart project/task suggestion if a matching recent booking exists)
 - **Link** — open the entry in the source application
 
 ## Presence Bar

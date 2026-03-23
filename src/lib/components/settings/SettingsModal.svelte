@@ -52,6 +52,14 @@
     updateSettings({ showQuickSelection: enabled });
   }
 
+  function handleFavoritesToggle(enabled: boolean): void {
+    updateSettings({ showFavorites: enabled });
+  }
+
+  function handleSmartSuggestionsToggle(enabled: boolean): void {
+    updateSettings({ showSmartSuggestions: enabled });
+  }
+
   let cachedMonths = $derived(getCachedMonthCount());
 
   async function handleClearCache(): Promise<void> {
@@ -197,6 +205,35 @@
 
       <!-- Features Tab -->
       <Tabs.Content value="features" class="mt-0 px-6 py-4 min-h-[240px] space-y-6">
+        <!-- Favorites -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-foreground">Favorites</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">
+              Show the favorites section in the sidebar.
+            </p>
+          </div>
+          <Switch checked={settingsState.showFavorites} onCheckedChange={handleFavoritesToggle} />
+        </div>
+
+        <div class="border-t border-border"></div>
+
+        <!-- Smart Suggestions -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-foreground">Smart Suggestions</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">
+              Suggest project and task based on recent bookings when creating entries.
+            </p>
+          </div>
+          <Switch
+            checked={settingsState.showSmartSuggestions}
+            onCheckedChange={handleSmartSuggestionsToggle}
+          />
+        </div>
+
+        <div class="border-t border-border"></div>
+
         <!-- Quick Selection -->
         <div class="flex items-center justify-between">
           <div>

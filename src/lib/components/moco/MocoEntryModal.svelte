@@ -25,9 +25,13 @@
   import { trackPairUsage } from '../../stores/recentMocoPairs.svelte';
   import { settingsState } from '../../stores/settings.svelte';
   import { dateNavState } from '../../stores/dateNavigation.svelte';
+  import { monthCacheState } from '../../stores/timeEntries.svelte';
+  import { findBookingSuggestion, type BookingSuggestion } from '../../utils/booking-suggestions';
+  import SmartSuggestionBanner from './SmartSuggestionBanner.svelte';
   import { untrack, type Snippet } from 'svelte';
   import AlertTriangle from '@lucide/svelte/icons/alert-triangle';
   import Star from '@lucide/svelte/icons/star';
+  import type { UnifiedTimeEntry } from '../../types';
 
   let {
     children,
@@ -48,6 +52,7 @@
       taskId?: number;
       remoteService?: string;
       remoteId?: string;
+      sourceEntry?: UnifiedTimeEntry;
     };
     activityId?: number;
     onSuccess?: () => void;
@@ -60,6 +65,8 @@
   let error = $state<string | null>(null);
   let savedAsFavorite = $state(false);
   let showDeleteConfirm = $state(false);
+  let suggestion = $state<BookingSuggestion | null>(null);
+  let suggestionLoading = $state(false);
 
   // Form state
   let date = $state('');
@@ -102,8 +109,25 @@
     taskInactiveWarning = false;
   }
 
+  function computeSuggestion(): void {
+    suggestion = null;
+    suggestionLoading = false;
+
+    if (mode !== 'create' || !settingsState.showSmartSuggestions) return;
+
+    const sourceEntry = prefill?.sourceEntry;
+    if (!sourceEntry) return;
+
+    suggestionLoading = true;
+    queueMicrotask(() => {
+      suggestion = findBookingSuggestion(sourceEntry, monthCacheState.cache);
+      suggestionLoading = false;
+    });
+  }
+
   function initModal(): void {
     resetForm();
+    computeSuggestion();
     fetchAssignedProjects().then(async () => {
       // Check if prefilled project is still active
       if (prefill?.projectId) {
@@ -163,6 +187,7 @@
     const changed = selectedProjectId !== projectId;
     selectedProjectId = projectId;
     projectInactiveWarning = false;
+    suggestion = null;
     if (changed) {
       taskValue = '';
       taskInactiveWarning = false;
@@ -369,6 +394,13 @@
     {:else}
       {#if mode === 'create' && settingsState.showQuickSelection}
         <RecentPairChips onSelect={handleChipSelect} />
+      {/if}
+      {#if mode === 'create' && settingsState.showSmartSuggestions}
+        <SmartSuggestionBanner
+          {suggestion}
+          loading={suggestionLoading}
+          onApply={handleChipSelect}
+        />
       {/if}
       <form onsubmit={handleSubmit} class="space-y-3 pt-2 pb-4">
         <!-- Project -->
