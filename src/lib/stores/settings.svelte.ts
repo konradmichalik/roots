@@ -19,6 +19,11 @@ export interface AppSettings {
   };
   weekdayHours: WeekdayHours;
   showQuickSelection: boolean;
+  showFavorites: boolean;
+  showSmartSuggestions: boolean;
+  favoritesSidebarCollapsed: boolean;
+  frequentlyUsedCollapsed: boolean;
+  suggestionCollapsed: boolean;
   billableTarget: number;
 }
 
@@ -39,6 +44,11 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
   weekdayHours: [8, 8, 8, 8, 8, 0, 0],
   showQuickSelection: true,
+  showFavorites: true,
+  showSmartSuggestions: true,
+  favoritesSidebarCollapsed: false,
+  frequentlyUsedCollapsed: false,
+  suggestionCollapsed: false,
   billableTarget: 80
 };
 
