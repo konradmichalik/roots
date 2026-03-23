@@ -213,10 +213,7 @@
               Show the favorites section in the sidebar.
             </p>
           </div>
-          <Switch
-            checked={settingsState.showFavorites}
-            onCheckedChange={handleFavoritesToggle}
-          />
+          <Switch checked={settingsState.showFavorites} onCheckedChange={handleFavoritesToggle} />
         </div>
 
         <div class="border-t border-border"></div>

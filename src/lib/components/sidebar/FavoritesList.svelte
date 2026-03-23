@@ -93,7 +93,9 @@
       aria-label={collapsed ? 'Expand favorites' : 'Collapse favorites'}
     >
       <ChevronRight
-        class="size-3.5 text-muted-foreground transition-transform duration-150 {collapsed ? '' : 'rotate-90'}"
+        class="size-3.5 text-muted-foreground transition-transform duration-150 {collapsed
+          ? ''
+          : 'rotate-90'}"
       />
       <Star class="size-4 text-warning" />
       <span>Favorites</span>

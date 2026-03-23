@@ -33,10 +33,7 @@ export function findBookingSuggestion(
 
   if (mocoEntries.length === 0) return null;
 
-  const matcher =
-    entry.source === 'jira'
-      ? buildJiraMatcher(entry)
-      : buildOutlookMatcher(entry);
+  const matcher = entry.source === 'jira' ? buildJiraMatcher(entry) : buildOutlookMatcher(entry);
 
   if (!matcher) return null;
 
@@ -83,9 +80,7 @@ function collectMocoEntries(
   return entries;
 }
 
-function buildJiraMatcher(
-  entry: UnifiedTimeEntry
-): ((moco: UnifiedTimeEntry) => boolean) | null {
+function buildJiraMatcher(entry: UnifiedTimeEntry): ((moco: UnifiedTimeEntry) => boolean) | null {
   const jiraMeta = entry.metadata as JiraMetadata;
   const projectKey = jiraMeta.projectKey ?? jiraMeta.issueKey?.split('-')[0];
   if (!projectKey) return null;
