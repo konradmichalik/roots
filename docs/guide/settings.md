@@ -39,6 +39,18 @@ When Moco is connected, roots tracks your working time (clock-in/clock-out) via 
 
 Presence data is cached for 5 minutes with the same TTL as time entries.
 
+## Features
+
+Toggle optional features on or off under Settings > Features.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Favorites** | On | Show the favorites section in the sidebar |
+| **Smart Suggestions** | On | Suggest project and task based on recent bookings when creating Moco entries from Jira or Outlook |
+| **Quick Selection** | On | Show frequently used project+task combinations in the booking modal |
+
+Both Smart Suggestions and Quick Selection sections in the booking modal are independently collapsible — the collapsed state is remembered across sessions.
+
 ## Auto-Refresh
 
 Configure automatic data refresh to keep the timeline up to date without manual reloading.

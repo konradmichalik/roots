@@ -25,7 +25,11 @@ The header shows a progress bar for each day, comparing booked hours against you
 
 ### Favorites
 
-Pin frequently used project/task combinations as favorites for one-click booking. Favorites support drag-and-drop reordering.
+Pin frequently used project/task combinations as favorites for one-click booking. Favorites support drag-and-drop reordering. The favorites section in the sidebar can be collapsed and toggled off entirely in Settings > Features.
+
+### Smart Booking Suggestions
+
+When booking a Jira worklog or Outlook event to Moco, roots suggests a project and task based on your recent booking history. It scans the past 7 days for Moco entries that match the Jira project key or Outlook event title and suggests the most recent match. Suggestions appear as a collapsible chip in the booking modal and can be toggled off in Settings > Features.
 
 ### Timer
 
