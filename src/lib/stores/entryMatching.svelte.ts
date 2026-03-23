@@ -224,5 +224,12 @@ export function buildMatchResult(
     }
   }
 
+  // Outlook entries always sorted chronologically by start time
+  sortedOutlook.sort((a, b) => {
+    const timeA = a.startTime ?? '';
+    const timeB = b.startTime ?? '';
+    return timeA.localeCompare(timeB);
+  });
+
   return { sortedMoco, sortedJira, sortedOutlook, entryGroupMap };
 }
