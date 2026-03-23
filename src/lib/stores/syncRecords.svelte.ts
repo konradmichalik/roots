@@ -101,6 +101,16 @@ export function getLastSyncForRule(ruleId: string): { date: string; count: numbe
   return { date: lastDate, count: countOnDate };
 }
 
+export function getConflictCountForRule(ruleId: string): number {
+  return syncRecordsState.records.filter(
+    (r) =>
+      r.ruleId === ruleId &&
+      r.status === 'success' &&
+      r.competingRuleIds &&
+      r.competingRuleIds.length > 0
+  ).length;
+}
+
 export function getSyncCountForRule(ruleId: string): number {
   return syncRecordsState.records.filter((r) => r.ruleId === ruleId && r.status === 'success')
     .length;

@@ -16,12 +16,14 @@ export interface SyncRecord {
   autoSynced: boolean;
   status: 'success' | 'failed';
   errorReason?: string;
+  competingRuleIds?: string[];
 }
 
 export interface SyncCandidate {
   rule: Rule;
   sourceEntry: UnifiedTimeEntry;
   mocoPayload: MocoCreateActivity;
+  competingRuleIds?: string[];
 }
 
 export interface SkippedEntry {

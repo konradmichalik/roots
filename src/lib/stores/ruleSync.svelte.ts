@@ -147,7 +147,10 @@ function buildPreview(
       }
     }
 
-    pending.push({ rule, sourceEntry: entry, mocoPayload: payload });
+    const competingRuleIds =
+      matchingRules.length > 1 ? matchingRules.slice(1).map((r) => r.id) : undefined;
+
+    pending.push({ rule, sourceEntry: entry, mocoPayload: payload, competingRuleIds });
   }
 
   return { pending, skipped, staleRules, errors };
@@ -210,7 +213,8 @@ export async function executeSyncCandidates(
         hours: candidate.mocoPayload.hours,
         description: candidate.mocoPayload.description ?? '',
         autoSynced,
-        status: 'success'
+        status: 'success',
+        competingRuleIds: candidate.competingRuleIds
       });
       created.push(record);
 
