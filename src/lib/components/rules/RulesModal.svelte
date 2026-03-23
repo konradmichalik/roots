@@ -5,7 +5,8 @@
   import SyncLogTab from './SyncLogTab.svelte';
   import RuleAnalyticsTab from './RuleAnalyticsTab.svelte';
   import BulkSyncDialog from './BulkSyncDialog.svelte';
-  import { getSortedRules, reorderRules } from '../../stores/rules.svelte';
+  import { getSortedRules } from '../../stores/rules.svelte';
+  import { getLastSyncForRule } from '../../stores/syncRecords.svelte';
   import type { Rule, SourceMatcher } from '../../types';
   import type { Snippet } from 'svelte';
   import Zap from '@lucide/svelte/icons/zap';
@@ -16,6 +17,7 @@
   import Play from '@lucide/svelte/icons/play';
   import Search from '@lucide/svelte/icons/search';
   import X from '@lucide/svelte/icons/x';
+  import Filter from '@lucide/svelte/icons/filter';
   let {
     children,
     defaultOpen = false,
@@ -39,21 +41,92 @@
   let editorPrefill = $state<{ source?: SourceMatcher } | undefined>(undefined);
 
   let filterQuery = $state('');
+  let filterSourceType = $state<'all' | 'jira' | 'outlook'>('all');
+  let filterStatus = $state<'all' | 'active' | 'paused' | 'stale'>('all');
+  let filterCustomer = $state('');
+  let filterAutoSync = $state<'all' | 'yes' | 'no'>('all');
+  let sortBy = $state<'name-asc' | 'name-desc' | 'edited' | 'synced'>('name-asc');
+  let showFilters = $state(false);
+
   let sortedRules = $derived(getSortedRules());
 
-  let filteredRules = $derived.by(() => {
+  let hasActiveFilters = $derived(
+    filterSourceType !== 'all' ||
+      filterStatus !== 'all' ||
+      filterCustomer !== '' ||
+      filterAutoSync !== 'all'
+  );
+
+  let uniqueCustomers = $derived(
+    [...new Set(sortedRules.map((r) => r.target.customerName))].sort()
+  );
+
+  let filteredAndSortedRules = $derived.by(() => {
+    let rules = sortedRules;
+
+    // Text search
     const q = filterQuery.trim().toLowerCase();
-    if (!q) return sortedRules;
-    return sortedRules.filter((rule) => {
-      const source =
-        rule.source.type === 'jira'
-          ? `jira ${rule.source.projectKey} ${rule.source.issuePattern ?? ''}`
-          : `outlook ${rule.source.eventPattern}`;
-      const target = `${rule.target.customerName} ${rule.target.mocoProjectName}`;
-      const searchable = `${rule.name} ${source} ${target}`.toLowerCase();
-      return searchable.includes(q);
+    if (q) {
+      rules = rules.filter((rule) => {
+        const source =
+          rule.source.type === 'jira'
+            ? `jira ${rule.source.projectKey} ${rule.source.issuePattern ?? ''}`
+            : `outlook ${rule.source.eventPattern}`;
+        const target = `${rule.target.customerName} ${rule.target.mocoProjectName}`;
+        return `${rule.name} ${source} ${target}`.toLowerCase().includes(q);
+      });
+    }
+
+    // Filters
+    if (filterSourceType !== 'all') {
+      rules = rules.filter((r) => r.source.type === filterSourceType);
+    }
+    if (filterStatus !== 'all') {
+      rules = rules.filter((r) => {
+        if (filterStatus === 'active') return r.enabled && r.targetStatus !== 'stale';
+        if (filterStatus === 'paused') return !r.enabled;
+        if (filterStatus === 'stale') return r.targetStatus === 'stale';
+        return true;
+      });
+    }
+    if (filterCustomer) {
+      rules = rules.filter((r) => r.target.customerName === filterCustomer);
+    }
+    if (filterAutoSync !== 'all') {
+      rules = rules.filter((r) => (filterAutoSync === 'yes' ? r.autoSync : !r.autoSync));
+    }
+
+    // Sort
+    rules = [...rules].sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'edited':
+          return b.updatedAt.localeCompare(a.updatedAt);
+        case 'synced': {
+          const aSync = getLastSyncForRule(a.id);
+          const bSync = getLastSyncForRule(b.id);
+          if (!aSync && !bSync) return 0;
+          if (!aSync) return 1;
+          if (!bSync) return -1;
+          return bSync.date.localeCompare(aSync.date);
+        }
+        default:
+          return 0;
+      }
     });
+
+    return rules;
   });
+
+  function clearFilters(): void {
+    filterSourceType = 'all';
+    filterStatus = 'all';
+    filterCustomer = '';
+    filterAutoSync = 'all';
+  }
 
   function handleOpen(isOpen: boolean): void {
     open = isOpen;
@@ -62,6 +135,9 @@
       editingRule = undefined;
       editorPrefill = undefined;
       filterQuery = '';
+      clearFilters();
+      sortBy = 'name-asc';
+      showFilters = false;
       onClose?.();
     }
   }
@@ -78,71 +154,6 @@
     editorPrefill = undefined;
   }
 
-  // Drag and Drop
-  let draggedId = $state<string | null>(null);
-  let dragOverId = $state<string | null>(null);
-
-  function handleDragStart(e: DragEvent, id: string): void {
-    draggedId = id;
-    if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', id);
-    }
-  }
-
-  function handleDragOver(e: DragEvent, id: string): void {
-    e.preventDefault();
-    if (draggedId !== id) dragOverId = id;
-  }
-
-  function handleDragLeave(): void {
-    dragOverId = null;
-  }
-
-  function handleDrop(e: DragEvent, targetId: string): void {
-    e.preventDefault();
-    if (!draggedId || draggedId === targetId) {
-      resetDrag();
-      return;
-    }
-
-    const currentIds = sortedRules.map((r) => r.id);
-    const draggedIndex = currentIds.indexOf(draggedId);
-    const targetIndex = currentIds.indexOf(targetId);
-
-    if (draggedIndex === -1 || targetIndex === -1) {
-      resetDrag();
-      return;
-    }
-
-    const newIds = [...currentIds];
-    newIds.splice(draggedIndex, 1);
-    newIds.splice(targetIndex, 0, draggedId);
-
-    reorderRules(newIds);
-    resetDrag();
-  }
-
-  function handleDragEnd(): void {
-    resetDrag();
-  }
-
-  function resetDrag(): void {
-    draggedId = null;
-    dragOverId = null;
-  }
-
-  function dragProps(id: string) {
-    return {
-      isDragged: draggedId === id,
-      isDragOver: dragOverId === id,
-      ondragstart: (e: DragEvent) => handleDragStart(e, id),
-      ondragover: (e: DragEvent) => handleDragOver(e, id),
-      ondragleave: handleDragLeave,
-      ondrop: (e: DragEvent) => handleDrop(e, id),
-      ondragend: handleDragEnd
-    };
-  }
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpen}>
@@ -155,7 +166,7 @@
       {/snippet}
     </Dialog.Trigger>
   {/if}
-  <Dialog.Content class="sm:max-w-2xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
+  <Dialog.Content class="sm:max-w-4xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
     <Dialog.Header>
       <div class="flex items-center gap-2">
         <Dialog.Title>Rules</Dialog.Title>
@@ -183,7 +194,7 @@
         <List class="size-3.5" />
         Rules
         {#if sortedRules.length > 0}
-          <span class="text-[10px] font-mono text-muted-foreground">({sortedRules.length})</span>
+          <span class="rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">{sortedRules.length}</span>
         {/if}
       </button>
       <button
@@ -255,16 +266,17 @@
           </button>
         </div>
       {:else}
-        <!-- Search filter -->
-        {#if sortedRules.length > 5}
-          <div class="relative mb-2">
+        <!-- Toolbar -->
+        <div class="flex items-center gap-2 mb-2">
+          <!-- Search -->
+          <div class="relative flex-1">
             <Search
               class="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground/60 pointer-events-none"
             />
             <input
               type="text"
               bind:value={filterQuery}
-              placeholder="Filter rules…"
+              placeholder="Search rules…"
               class="w-full rounded-md border border-border bg-secondary/50 py-1.5 pl-8 pr-8 text-sm text-foreground placeholder:text-muted-foreground/50
                 focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-primary transition-colors"
             />
@@ -273,20 +285,152 @@
                 type="button"
                 onclick={() => (filterQuery = '')}
                 class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Clear filter"
+                aria-label="Clear search"
               >
                 <X class="size-3.5" />
               </button>
             {/if}
           </div>
+
+          <!-- Filter toggle -->
+          <button
+            type="button"
+            onclick={() => (showFilters = !showFilters)}
+            class="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors
+              {hasActiveFilters
+              ? 'text-brand-text bg-information-subtle'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent'}"
+          >
+            <Filter class="size-3.5" />
+            Filter
+            {#if hasActiveFilters}
+              <span class="text-[10px] font-mono">({filteredAndSortedRules.length})</span>
+            {/if}
+          </button>
+          {#if hasActiveFilters}
+            <button
+              type="button"
+              onclick={clearFilters}
+              class="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Clear
+            </button>
+          {/if}
+
+          <!-- Sort -->
+          <select
+            bind:value={sortBy}
+            class="rounded-md border border-border bg-secondary/50 px-2 py-1.5 text-sm text-foreground
+              focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-primary transition-colors"
+          >
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+            <option value="edited">Last edited</option>
+            <option value="synced">Last synced</option>
+          </select>
+        </div>
+
+        <!-- Filter panel -->
+        {#if showFilters}
+          <div
+            class="grid grid-cols-4 gap-2 mb-3 p-2.5 rounded-lg bg-secondary/50 animate-slide-up"
+          >
+            <!-- Source Type -->
+            <div>
+              <p
+                class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1"
+              >
+                Source
+              </p>
+              <div class="flex gap-0.5 p-0.5 rounded-md bg-secondary">
+                {#each [['all', 'All'], ['jira', 'Jira'], ['outlook', 'Outlook']] as [val, label] (val)}
+                  <button
+                    type="button"
+                    onclick={() => (filterSourceType = val as typeof filterSourceType)}
+                    class="flex-1 rounded px-2 py-1 text-xs font-medium transition-colors
+                      {filterSourceType === val
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'}"
+                  >
+                    {label}
+                  </button>
+                {/each}
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div>
+              <p
+                class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1"
+              >
+                Status
+              </p>
+              <div class="flex gap-0.5 p-0.5 rounded-md bg-secondary">
+                {#each [['all', 'All'], ['active', 'Active'], ['paused', 'Paused'], ['stale', 'Stale']] as [val, label] (val)}
+                  <button
+                    type="button"
+                    onclick={() => (filterStatus = val as typeof filterStatus)}
+                    class="flex-1 rounded px-1.5 py-1 text-xs font-medium transition-colors
+                      {filterStatus === val
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'}"
+                  >
+                    {label}
+                  </button>
+                {/each}
+              </div>
+            </div>
+
+            <!-- Customer -->
+            <div>
+              <p
+                class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1"
+              >
+                Customer
+              </p>
+              <select
+                bind:value={filterCustomer}
+                class="w-full rounded-md border border-input bg-background px-2 py-1 text-xs
+                  focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-primary transition-colors"
+              >
+                <option value="">All</option>
+                {#each uniqueCustomers as customer (customer)}
+                  <option value={customer}>{customer}</option>
+                {/each}
+              </select>
+            </div>
+
+            <!-- Auto-Sync -->
+            <div>
+              <p
+                class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1"
+              >
+                Auto-Sync
+              </p>
+              <div class="flex gap-0.5 p-0.5 rounded-md bg-secondary">
+                {#each [['all', 'All'], ['yes', 'Yes'], ['no', 'No']] as [val, label] (val)}
+                  <button
+                    type="button"
+                    onclick={() => (filterAutoSync = val as typeof filterAutoSync)}
+                    class="flex-1 rounded px-2 py-1 text-xs font-medium transition-colors
+                      {filterAutoSync === val
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'}"
+                  >
+                    {label}
+                  </button>
+                {/each}
+              </div>
+            </div>
+          </div>
         {/if}
 
-        {#if filteredRules.length === 0}
+        {#if filteredAndSortedRules.length === 0}
           <p class="py-4 text-center text-sm text-muted-foreground">No matching rules.</p>
         {:else}
           <div class="space-y-1">
-            {#each filteredRules as rule (rule.id)}
-              <RuleListItem {rule} {...dragProps(rule.id)} onEdit={() => openEditor(rule)} />
+            {#each filteredAndSortedRules as rule (rule.id)}
+              <RuleListItem {rule} onEdit={() => openEditor(rule)} />
             {/each}
           </div>
         {/if}
