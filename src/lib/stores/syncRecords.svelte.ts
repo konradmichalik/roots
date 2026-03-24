@@ -88,7 +88,9 @@ export function getSyncRecordsForRule(ruleId: string): SyncRecord[] {
   return syncRecordsState.records.filter((r) => r.ruleId === ruleId);
 }
 
-export function getLastSyncForRule(ruleId: string): { date: string; count: number } | null {
+export function getLastSyncForRule(
+  ruleId: string
+): { date: string; count: number; syncedAt: string } | null {
   const ruleRecords = syncRecordsState.records
     .filter((r) => r.ruleId === ruleId && r.status === 'success')
     .sort((a, b) => b.syncedAt.localeCompare(a.syncedAt));
@@ -98,7 +100,7 @@ export function getLastSyncForRule(ruleId: string): { date: string; count: numbe
   const lastDate = ruleRecords[0].mocoDate;
   const countOnDate = ruleRecords.filter((r) => r.mocoDate === lastDate).length;
 
-  return { date: lastDate, count: countOnDate };
+  return { date: lastDate, count: countOnDate, syncedAt: ruleRecords[0].syncedAt };
 }
 
 export function getConflictCountForRule(ruleId: string): number {
