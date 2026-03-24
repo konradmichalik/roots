@@ -40,6 +40,8 @@
   let editingRule = $state<Rule | undefined>(undefined);
   let editorPrefill = $state<{ source?: SourceMatcher } | undefined>(undefined);
 
+  let logFilterRuleId = $state('');
+
   let filterQuery = $state('');
   let filterSourceType = $state<'all' | 'jira' | 'outlook'>('all');
   let filterStatus = $state<'all' | 'active' | 'paused' | 'stale'>('all');
@@ -149,8 +151,14 @@
       clearFilters();
       sortBy = 'name-asc';
       showFilters = false;
+      logFilterRuleId = '';
       onClose?.();
     }
+  }
+
+  function showLogForRule(ruleId: string): void {
+    logFilterRuleId = ruleId;
+    activeTab = 'log';
   }
 
   function openEditor(rule?: Rule): void {
@@ -179,6 +187,7 @@
   <Dialog.Content class="sm:max-w-4xl max-h-[85vh] overflow-y-auto overflow-x-hidden">
     <Dialog.Header>
       <div class="flex items-center gap-2">
+        <Zap class="size-4 text-warning" />
         <Dialog.Title>Rules</Dialog.Title>
         <span
           class="rounded-full bg-discovery-subtle px-2 py-0.5 text-[10px] font-semibold text-discovery-text"
@@ -443,7 +452,7 @@
         {:else}
           <div class="space-y-1">
             {#each filteredAndSortedRules as rule (rule.id)}
-              <RuleListItem {rule} onEdit={() => openEditor(rule)} />
+              <RuleListItem {rule} onEdit={() => openEditor(rule)} onShowLog={() => showLogForRule(rule.id)} />
             {/each}
           </div>
         {/if}
@@ -452,7 +461,7 @@
 
     <!-- Sync Log Tab -->
     {#if activeTab === 'log'}
-      <SyncLogTab />
+      <SyncLogTab initialRuleId={logFilterRuleId} />
     {/if}
 
     <!-- Analytics Tab -->
