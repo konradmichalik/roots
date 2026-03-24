@@ -10,6 +10,7 @@
   import { yearStatsState, fetchYearStats, getYearBalance } from '../../stores/yearStats.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { getVacationSummary } from '../../stores/absences.svelte';
+  import StatsProgressBar from './StatsProgressBar.svelte';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import TrendingUp from '@lucide/svelte/icons/trending-up';
   import TreePalm from '@lucide/svelte/icons/tree-palm';
@@ -111,25 +112,7 @@
             </div>
           </div>
 
-          <!-- Mini progress bar with pace marker -->
-          <div class="relative w-full h-1 rounded-full bg-muted/30">
-            <div
-              class="absolute top-0 left-0 h-full rounded-full bg-success transition-all duration-300"
-              style="width: {progressPercent}%;"
-            ></div>
-            {#if overPercent > 0}
-              <div
-                class="absolute top-0 left-0 h-full rounded-full bg-discovery transition-all duration-300"
-                style="width: {overPercent}%;"
-              ></div>
-            {/if}
-            {#if pacePercent > 0 && pacePercent < 100}
-              <div
-                class="absolute top-1/2 -translate-y-1/2 w-0.5 h-2.5 bg-foreground/60 rounded-full"
-                style="left: {pacePercent}%;"
-              ></div>
-            {/if}
-          </div>
+          <StatsProgressBar {progressPercent} {overPercent} {pacePercent} />
           <p class="text-[10px] text-muted-foreground">
             {yearElapsedDays} of {yearTotalDays} working days (excl. today)
           </p>
