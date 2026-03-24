@@ -19,8 +19,8 @@ You need an **Azure App Registration**. This is a one-time setup performed by yo
    - **Name**: `roots` (or any name)
    - **Supported account types**: "Accounts in this organizational directory only" (single tenant)
    - **Redirect URI**:
-     - Platform: **Single-page application (SPA)**
-     - URI: `http://localhost:1420` (for dev) or `roots://oauth/callback` (for desktop)
+     - Platform: **Mobile and desktop applications**
+     - URI: `roots://oauth/callback` (for desktop) or `http://localhost:1420` (for dev)
 4. Click **Register**
 5. Copy the **Application (client) ID** and **Directory (tenant) ID** from the overview page
 
