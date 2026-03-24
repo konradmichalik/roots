@@ -91,13 +91,13 @@
 </script>
 
 <Dialog.Root bind:open onOpenChange={handleOpen}>
-  <Dialog.Content class="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+  <Dialog.Content class="sm:max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
     <Dialog.Header>
       <Dialog.Title>Apply Rules</Dialog.Title>
       <Dialog.Description>Review entries before transferring to Moco.</Dialog.Description>
     </Dialog.Header>
 
-    <div class="space-y-4 py-2">
+    <div class="space-y-4 py-2 overflow-y-auto min-h-0">
       <!-- Stale warnings -->
       {#if preview.staleRules.length > 0}
         <div class="p-2.5 rounded-lg bg-warning-subtle space-y-1">
@@ -132,7 +132,7 @@
             </button>
           </div>
 
-          <div class="space-y-1 max-h-[35vh] overflow-y-auto">
+          <div class="space-y-1">
             {#each preview.pending as candidate (candidate.sourceEntry.id)}
               <label
                 class="flex items-start gap-2.5 rounded-lg px-2.5 py-2 cursor-pointer transition-colors hover:bg-accent/50
@@ -220,43 +220,43 @@
           {/each}
         </div>
       {/if}
-
-      <!-- Footer -->
-      {#if preview.pending.length > 0}
-        <div class="flex items-center justify-between pt-2 border-t border-border">
-          <span class="text-xs text-muted-foreground">
-            {formatHours(totalHours)} total
-          </span>
-          <div class="flex gap-2">
-            <button
-              type="button"
-              onclick={() => handleOpen(false)}
-              class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground
-                hover:bg-accent transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onclick={handleSync}
-              disabled={selectedCandidates.length === 0 || isSyncing}
-              class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground
-                hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
-                flex items-center gap-1.5"
-            >
-              {#if isSyncing}
-                <LoaderCircle class="size-3.5 animate-spin" />
-                Syncing...
-              {:else}
-                <Zap class="size-3.5" />
-                Transfer {selectedCandidates.length}
-                {selectedCandidates.length === 1 ? 'entry' : 'entries'}
-              {/if}
-            </button>
-          </div>
-        </div>
-      {/if}
     </div>
+
+    <!-- Footer -->
+    {#if preview.pending.length > 0}
+      <div class="flex items-center justify-between pt-2 border-t border-border">
+        <span class="text-xs text-muted-foreground">
+          {formatHours(totalHours)} total
+        </span>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            onclick={() => handleOpen(false)}
+            class="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground
+              hover:bg-accent transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onclick={handleSync}
+            disabled={selectedCandidates.length === 0 || isSyncing}
+            class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground
+              hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+              transition-all duration-150 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none
+              flex items-center gap-1.5"
+          >
+            {#if isSyncing}
+              <LoaderCircle class="size-3.5 animate-spin" />
+              Syncing...
+            {:else}
+              <Zap class="size-3.5" />
+              Transfer {selectedCandidates.length}
+              {selectedCandidates.length === 1 ? 'entry' : 'entries'}
+            {/if}
+          </button>
+        </div>
+      </div>
+    {/if}
   </Dialog.Content>
 </Dialog.Root>
