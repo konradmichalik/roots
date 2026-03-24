@@ -20,7 +20,7 @@
   import { isTauri } from '../../utils/storage';
   import { onMount } from 'svelte';
 
-  const isDesktop = isTauri();
+  const _isDesktop = isTauri();
 
   let innerWidth = $state(0);
   const isCompact = $derived(innerWidth < 1536);

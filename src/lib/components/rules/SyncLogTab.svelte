@@ -9,10 +9,24 @@
   import Zap from '@lucide/svelte/icons/zap';
   import Filter from '@lucide/svelte/icons/filter';
 
+  let {
+    initialRuleId = ''
+  }: {
+    initialRuleId?: string;
+  } = $props();
+
   // Filters
   let filterRuleId = $state<string | ''>('');
   let filterSourceType = $state<'all' | 'jira' | 'outlook'>('all');
   let filterStatus = $state<'all' | 'success' | 'failed'>('all');
+
+  // Sync initialRuleId changes from parent (also handles initial value)
+  $effect(() => {
+    if (initialRuleId) {
+      filterRuleId = initialRuleId;
+      showFilters = true;
+    }
+  });
 
   let availableRules = $derived(rulesState.rules.map((r) => ({ id: r.id, name: r.name })));
 
