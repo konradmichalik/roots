@@ -7,6 +7,7 @@
     getOverPercent,
     getPacePercent
   } from '../../utils/time-format';
+  import { settingsState } from '../../stores/settings.svelte';
   import StatsProgressBar from './StatsProgressBar.svelte';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import CalendarRange from '@lucide/svelte/icons/calendar-range';
@@ -16,13 +17,17 @@
     weekActual,
     weekTarget,
     weekFullTarget,
-    daysCount
+    daysCount,
+    weekBillablePercent = 0,
+    onBillableClick
   }: {
     weekBalance: number;
     weekActual: number;
     weekTarget: number;
     weekFullTarget: number;
     daysCount: number;
+    weekBillablePercent?: number;
+    onBillableClick?: () => void;
   } = $props();
 
   let isOpen = $state(true);
@@ -76,6 +81,21 @@
       <p class="text-[10px] text-muted-foreground">
         {daysCount} working day{daysCount !== 1 ? 's' : ''} (excl. today)
       </p>
+
+      <!-- Billable % (same pattern as SidebarStatsMonth) -->
+      <button
+        onclick={() => onBillableClick?.()}
+        class="flex items-center justify-between w-full text-muted-foreground
+          hover:text-foreground transition-colors rounded
+          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+      >
+        <span class="text-[10px] uppercase tracking-wider">Billable</span>
+        <span
+          class="font-mono font-medium {weekBillablePercent >= settingsState.billableTarget
+            ? 'text-success-text'
+            : 'text-warning-text'}">{weekBillablePercent}%</span
+        >
+      </button>
     </div>
   {/if}
 </div>
