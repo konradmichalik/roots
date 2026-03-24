@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getLastSyncForRule, getConflictCountForRule } from '../../stores/syncRecords.svelte';
+  import { formatRelativeTime } from '../../utils/date-helpers';
   import type { Rule } from '../../types';
   import Pencil from '@lucide/svelte/icons/pencil';
   import Zap from '@lucide/svelte/icons/zap';
@@ -32,9 +33,8 @@
 
   let lastSyncLabel = $derived.by(() => {
     if (!lastSync) return 'Never synced';
-    const today = new Date().toISOString().slice(0, 10);
-    if (lastSync.date === today) return `Today, ${lastSync.count} entries`;
-    return `${lastSync.date}, ${lastSync.count} entries`;
+    const relative = formatRelativeTime(new Date(lastSync.syncedAt));
+    return `${relative}, ${lastSync.count} entries`;
   });
 
   let statusLabel = $derived.by(() => {
