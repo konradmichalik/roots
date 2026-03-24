@@ -100,7 +100,7 @@
           hover:text-foreground transition-colors rounded
           focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       >
-        <span>Billable</span>
+        <span class="text-[10px] uppercase tracking-wider">Billable</span>
         <span
           class="font-mono font-medium {billablePercent >= settingsState.billableTarget
             ? 'text-success-text'

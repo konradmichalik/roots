@@ -13,6 +13,7 @@
     getOpenHoursDays
   } from '../../stores/timeEntries.svelte';
   import { getPresenceForDate } from '../../stores/presences.svelte';
+
   import { statsModalState } from '../../stores/statsModal.svelte';
   import {
     getWeekDates,
@@ -21,7 +22,7 @@
     parseDate
   } from '../../utils/date-helpers';
   import { settingsState } from '../../stores/settings.svelte';
-  import type { MocoMetadata } from '../../types';
+  import type { MocoMetadata, UnifiedTimeEntry } from '../../types';
   import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
 
   // Helper: get required hours for a date from weekdayHours setting
@@ -56,19 +57,31 @@
   let monthActual = $derived(monthOverviews.reduce((sum, d) => sum + d.totals.actual, 0));
   let monthTarget = $derived(monthOverviews.reduce((sum, d) => sum + d.requiredHours, 0));
 
-  // Billable percentage from month cache
-  let billablePercent = $derived.by(() => {
-    const cached = monthCacheState.cache[monthStart];
-    if (!cached) return 0;
+  // Billable percentage helper
+  function calcBillablePercent(entries: UnifiedTimeEntry[], dateFilter?: Set<string>): number {
     let billable = 0;
     let total = 0;
-    for (const entry of cached.mocoEntries) {
+    for (const entry of entries) {
+      if (dateFilter && !dateFilter.has(entry.date)) continue;
       const meta = entry.metadata as MocoMetadata;
       if (meta.billable) billable += entry.hours;
       total += entry.hours;
     }
     return total > 0 ? Math.round((billable / total) * 100) : 0;
-  });
+  }
+
+  // Collect all cached moco entries (flattened across months)
+  let allCachedMocoEntries = $derived(
+    Object.values(monthCacheState.cache).flatMap((c) => c?.mocoEntries ?? [])
+  );
+
+  // Week billable percentage (across all cached months for week-spanning-month-boundary)
+  let weekBillablePercent = $derived(calcBillablePercent(allCachedMocoEntries, new Set(weekDates)));
+
+  // Month billable percentage
+  let billablePercent = $derived(
+    calcBillablePercent(monthCacheState.cache[monthStart]?.mocoEntries ?? [])
+  );
 
   // StatsModal controlled via global store (so context menus can open it too)
 
@@ -116,6 +129,13 @@
     return { fullTarget, totalDays, elapsedDays };
   });
 
+  function openBillabilitySlide() {
+    statsModalState.initialSlide = 'billability';
+    statsModalState.highlightProjectId = undefined;
+    statsModalState.highlightTaskName = undefined;
+    statsModalState.open = true;
+  }
+
   let isStatsLoading = $derived(monthCacheState.loading && !monthCacheState.cache[monthStart]);
 </script>
 
@@ -144,6 +164,8 @@
       {weekTarget}
       {weekFullTarget}
       daysCount={weekDatesUntilYesterday.length}
+      {weekBillablePercent}
+      onBillableClick={openBillabilitySlide}
     />
     <SidebarStatsMonth
       {monthBalance}
@@ -154,12 +176,7 @@
       {balancedDays}
       totalWorkingDays={allMonthWorkingDays?.length ?? 0}
       elapsedWorkingDays={monthWorkingDaysUntilYesterday.length}
-      onBillableClick={() => {
-        statsModalState.initialSlide = 'billability';
-        statsModalState.highlightProjectId = undefined;
-        statsModalState.highlightTaskName = undefined;
-        statsModalState.open = true;
-      }}
+      onBillableClick={openBillabilitySlide}
     />
     <SidebarStatsTotal
       {todayStr}
