@@ -83,21 +83,19 @@
       </p>
 
       <!-- Billable % (same pattern as SidebarStatsMonth) -->
-      {#if weekBillablePercent > 0}
-        <button
-          onclick={() => onBillableClick?.()}
-          class="flex items-center justify-between w-full text-muted-foreground
-            hover:text-foreground transition-colors rounded
-            focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+      <button
+        onclick={() => onBillableClick?.()}
+        class="flex items-center justify-between w-full text-muted-foreground
+          hover:text-foreground transition-colors rounded
+          focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+      >
+        <span class="text-[10px] uppercase tracking-wider">Billable</span>
+        <span
+          class="font-mono font-medium {weekBillablePercent >= settingsState.billableTarget
+            ? 'text-success-text'
+            : 'text-warning-text'}">{weekBillablePercent}%</span
         >
-          <span class="text-[10px] uppercase tracking-wider">Billable</span>
-          <span
-            class="font-mono font-medium {weekBillablePercent >= settingsState.billableTarget
-              ? 'text-success-text'
-              : 'text-warning-text'}">{weekBillablePercent}%</span
-          >
-        </button>
-      {/if}
+      </button>
     </div>
   {/if}
 </div>
