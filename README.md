@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://konradmichalik.github.io/roots/"><img src="https://img.shields.io/badge/docs-online-blue?logo=readthedocs" alt="Documentation" /></a>
   <img src="https://img.shields.io/badge/Svelte-5-ff3e00?logo=svelte" alt="Svelte 5" />
   <img src="https://img.shields.io/badge/Tauri-2-24c8db?logo=tauri" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript" alt="TypeScript" />

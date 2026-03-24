@@ -53,7 +53,7 @@
           GitHub
         </a>
         <a
-          href="https://github.com/konradmichalik/roots#readme"
+          href="https://konradmichalik.github.io/roots/"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent transition-colors duration-150"
