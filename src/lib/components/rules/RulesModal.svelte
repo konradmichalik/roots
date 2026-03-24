@@ -452,7 +452,11 @@
         {:else}
           <div class="space-y-1">
             {#each filteredAndSortedRules as rule (rule.id)}
-              <RuleListItem {rule} onEdit={() => openEditor(rule)} onShowLog={() => showLogForRule(rule.id)} />
+              <RuleListItem
+                {rule}
+                onEdit={() => openEditor(rule)}
+                onShowLog={() => showLogForRule(rule.id)}
+              />
             {/each}
           </div>
         {/if}

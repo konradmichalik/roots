@@ -100,6 +100,8 @@
     {isDragOver
     ? 'border-success border-dashed bg-success/5 ring-2 ring-success/20'
     : 'border-border dark:border-white/10'}"
+  role={isDropTarget ? 'region' : undefined}
+  aria-label={isDropTarget ? `Drop zone for ${label}` : undefined}
   ondragover={isDropTarget ? handleDragOver : undefined}
   ondragleave={isDropTarget ? handleDragLeave : undefined}
   ondrop={isDropTarget ? handleDrop : undefined}
