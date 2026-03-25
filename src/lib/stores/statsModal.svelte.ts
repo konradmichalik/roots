@@ -2,7 +2,7 @@
 // Global StatsModal control — lets any component open the stats dialog
 // ---------------------------------------------------------------------------
 
-type SlideId = 'overview' | 'billability' | 'projects';
+type SlideId = 'overview' | 'daily' | 'billability' | 'projects';
 
 export const statsModalState = $state({
   open: false,
@@ -25,6 +25,14 @@ export function openStatsForTask(projectId: number, taskName: string): void {
   statsModalState.initialSlide = 'projects';
   statsModalState.highlightProjectId = projectId;
   statsModalState.highlightTaskName = taskName;
+}
+
+/** Open the stats modal on the Billability slide. */
+export function openStatsBillability(): void {
+  statsModalState.open = true;
+  statsModalState.initialSlide = 'billability';
+  statsModalState.highlightProjectId = undefined;
+  statsModalState.highlightTaskName = undefined;
 }
 
 /** Clear highlight (called when the modal closes). */

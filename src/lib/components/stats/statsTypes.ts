@@ -26,3 +26,11 @@ export interface WeekBillability {
   total: number;
   rate: number;
 }
+
+export interface DayChartEntry {
+  date: string;
+  actual: number;
+  target: number;
+  balance: number;
+  isFuture: boolean;
+}

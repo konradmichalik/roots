@@ -3,6 +3,7 @@
   import type { MonthProjectStats } from './statsTypes';
   import { statsModalState } from '../../stores/statsModal.svelte';
   import { tick } from 'svelte';
+  import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
   let { stats }: { stats: MonthProjectStats } = $props();
 
@@ -93,6 +94,16 @@
   }
 
   let hoveredSegment = $state<number | null>(null);
+
+  // Project list accordion
+  let showProjectList = $state(false);
+
+  // Auto-expand when a project is highlighted
+  $effect(() => {
+    if (highlightProjectId !== undefined) {
+      showProjectList = true;
+    }
+  });
 </script>
 
 <div class="space-y-3 animate-in fade-in duration-200" bind:this={listRef}>
@@ -150,81 +161,101 @@
       </div>
     </div>
 
-    <!-- Project List -->
-    {#each stats.projects as project, i (project.projectId)}
-      {@const isHighlighted =
-        highlightProjectId !== undefined && project.projectId === highlightProjectId}
-      <div
-        role="listitem"
-        class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm transition-all duration-300
-          {isHighlighted ? 'ring-2 ring-primary/50' : ''}"
-        data-project-id={project.projectId}
+    <!-- Project List Accordion -->
+    <button
+      onclick={() => (showProjectList = !showProjectList)}
+      aria-expanded={showProjectList}
+      aria-controls="projects-accordion-panel"
+      class="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full"
+    >
+      <ChevronRight
+        class="size-3.5 transition-transform duration-200 {showProjectList ? 'rotate-90' : ''}"
+      />
+      <span class="font-medium"
+        >{stats.projects.length} {stats.projects.length === 1 ? 'project' : 'projects'}</span
       >
-        <!-- Project Header -->
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 min-w-0 flex-1">
-            <div
-              class="h-3 w-3 rounded-full flex-shrink-0"
-              style="background-color: {getProjectColor(i)}"
-            ></div>
-            <span
-              class="text-sm font-medium text-foreground truncate"
-              title="{project.customerName} — {project.projectName}"
-            >
-              {project.customerName} — {project.projectName}
-            </span>
-          </div>
-          <div class="flex items-center ml-2 flex-shrink-0">
-            <span class="font-mono text-xs text-muted-foreground w-10 text-right">
-              {getPercent(project.hours, stats.total)}%
-            </span>
-            <span class="font-mono text-sm font-semibold text-foreground w-[72px] text-right">
-              {formatHours(project.hours)}
-            </span>
-          </div>
-        </div>
+    </button>
 
-        <!-- Project Progress Bar -->
-        <div class="h-1.5 rounded-full bg-muted overflow-hidden">
+    {#if showProjectList}
+      <div id="projects-accordion-panel" class="space-y-3 animate-in fade-in duration-200">
+        {#each stats.projects as project, i (project.projectId)}
+          {@const isHighlighted =
+            highlightProjectId !== undefined && project.projectId === highlightProjectId}
           <div
-            class="h-full rounded-full transition-all duration-300"
-            style="width: {getPercent(
-              project.hours,
-              stats.total
-            )}%; background-color: {getProjectColor(i)}"
-          ></div>
-        </div>
-
-        <!-- Tasks within Project -->
-        <div class="pl-5 space-y-1 pt-1">
-          {#each project.tasks as task, taskIndex (`${project.projectId}-${taskIndex}`)}
-            {@const isTaskHighlighted =
-              isHighlighted &&
-              highlightTaskName !== undefined &&
-              task.taskName === highlightTaskName}
-            <div
-              class="flex items-center text-xs gap-2 transition-colors duration-300
-              {isTaskHighlighted ? 'bg-primary/10 rounded px-1 -mx-1' : ''}"
-            >
-              <span
-                class="{isTaskHighlighted
-                  ? 'text-foreground font-medium'
-                  : 'text-muted-foreground/70'} truncate min-w-0 flex-1"
-                title={task.taskName}
-              >
-                {task.taskName}
-              </span>
-              <span class="font-mono text-muted-foreground/50 flex-shrink-0 w-10 text-right">
-                {getPercent(task.hours, stats.total)}%
-              </span>
-              <span class="font-mono text-muted-foreground/70 flex-shrink-0 w-[72px] text-right">
-                {formatHours(task.hours)}
-              </span>
+            role="listitem"
+            class="rounded-xl border border-border bg-card p-3 space-y-2 shadow-sm transition-all duration-300
+              {isHighlighted ? 'ring-2 ring-primary/50' : ''}"
+            data-project-id={project.projectId}
+          >
+            <!-- Project Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                <div
+                  class="h-3 w-3 rounded-full flex-shrink-0"
+                  style="background-color: {getProjectColor(i)}"
+                ></div>
+                <span
+                  class="text-sm font-medium text-foreground truncate"
+                  title="{project.customerName} — {project.projectName}"
+                >
+                  {project.customerName} — {project.projectName}
+                </span>
+              </div>
+              <div class="flex items-center ml-2 flex-shrink-0">
+                <span class="font-mono text-xs text-muted-foreground w-10 text-right">
+                  {getPercent(project.hours, stats.total)}%
+                </span>
+                <span class="font-mono text-sm font-semibold text-foreground w-[72px] text-right">
+                  {formatHours(project.hours)}
+                </span>
+              </div>
             </div>
-          {/each}
-        </div>
+
+            <!-- Project Progress Bar -->
+            <div class="h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all duration-300"
+                style="width: {getPercent(
+                  project.hours,
+                  stats.total
+                )}%; background-color: {getProjectColor(i)}"
+              ></div>
+            </div>
+
+            <!-- Tasks within Project -->
+            <div class="pl-5 space-y-1 pt-1">
+              {#each project.tasks as task, taskIndex (`${project.projectId}-${taskIndex}`)}
+                {@const isTaskHighlighted =
+                  isHighlighted &&
+                  highlightTaskName !== undefined &&
+                  task.taskName === highlightTaskName}
+                <div
+                  class="flex items-center text-xs gap-2 transition-colors duration-300
+                  {isTaskHighlighted ? 'bg-primary/10 rounded px-1 -mx-1' : ''}"
+                >
+                  <span
+                    class="{isTaskHighlighted
+                      ? 'text-foreground font-medium'
+                      : 'text-muted-foreground/70'} truncate min-w-0 flex-1"
+                    title={task.taskName}
+                  >
+                    {task.taskName}
+                  </span>
+                  <span class="font-mono text-muted-foreground/50 flex-shrink-0 w-10 text-right">
+                    {getPercent(task.hours, stats.total)}%
+                  </span>
+                  <span
+                    class="font-mono text-muted-foreground/70 flex-shrink-0 w-[72px] text-right"
+                  >
+                    {formatHours(task.hours)}
+                  </span>
+                </div>
+              {/each}
+            </div>
+          </div>
+        {/each}
       </div>
-    {/each}
+    {/if}
   {:else}
     <div class="rounded-xl border border-border bg-card p-8 text-center">
       <p class="text-sm text-muted-foreground">No projects tracked this month.</p>

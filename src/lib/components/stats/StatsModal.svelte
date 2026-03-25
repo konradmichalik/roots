@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Dialog from '../ui/dialog';
   import StatsOverviewSlide from './StatsOverviewSlide.svelte';
-
+  import StatsDailyChart from './StatsDailyChart.svelte';
   import StatsProjectsSlide from './StatsProjectsSlide.svelte';
   import StatsBillabilitySlide from './StatsBillabilitySlide.svelte';
   import { Skeleton } from '$lib/components/ui/skeleton/index.js';
@@ -29,7 +29,7 @@
   import ChevronLeft from '@lucide/svelte/icons/chevron-left';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
-  type SlideId = 'overview' | 'billability' | 'projects';
+  type SlideId = 'overview' | 'daily' | 'billability' | 'projects';
 
   let {
     children,
@@ -81,6 +81,7 @@
 
   const slides: { id: SlideId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
+    { id: 'daily', label: 'Daily' },
     { id: 'billability', label: 'Billability' },
     { id: 'projects', label: 'Tasks' }
   ];
@@ -245,6 +246,11 @@
   let monthProjectStats = $derived(mocoAnalysis.projectStats);
   let weeklyBillability = $derived(mocoAnalysis.weeks);
   let overallBillabilityRate = $derived(mocoAnalysis.billabilityRate);
+
+  // Helper for Daily chart: get overview for a specific date
+  function getDayOverviewForChart(date: string) {
+    return getCachedDayOverview(date, monthStart);
+  }
 </script>
 
 <Dialog.Root bind:open>
@@ -257,7 +263,7 @@
       </div>
     {/snippet}
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+  <Dialog.Content class="sm:max-w-3xl max-h-[85vh] flex flex-col overflow-hidden">
     <!-- Header: Title + Month Nav on one line -->
     <div class="flex items-center justify-between pr-8">
       <Dialog.Header class="p-0 space-y-0">
@@ -323,7 +329,7 @@
                   <Skeleton class="h-3 w-28" />
                   <Skeleton class="h-3 w-28" />
                 </div>
-                <Skeleton class="h-2 w-full rounded-full" />
+                <Skeleton class="h-2.5 w-full rounded-full" />
                 <Skeleton class="h-3 w-40" />
               </div>
             {/each}
@@ -336,6 +342,14 @@
             {monthTotalsUntilYesterday}
             monthWorkingDaysCount={monthWorkingDays.length}
             {showMonthUntilYesterday}
+            billabilityRate={overallBillabilityRate}
+          />
+        {:else if activeSlide === 'daily'}
+          <StatsDailyChart
+            workingDays={monthWorkingDays}
+            getOverview={getDayOverviewForChart}
+            {todayStr}
+            {isCurrentMonth}
           />
         {:else if activeSlide === 'billability'}
           <StatsBillabilitySlide weeks={weeklyBillability} overallRate={overallBillabilityRate} />

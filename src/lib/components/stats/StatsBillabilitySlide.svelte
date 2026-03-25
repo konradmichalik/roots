@@ -71,9 +71,9 @@
   let targetY = $derived(rateToY(target));
 
   function dotColor(rate: number): string {
-    if (rate >= target) return 'var(--success)';
-    if (rate >= target - 10) return 'var(--warning)';
-    return 'var(--muted-foreground)';
+    if (rate >= target) return 'var(--color-success)';
+    if (rate >= target - 10) return 'var(--color-warning)';
+    return 'var(--color-danger)';
   }
 
   const MONO_FONT = "'JetBrains Mono Variable', ui-monospace, monospace";
@@ -240,8 +240,8 @@
                 10}–{target - 1}%
             </span>
             <span class="flex items-center gap-1">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground"
-              ></span>&lt;{target - 10}%
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-danger"></span>&lt;{target -
+                10}%
             </span>
           </div>
           <span>{weeks.length} weeks</span>

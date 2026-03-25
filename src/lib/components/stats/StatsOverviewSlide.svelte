@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatHours, formatBalance, getBalanceClass } from '../../utils/time-format';
+  import { settingsState } from '../../stores/settings.svelte';
 
   interface Totals {
     actual: number;
@@ -17,7 +18,8 @@
     monthTotals,
     monthTotalsUntilYesterday,
     monthWorkingDaysCount,
-    showMonthUntilYesterday
+    showMonthUntilYesterday,
+    billabilityRate
   }: {
     weekTotals: Totals;
     weekTotalsUntilYesterday: TotalsUntilYesterday;
@@ -25,15 +27,51 @@
     monthTotalsUntilYesterday: TotalsUntilYesterday;
     monthWorkingDaysCount: number;
     showMonthUntilYesterday: boolean;
+    billabilityRate: number;
   } = $props();
 
   function getProgressPercent(actual: number, required: number): number {
     if (required === 0) return 0;
     return Math.min(100, Math.round((actual / required) * 100));
   }
+
+  let billableTarget = $derived(settingsState.billableTarget);
 </script>
 
 <div class="space-y-4 animate-in fade-in duration-200">
+  <!-- KPI Summary Row -->
+  <div class="grid grid-cols-3 gap-3">
+    <div class="rounded-xl border border-border bg-card p-3 text-center shadow-sm">
+      <span class="text-[10px] uppercase tracking-wider text-muted-foreground">Week</span>
+      <div class="font-mono text-lg font-bold {getBalanceClass(weekTotals.balance)}">
+        {formatBalance(weekTotals.balance)}
+      </div>
+      <div class="text-[10px] text-muted-foreground font-mono">
+        {formatHours(weekTotals.actual)} / {formatHours(weekTotals.required)}
+      </div>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-3 text-center shadow-sm">
+      <span class="text-[10px] uppercase tracking-wider text-muted-foreground">Month</span>
+      <div class="font-mono text-lg font-bold {getBalanceClass(monthTotals.balance)}">
+        {formatBalance(monthTotals.balance)}
+      </div>
+      <div class="text-[10px] text-muted-foreground font-mono">
+        {formatHours(monthTotals.actual)} / {formatHours(monthTotals.required)}
+      </div>
+    </div>
+    <div class="rounded-xl border border-border bg-card p-3 text-center shadow-sm">
+      <span class="text-[10px] uppercase tracking-wider text-muted-foreground">Billable</span>
+      <div
+        class="font-mono text-lg font-bold {billabilityRate >= billableTarget
+          ? 'text-success-text'
+          : 'text-danger-text'}"
+      >
+        {billabilityRate}%
+      </div>
+      <div class="text-[10px] text-muted-foreground font-mono">target {billableTarget}%</div>
+    </div>
+  </div>
+
   <!-- Week Balance -->
   <div class="rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm">
     <div class="flex items-center justify-between">
@@ -54,7 +92,7 @@
         ></span
       >
     </div>
-    <div class="h-2 rounded-full bg-muted overflow-hidden">
+    <div class="h-2.5 rounded-full bg-muted overflow-hidden">
       <div
         class="h-full rounded-full bg-success transition-all duration-300"
         style="width: {getProgressPercent(weekTotals.actual, weekTotals.required)}%"
@@ -105,7 +143,7 @@
         ></span
       >
     </div>
-    <div class="h-2 rounded-full bg-muted overflow-hidden">
+    <div class="h-2.5 rounded-full bg-muted overflow-hidden">
       <div
         class="h-full rounded-full bg-success transition-all duration-300"
         style="width: {getProgressPercent(monthTotals.actual, monthTotals.required)}%"
