@@ -164,6 +164,8 @@
     <!-- Project List Accordion -->
     <button
       onclick={() => (showProjectList = !showProjectList)}
+      aria-expanded={showProjectList}
+      aria-controls="projects-accordion-panel"
       class="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full"
     >
       <ChevronRight
@@ -175,7 +177,7 @@
     </button>
 
     {#if showProjectList}
-      <div class="space-y-3 animate-in fade-in duration-200">
+      <div id="projects-accordion-panel" class="space-y-3 animate-in fade-in duration-200">
         {#each stats.projects as project, i (project.projectId)}
           {@const isHighlighted =
             highlightProjectId !== undefined && project.projectId === highlightProjectId}
