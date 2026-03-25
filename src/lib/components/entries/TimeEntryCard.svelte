@@ -421,7 +421,7 @@
         </span>
       {:else if mocoMeta?.customerName}
         <span
-          class="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider leading-tight"
+          class="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider leading-none"
         >
           {mocoMeta.customerName}
         </span>
