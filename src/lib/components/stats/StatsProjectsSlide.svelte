@@ -169,7 +169,9 @@
       <ChevronRight
         class="size-3.5 transition-transform duration-200 {showProjectList ? 'rotate-90' : ''}"
       />
-      <span class="font-medium">{stats.projects.length} {stats.projects.length === 1 ? 'project' : 'projects'}</span>
+      <span class="font-medium"
+        >{stats.projects.length} {stats.projects.length === 1 ? 'project' : 'projects'}</span
+      >
     </button>
 
     {#if showProjectList}
@@ -240,7 +242,9 @@
                   <span class="font-mono text-muted-foreground/50 flex-shrink-0 w-10 text-right">
                     {getPercent(task.hours, stats.total)}%
                   </span>
-                  <span class="font-mono text-muted-foreground/70 flex-shrink-0 w-[72px] text-right">
+                  <span
+                    class="font-mono text-muted-foreground/70 flex-shrink-0 w-[72px] text-right"
+                  >
                     {formatHours(task.hours)}
                   </span>
                 </div>

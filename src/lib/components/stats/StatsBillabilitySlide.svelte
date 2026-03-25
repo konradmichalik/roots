@@ -240,8 +240,8 @@
                 10}–{target - 1}%
             </span>
             <span class="flex items-center gap-1">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-danger"
-              ></span>&lt;{target - 10}%
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-danger"></span>&lt;{target -
+                10}%
             </span>
           </div>
           <span>{weeks.length} weeks</span>

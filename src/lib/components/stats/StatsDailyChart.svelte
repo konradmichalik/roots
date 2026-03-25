@@ -284,11 +284,7 @@
         {@const isRight = pct > 80}
         <div
           class="absolute pointer-events-none bg-popover border border-border rounded-md shadow-md px-2.5 py-1.5 text-[11px] z-10 whitespace-nowrap top-1"
-          style="left: {pct}%; transform: translateX({isLeft
-            ? '0%'
-            : isRight
-              ? '-100%'
-              : '-50%'})"
+          style="left: {pct}%; transform: translateX({isLeft ? '0%' : isRight ? '-100%' : '-50%'})"
         >
           <div class="text-muted-foreground">{formatDateShort(entry.date)}</div>
           <div class="flex items-center gap-2 mt-0.5">
