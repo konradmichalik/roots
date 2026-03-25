@@ -20,7 +20,7 @@
   let entries = $derived.by((): DayChartEntry[] => {
     return workingDays.map((date) => {
       const overview = getOverview(date);
-      const isFuture = isCurrentMonth && date >= todayStr;
+      const isFuture = isCurrentMonth && date > todayStr;
       return {
         date,
         actual: overview.totals.actual,

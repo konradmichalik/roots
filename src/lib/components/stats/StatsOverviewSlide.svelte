@@ -64,7 +64,7 @@
       <div
         class="font-mono text-lg font-bold {billabilityRate >= billableTarget
           ? 'text-success-text'
-          : 'text-warning-text'}"
+          : 'text-danger-text'}"
       >
         {billabilityRate}%
       </div>
