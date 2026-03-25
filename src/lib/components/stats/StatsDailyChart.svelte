@@ -130,8 +130,12 @@
     });
   });
 
-  // Target line Y position (use first entry's target, typically consistent)
-  let targetHours = $derived(entries.length > 0 ? entries[0].target : 8);
+  // Target line Y position (average across all entries to handle varied weekday hours)
+  let targetHours = $derived(
+    entries.length > 0
+      ? entries.reduce((sum, e) => sum + e.target, 0) / entries.length
+      : 8
+  );
   let targetY = $derived(hoursToY(targetHours));
 
   function barColor(entry: DayChartEntry): string {
