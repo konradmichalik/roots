@@ -21,7 +21,8 @@
   import { rulesState, getStaleRules, findMatchingRules } from '../../stores/rules.svelte';
   import { syncDay, detectHoursChanges } from '../../stores/ruleSync.svelte';
   import { isSynced } from '../../stores/syncRecords.svelte';
-  import type { SyncPreview, UnifiedTimeEntry } from '../../types';
+  import { isDismissed } from '../../stores/dismissedEvents.svelte';
+  import type { SyncPreview, UnifiedTimeEntry, OutlookMetadata } from '../../types';
   import { buildMocoPrefill, type MocoPrefill } from '../../utils/moco-prefill';
   import Clock from '@lucide/svelte/icons/clock';
   import Plus from '@lucide/svelte/icons/plus';
@@ -58,7 +59,12 @@
   // Count pending entries (matched by rules but not yet synced)
   let pendingCount = $derived.by(() => {
     if (!hasRules) return 0;
-    const sourceEntries: UnifiedTimeEntry[] = [...entries.jira, ...entries.outlook];
+    const sourceEntries: UnifiedTimeEntry[] = [
+      ...entries.jira,
+      ...entries.outlook.filter(
+        (e) => !isDismissed((e.metadata as OutlookMetadata).eventId, e.date)
+      )
+    ];
     let count = 0;
     for (const entry of sourceEntries) {
       if (entry.hours <= 0) continue;

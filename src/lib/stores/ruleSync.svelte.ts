@@ -1,5 +1,6 @@
 import type {
   UnifiedTimeEntry,
+  OutlookMetadata,
   MocoCreateActivity,
   SyncCandidate,
   SkippedEntry,
@@ -10,6 +11,7 @@ import type {
   Rule
 } from '../types';
 import { timeEntriesState, refreshDayEntries } from './timeEntries.svelte';
+import { isDismissed } from './dismissedEvents.svelte';
 import { refreshMonthCacheForDate } from './timeEntriesCache.svelte';
 import {
   getMocoClient,
@@ -163,7 +165,10 @@ export async function syncDay(
 ): Promise<SyncPreview> {
   const sourceEntries: UnifiedTimeEntry[] = [
     ...timeEntriesState.jiraWorklogs.filter((e) => e.date === date),
-    ...timeEntriesState.outlookEvents.filter((e) => e.date === date)
+    ...timeEntriesState.outlookEvents.filter(
+      (e) =>
+        e.date === date && !isDismissed((e.metadata as OutlookMetadata).eventId, date)
+    )
   ];
   const mocoEntries = timeEntriesState.mocoActivities.filter((e) => e.date === date);
 
@@ -334,7 +339,9 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
     const date = current;
 
     const dayJira = jiraWorklogs.filter((e) => e.date === date);
-    const dayOutlook = outlookEvents.filter((e) => e.date === date);
+    const dayOutlook = outlookEvents.filter(
+      (e) => e.date === date && !isDismissed((e.metadata as OutlookMetadata).eventId, date)
+    );
     const dayMoco = mocoActivities.filter((e) => e.date === date);
 
     const preview = buildPreview([...dayJira, ...dayOutlook], dayMoco);
