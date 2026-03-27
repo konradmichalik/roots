@@ -174,10 +174,6 @@ export function isJiraConnected(): boolean {
   return connectionsState.jiraConnections.some((c) => c.state.isConnected);
 }
 
-export function getJiraConnectionState(connectionId: string): JiraConnectionInstance | undefined {
-  return connectionsState.jiraConnections.find((c) => c.id === connectionId);
-}
-
 export async function connectJira(config: JiraConnectionConfig): Promise<boolean> {
   let instance = connectionsState.jiraConnections.find((c) => c.id === config.id);
   if (!instance) {
@@ -242,14 +238,6 @@ export function getConnectedJiraIds(): string[] {
     .map((c) => c.id);
 }
 
-export function getJiraError(): string | null {
-  const errored = connectionsState.jiraConnections.find((c) => c.state.error);
-  return errored?.state.error ?? null;
-}
-
-export function isJiraConnecting(): boolean {
-  return connectionsState.jiraConnections.some((c) => c.state.isConnecting);
-}
 
 async function restoreOutlook(config: OutlookConnectionConfig, tokens: OAuthTokens): Promise<void> {
   try {
