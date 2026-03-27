@@ -1,4 +1,6 @@
 export interface JiraConnectionConfig {
+  id: string;                        // crypto.randomUUID() or 'default' for migrated
+  label: string;                     // User-assigned, e.g. "Cloud Production"
   instanceType: 'cloud' | 'server';
   baseUrl: string;
   credentials: JiraCredentials;
