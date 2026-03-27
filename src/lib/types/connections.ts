@@ -9,9 +9,15 @@ export interface ServiceConnectionState {
   needsReauth: boolean;
 }
 
+export interface JiraConnectionInstance {
+  id: string;
+  label: string;
+  state: ServiceConnectionState;
+}
+
 export interface AllConnectionsState {
   moco: ServiceConnectionState;
-  jira: ServiceConnectionState;
+  jiraConnections: JiraConnectionInstance[];
   outlook: ServiceConnectionState;
   personio: ServiceConnectionState;
 }

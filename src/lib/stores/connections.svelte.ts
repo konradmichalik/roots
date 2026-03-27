@@ -2,6 +2,7 @@ import type {
   AllConnectionsState,
   MocoConnectionConfig,
   JiraConnectionConfig,
+  JiraConnectionInstance,
   OutlookConnectionConfig,
   PersonioConnectionConfig,
   PersonioAuthToken,
@@ -35,7 +36,7 @@ import { updateSettings } from './settings.svelte';
 
 export const connectionsState = $state<AllConnectionsState>({
   moco: createInitialServiceState('moco'),
-  jira: createInitialServiceState('jira'),
+  jiraConnections: [],
   outlook: createInitialServiceState('outlook'),
   personio: createInitialServiceState('personio')
 });
@@ -47,8 +48,8 @@ let hasConfiguredServices = $state(false);
 export let mocoUserName = $state<{ value: string | null }>({ value: null });
 
 let mocoClient: MocoClient | null = null;
-let jiraClient: JiraWorklogClient | null = null;
-let jiraConfig: JiraConnectionConfig | null = null;
+const jiraClients = new Map<string, JiraWorklogClient>();
+const jiraConfigs = new Map<string, JiraConnectionConfig>();
 let outlookClient: OutlookClient | null = null;
 let personioClient: PersonioClient | null = null;
 
@@ -62,11 +63,13 @@ export async function initializeConnections(): Promise<void> {
     restores.push(connectMoco(mocoConfig).then(() => {}));
   }
 
-  const jiraConfig = await getStorageItemAsync<JiraConnectionConfig>(STORAGE_KEYS.JIRA_CONFIG);
-  if (jiraConfig) {
+  const jiraConfigList = await getStorageItemAsync<JiraConnectionConfig[]>(STORAGE_KEYS.JIRA_CONFIGS);
+  if (jiraConfigList && jiraConfigList.length > 0) {
     hasConfiguredServices = true;
-    logger.connection('Restoring Jira connection from storage');
-    restores.push(connectJira(jiraConfig).then(() => {}));
+    for (const config of jiraConfigList) {
+      logger.connection(`Restoring Jira connection [${config.label}] from storage`);
+      restores.push(connectJira(config).then(() => {}));
+    }
   }
 
   const outlookConfig = await getStorageItemAsync<OutlookConnectionConfig>(
@@ -137,47 +140,85 @@ export async function disconnectMoco(): Promise<void> {
   logger.connection('Moco disconnected');
 }
 
+export function isJiraConnected(): boolean {
+  return connectionsState.jiraConnections.some((c) => c.state.isConnected);
+}
+
+export function getJiraConnectionState(connectionId: string): JiraConnectionInstance | undefined {
+  return connectionsState.jiraConnections.find((c) => c.id === connectionId);
+}
+
 export async function connectJira(config: JiraConnectionConfig): Promise<boolean> {
-  connectionsState.jira.isConnecting = true;
-  connectionsState.jira.error = null;
+  let instance = connectionsState.jiraConnections.find((c) => c.id === config.id);
+  if (!instance) {
+    instance = {
+      id: config.id,
+      label: config.label,
+      state: createInitialServiceState('jira')
+    };
+    connectionsState.jiraConnections = [...connectionsState.jiraConnections, instance];
+  }
+
+  instance.state.isConnecting = true;
+  instance.state.error = null;
 
   try {
-    jiraClient = createJiraWorklogClient(config);
-    const result = await jiraClient.testConnection();
+    const client = createJiraWorklogClient(config);
+    const result = await client.testConnection();
 
     if (!result.success) {
       throw new Error(result.error || 'Jira connection failed');
     }
 
-    connectionsState.jira.isConnected = true;
-    connectionsState.jira.isConnecting = false;
-    connectionsState.jira.error = null;
-    connectionsState.jira.lastConnected = new Date().toISOString();
-    jiraConfig = config;
+    jiraClients.set(config.id, client);
+    jiraConfigs.set(config.id, config);
 
-    await setStorageItemAsync(STORAGE_KEYS.JIRA_CONFIG, config);
+    instance.state.isConnected = true;
+    instance.state.isConnecting = false;
+    instance.state.error = null;
+    instance.state.lastConnected = new Date().toISOString();
+    instance.label = config.label;
+
+    await persistJiraConfigs();
     hasConfiguredServices = true;
-    logger.connectionSuccess(`Jira connected as ${result.user?.displayName ?? 'unknown'}`);
+    logger.connectionSuccess(`Jira [${config.label}] connected as ${result.user?.displayName ?? 'unknown'}`);
     return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Connection failed';
-    connectionsState.jira.isConnected = false;
-    connectionsState.jira.isConnecting = false;
-    connectionsState.jira.error = message;
-    connectionsState.jira.lastConnected = null;
-    jiraClient = null;
-    jiraConfig = null;
-    logger.error('Jira connection failed', error);
+    instance.state.isConnected = false;
+    instance.state.isConnecting = false;
+    instance.state.error = message;
+    instance.state.lastConnected = null;
+    jiraClients.delete(config.id);
+    jiraConfigs.delete(config.id);
+    logger.error(`Jira [${config.label}] connection failed`, error);
     return false;
   }
 }
 
-export async function disconnectJira(): Promise<void> {
-  connectionsState.jira = createInitialServiceState('jira');
-  jiraClient = null;
-  jiraConfig = null;
-  await removeStorageItemAsync(STORAGE_KEYS.JIRA_CONFIG);
-  logger.connection('Jira disconnected');
+export async function disconnectJira(connectionId: string): Promise<void> {
+  connectionsState.jiraConnections = connectionsState.jiraConnections.filter(
+    (c) => c.id !== connectionId
+  );
+  jiraClients.delete(connectionId);
+  jiraConfigs.delete(connectionId);
+  await persistJiraConfigs();
+  logger.connection(`Jira [${connectionId}] disconnected`);
+}
+
+export function getConnectedJiraIds(): string[] {
+  return connectionsState.jiraConnections
+    .filter((c) => c.state.isConnected)
+    .map((c) => c.id);
+}
+
+export function getJiraError(): string | null {
+  const errored = connectionsState.jiraConnections.find((c) => c.state.error);
+  return errored?.state.error ?? null;
+}
+
+export function isJiraConnecting(): boolean {
+  return connectionsState.jiraConnections.some((c) => c.state.isConnecting);
 }
 
 async function restoreOutlook(config: OutlookConnectionConfig, tokens: OAuthTokens): Promise<void> {
@@ -271,16 +312,28 @@ export function getMocoClient(): MocoClient | null {
   return mocoClient;
 }
 
-export function getJiraClient(): JiraWorklogClient | null {
-  return jiraClient;
+export function getJiraClient(connectionId?: string): JiraWorklogClient | null {
+  if (connectionId) {
+    return jiraClients.get(connectionId) ?? null;
+  }
+  for (const [, client] of jiraClients) {
+    return client;
+  }
+  return null;
 }
 
 export function getOutlookClient(): OutlookClient | null {
   return outlookClient;
 }
 
-export function getJiraBaseUrl(): string | null {
-  return jiraConfig?.baseUrl ?? null;
+export function getJiraBaseUrl(connectionId?: string): string | null {
+  if (connectionId) {
+    return jiraConfigs.get(connectionId)?.baseUrl ?? null;
+  }
+  for (const [, config] of jiraConfigs) {
+    return config.baseUrl;
+  }
+  return null;
 }
 
 export async function connectPersonio(config: PersonioConnectionConfig): Promise<boolean> {
@@ -371,10 +424,15 @@ export function getPersonioClient(): PersonioClient | null {
 export function isAnyServiceConnected(): boolean {
   return (
     connectionsState.moco.isConnected ||
-    connectionsState.jira.isConnected ||
+    isJiraConnected() ||
     connectionsState.outlook.isConnected ||
     connectionsState.personio.isConnected
   );
+}
+
+async function persistJiraConfigs(): Promise<void> {
+  const configs = Array.from(jiraConfigs.values());
+  await setStorageItemAsync(STORAGE_KEYS.JIRA_CONFIGS, configs);
 }
 
 export function hasAnyServiceConfigured(): boolean {
