@@ -58,7 +58,10 @@
   // Count pending entries (matched by rules but not yet synced)
   let pendingCount = $derived.by(() => {
     if (!hasRules) return 0;
-    const sourceEntries: UnifiedTimeEntry[] = [...entries.jira, ...entries.outlook];
+    const sourceEntries: UnifiedTimeEntry[] = [
+      ...entries.jira,
+      ...entries.outlook
+    ];
     let count = 0;
     for (const entry of sourceEntries) {
       if (entry.hours <= 0) continue;

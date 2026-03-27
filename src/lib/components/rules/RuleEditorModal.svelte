@@ -535,6 +535,24 @@
               </div>
             </div>
 
+            <!-- Jira Instance Picker (only when multiple connections) -->
+            {#if sourceType === 'jira' && connectionsState.jiraConnections.length > 1}
+              <div>
+                <label for="rule-jira-connection" class="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Jira Instance
+                </label>
+                <select
+                  id="rule-jira-connection"
+                  bind:value={jiraConnectionId}
+                  class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
+                >
+                  {#each connectionsState.jiraConnections as conn (conn.id)}
+                    <option value={conn.id}>{conn.label}</option>
+                  {/each}
+                </select>
+              </div>
+            {/if}
+
             <!-- Source-specific forms -->
             {#if sourceType === 'jira'}
               <JiraSourceForm

@@ -274,8 +274,6 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
 
   // Fetch entries for the range from services directly
   const connectedJiraIds = getConnectedJiraIds();
-  const jiraClient = getJiraClient();
-  const jiraConnectionId = connectedJiraIds[0] ?? 'default';
   const outlookClient = getOutlookClient();
   const mocoClient = getMocoClient();
 
@@ -286,16 +284,19 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
 
   const fetches: Promise<void>[] = [];
 
-  if (jiraClient && isJiraConnected()) {
+  // Fetch worklogs from ALL connected Jira instances
+  for (const connId of connectedJiraIds) {
+    const client = getJiraClient(connId);
+    if (!client) continue;
     fetches.push(
-      jiraClient
+      client
         .getWorklogsForRange(from, to)
         .then((worklogs) => {
-          jiraWorklogs = worklogs.map((w) => mapJiraWorklog(w, jiraClient, jiraConnectionId));
+          jiraWorklogs.push(...worklogs.map((w) => mapJiraWorklog(w, client, connId)));
         })
         .catch((e) => {
-          fetchErrors.push(`Jira: ${e instanceof Error ? e.message : 'Failed to fetch worklogs'}`);
-          logger.error('Bulk sync: Failed to fetch Jira worklogs', e);
+          fetchErrors.push(`Jira [${connId}]: ${e instanceof Error ? e.message : 'Failed to fetch worklogs'}`);
+          logger.error(`Bulk sync: Failed to fetch Jira worklogs from [${connId}]`, e);
         })
     );
   }
