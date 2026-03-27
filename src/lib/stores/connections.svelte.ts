@@ -53,7 +53,37 @@ const jiraConfigs = new Map<string, JiraConnectionConfig>();
 let outlookClient: OutlookClient | null = null;
 let personioClient: PersonioClient | null = null;
 
+async function migrateJiraSingleToMulti(): Promise<void> {
+  const newConfigs = await getStorageItemAsync<JiraConnectionConfig[]>(STORAGE_KEYS.JIRA_CONFIGS);
+  if (newConfigs) return; // Already migrated
+
+  const oldConfig = await getStorageItemAsync<Record<string, unknown>>(STORAGE_KEYS.JIRA_CONFIG);
+  if (!oldConfig) return; // Nothing to migrate
+
+  const migrated: JiraConnectionConfig = {
+    ...(oldConfig as Omit<JiraConnectionConfig, 'id' | 'label'>),
+    id: 'default',
+    label: deriveLabel(oldConfig as { baseUrl?: string; instanceType?: string }),
+  };
+
+  await setStorageItemAsync(STORAGE_KEYS.JIRA_CONFIGS, [migrated]);
+  await removeStorageItemAsync(STORAGE_KEYS.JIRA_CONFIG);
+  logger.connection('Migrated single Jira config to multi-connection format');
+}
+
+function deriveLabel(config: { baseUrl?: string; instanceType?: string }): string {
+  try {
+    const hostname = new URL(config.baseUrl ?? '').hostname;
+    const prefix = config.instanceType === 'cloud' ? 'Cloud' : 'Server';
+    return `${prefix} (${hostname})`;
+  } catch {
+    return config.instanceType === 'cloud' ? 'Jira Cloud' : 'Jira Server';
+  }
+}
+
 export async function initializeConnections(): Promise<void> {
+  await migrateJiraSingleToMulti();
+
   const restores: Promise<void>[] = [];
 
   const mocoConfig = await getStorageItemAsync<MocoConnectionConfig>(STORAGE_KEYS.MOCO_CONFIG);
