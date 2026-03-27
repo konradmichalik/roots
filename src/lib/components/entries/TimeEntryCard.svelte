@@ -5,7 +5,7 @@
   import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
   import { formatHours } from '../../utils/time-format';
   import { extractFirstIssueKey } from '../../utils/jira-issue-parser';
-  import { connectionsState, getJiraBaseUrl } from '../../stores/connections.svelte';
+  import { connectionsState, getJiraBaseUrl, isJiraConnected as checkJiraConnected } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
   import { buildMocoPrefill } from '../../utils/moco-prefill';
   import { openStatsForTask } from '../../stores/statsModal.svelte';
@@ -70,7 +70,7 @@
     entry.metadata.source === 'outlook' ? (entry.metadata as OutlookMetadata) : null
   );
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
-  let isJiraConnected = $derived(connectionsState.jira.isConnected);
+  let isJiraConnected = $derived(checkJiraConnected());
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
   let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
@@ -120,7 +120,7 @@
 
   let jiraIssueUrl = $derived.by(() => {
     if (!jiraMeta) return null;
-    const baseUrl = getJiraBaseUrl();
+    const baseUrl = getJiraBaseUrl(jiraMeta.connectionId);
     if (!baseUrl) return null;
     return `${baseUrl}/browse/${jiraMeta.issueKey}`;
   });
@@ -238,7 +238,8 @@
       hours: entry.hours,
       comment: entry.description ?? '',
       issueKey: jiraMeta.issueKey,
-      worklogId: jiraMeta.worklogId
+      worklogId: jiraMeta.worklogId,
+      connectionId: jiraMeta.connectionId
     }}
     defaultOpen={showJiraEditModal}
     onClose={() => (showJiraEditModal = false)}
@@ -291,7 +292,7 @@
     prefill={{
       source: {
         type: 'jira',
-        connectionId: 'default',
+        connectionId: jiraMeta.connectionId,
         projectKey: jiraMeta.projectKey ?? jiraMeta.issueKey.split('-')[0],
         issuePattern: jiraMeta.issueKey
       }

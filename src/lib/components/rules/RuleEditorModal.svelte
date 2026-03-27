@@ -18,7 +18,7 @@
     getProjectById,
     getTasksForProject
   } from '../../stores/mocoProjects.svelte';
-  import { connectionsState } from '../../stores/connections.svelte';
+  import { connectionsState, getConnectedJiraIds } from '../../stores/connections.svelte';
   import {
     renderDescriptionTemplate,
     buildExampleVariables,
@@ -69,6 +69,7 @@
   let sourceType = $state<'jira' | 'outlook'>('jira');
 
   // Jira source
+  let jiraConnectionId = $state(connectionsState.jiraConnections[0]?.id ?? 'default');
   let jiraProjectKey = $state('');
   let jiraIssuePattern = $state('');
   let jiraEpicKey = $state('');
@@ -109,7 +110,7 @@
     if (sourceType === 'jira') {
       return {
         type: 'jira',
-        connectionId: 'default',
+        connectionId: jiraConnectionId,
         projectKey: jiraProjectKey,
         issuePattern: jiraIssuePattern || undefined,
         epicKey: jiraEpicKey || undefined,
@@ -245,6 +246,7 @@
       selectedProjectId = editRule.target.mocoProjectId;
 
       if (editRule.source.type === 'jira') {
+        jiraConnectionId = editRule.source.connectionId;
         jiraProjectKey = editRule.source.projectKey;
         jiraIssuePattern = editRule.source.issuePattern ?? '';
         jiraEpicKey = editRule.source.epicKey ?? '';
@@ -285,6 +287,7 @@
         jiraProjectKey = '';
         jiraIssuePattern = '';
       } else if (prefill?.source?.type === 'jira') {
+        jiraConnectionId = prefill.source.connectionId;
         jiraProjectKey = prefill.source.projectKey;
         jiraIssuePattern = prefill.source.issuePattern ?? '';
         jiraEpicKey = prefill.source.epicKey ?? '';

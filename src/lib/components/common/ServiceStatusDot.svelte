@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ServiceType } from '../../types';
-  import { connectionsState } from '../../stores/connections.svelte';
+  import { connectionsState, isJiraConnected } from '../../stores/connections.svelte';
   import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
   let { service }: { service: ServiceType } = $props();
@@ -28,7 +28,11 @@
     personio: 'bg-source-personio-text/10'
   };
 
-  let isConnected = $derived(connectionsState[service].isConnected);
+  let isConnected = $derived(
+    service === 'jira'
+      ? isJiraConnected()
+      : connectionsState[service as 'moco' | 'outlook' | 'personio'].isConnected
+  );
 </script>
 
 <Tooltip.Provider delayDuration={200}>

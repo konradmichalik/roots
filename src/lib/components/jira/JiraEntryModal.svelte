@@ -29,6 +29,7 @@
       comment?: string;
       issueKey?: string;
       worklogId?: string;
+      connectionId?: string;
     };
     onSuccess?: () => void;
     onClose?: () => void;
@@ -100,19 +101,23 @@
             comment: comment.trim() || undefined
           },
           date,
-          prefill.date
+          prefill.date,
+          prefill.connectionId
         );
         if (!success) {
           error = 'Failed to update worklog.';
           return;
         }
       } else {
-        const success = await createJiraWorklog({
-          issueKey,
-          date,
-          hours,
-          comment: comment.trim() || undefined
-        });
+        const success = await createJiraWorklog(
+          {
+            issueKey,
+            date,
+            hours,
+            comment: comment.trim() || undefined
+          },
+          prefill?.connectionId
+        );
         if (!success) {
           error = 'Failed to create worklog.';
           return;
@@ -142,7 +147,7 @@
     error = null;
 
     try {
-      const success = await deleteJiraWorklog(prefill.issueKey, prefill.worklogId, date);
+      const success = await deleteJiraWorklog(prefill.issueKey, prefill.worklogId, date, prefill?.connectionId);
       if (success) {
         open = false;
         onClose?.();

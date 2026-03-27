@@ -15,7 +15,9 @@ import {
   getMocoClient,
   getJiraClient,
   getOutlookClient,
-  connectionsState
+  connectionsState,
+  isJiraConnected,
+  getConnectedJiraIds
 } from './connections.svelte';
 import { findMatchingRules } from './rules.svelte';
 import { isSynced, addSyncRecord, getSyncRecord } from './syncRecords.svelte';
@@ -271,7 +273,9 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
   let totalErrors = 0;
 
   // Fetch entries for the range from services directly
+  const connectedJiraIds = getConnectedJiraIds();
   const jiraClient = getJiraClient();
+  const jiraConnectionId = connectedJiraIds[0] ?? 'default';
   const outlookClient = getOutlookClient();
   const mocoClient = getMocoClient();
 
@@ -282,12 +286,12 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
 
   const fetches: Promise<void>[] = [];
 
-  if (jiraClient && connectionsState.jira.isConnected) {
+  if (jiraClient && isJiraConnected()) {
     fetches.push(
       jiraClient
         .getWorklogsForRange(from, to)
         .then((worklogs) => {
-          jiraWorklogs = worklogs.map((w) => mapJiraWorklog(w, jiraClient));
+          jiraWorklogs = worklogs.map((w) => mapJiraWorklog(w, jiraClient, jiraConnectionId));
         })
         .catch((e) => {
           fetchErrors.push(`Jira: ${e instanceof Error ? e.message : 'Failed to fetch worklogs'}`);
