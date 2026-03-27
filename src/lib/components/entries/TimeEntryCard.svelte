@@ -29,6 +29,9 @@
   import RuleEditorModal from '../rules/RuleEditorModal.svelte';
   import Zap from '@lucide/svelte/icons/zap';
   import Tag from '@lucide/svelte/icons/tag';
+  import EyeOff from '@lucide/svelte/icons/eye-off';
+  import Eye from '@lucide/svelte/icons/eye';
+  import { isDismissed, dismissEvent, restoreEvent } from '../../stores/dismissedEvents.svelte';
 
   let {
     entry,
@@ -74,8 +77,14 @@
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
   let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
+  let isDismissedEntry = $derived(
+    outlookMeta ? isDismissed(outlookMeta.eventId, entry.date) : false
+  );
+
   // Jira/Outlook entry not linked to any Moco entry
-  let isUnbooked = $derived((jiraMeta || outlookMeta) && isMocoConnected && !matchGroupId);
+  let isUnbooked = $derived(
+    (jiraMeta || outlookMeta) && isMocoConnected && !matchGroupId && !isDismissedEntry
+  );
 
   // Detect Jira issue key in Moco entry description or remoteTicketKey
   let mocoIssueKey = $derived.by(() => {
@@ -194,6 +203,14 @@
   function openJiraSync(): void {
     showJiraSyncModal = true;
   }
+
+  function handleDismiss(): void {
+    if (outlookMeta) dismissEvent(outlookMeta.eventId, entry.date);
+  }
+
+  function handleRestore(): void {
+    if (outlookMeta) restoreEvent(outlookMeta.eventId, entry.date);
+  }
 </script>
 
 <!-- Moco Edit Modal -->
@@ -311,7 +328,7 @@
         ondragstart={isDraggable ? handleDragStart : undefined}
         ondragend={isDraggable ? handleDragEnd : undefined}
         class="group relative rounded-xl border border-border {borderColorClass} border-l-[3px] bg-card dark:bg-white/[0.03] dark:border-white/10 p-3 pl-4 hover:border-border-bold dark:hover:border-white/20 dark:hover:bg-white/[0.05] transition-all duration-150
-          {isDimmed ? 'opacity-40' : ''}
+          {isDimmed || isDismissedEntry ? 'opacity-40' : ''}
           {isInHoveredGroup ? 'border-border-bold dark:border-white/20' : ''}
           {isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}
           {isDragging ? 'opacity-50' : ''}"
@@ -385,26 +402,40 @@
     {/if}
 
     <!-- Outlook Entry Actions -->
-    {#if outlookMeta && isMocoConnected}
-      {#if matchedFavorite}
-        <ContextMenu.Item onclick={openMocoCreate}>
-          <Star class="text-warning" />
-          <span>Book as Favorite</span>
-          <span class="ml-auto text-xs text-muted-foreground truncate max-w-[120px]"
-            >{matchedFavorite.name}</span
-          >
+    {#if outlookMeta}
+      {#if isDismissedEntry}
+        <ContextMenu.Item onclick={handleRestore}>
+          <Eye class="text-muted-foreground" />
+          <span>Restore</span>
         </ContextMenu.Item>
       {:else}
-        <ContextMenu.Item onclick={openMocoCreate}>
-          <Plus class="text-success" />
-          <span>Book in Moco</span>
+        {#if isMocoConnected}
+          {#if matchedFavorite}
+            <ContextMenu.Item onclick={openMocoCreate}>
+              <Star class="text-warning" />
+              <span>Book as Favorite</span>
+              <span class="ml-auto text-xs text-muted-foreground truncate max-w-[120px]"
+                >{matchedFavorite.name}</span
+              >
+            </ContextMenu.Item>
+          {:else}
+            <ContextMenu.Item onclick={openMocoCreate}>
+              <Plus class="text-success" />
+              <span>Book in Moco</span>
+            </ContextMenu.Item>
+          {/if}
+          <ContextMenu.Separator />
+          <ContextMenu.Item onclick={() => (showRuleEditorModal = true)}>
+            <Zap class="text-warning" />
+            <span>Create Rule</span>
+          </ContextMenu.Item>
+        {/if}
+        <ContextMenu.Separator />
+        <ContextMenu.Item onclick={handleDismiss}>
+          <EyeOff class="text-muted-foreground" />
+          <span>Dismiss</span>
         </ContextMenu.Item>
       {/if}
-      <ContextMenu.Separator />
-      <ContextMenu.Item onclick={() => (showRuleEditorModal = true)}>
-        <Zap class="text-warning" />
-        <span>Create Rule</span>
-      </ContextMenu.Item>
     {/if}
   </ContextMenu.Content>
 </ContextMenu.Root>
@@ -454,7 +485,11 @@
       {/if}
 
       <!-- Title -->
-      <span class="text-sm font-semibold text-foreground leading-snug line-clamp-2">
+      <span
+        class="text-sm font-semibold text-foreground leading-snug line-clamp-2 {isDismissedEntry
+          ? 'line-through text-muted-foreground'
+          : ''}"
+      >
         {entry.title}
       </span>
 
