@@ -166,8 +166,7 @@ export async function syncDay(
   const sourceEntries: UnifiedTimeEntry[] = [
     ...timeEntriesState.jiraWorklogs.filter((e) => e.date === date),
     ...timeEntriesState.outlookEvents.filter(
-      (e) =>
-        e.date === date && !isDismissed((e.metadata as OutlookMetadata).eventId, date)
+      (e) => e.date === date && !isDismissed((e.metadata as OutlookMetadata).eventId, date)
     )
   ];
   const mocoEntries = timeEntriesState.mocoActivities.filter((e) => e.date === date);

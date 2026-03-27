@@ -485,7 +485,11 @@
       {/if}
 
       <!-- Title -->
-      <span class="text-sm font-semibold text-foreground leading-snug line-clamp-2 {isDismissedEntry ? 'line-through text-muted-foreground' : ''}">
+      <span
+        class="text-sm font-semibold text-foreground leading-snug line-clamp-2 {isDismissedEntry
+          ? 'line-through text-muted-foreground'
+          : ''}"
+      >
         {entry.title}
       </span>
 
