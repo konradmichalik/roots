@@ -29,6 +29,7 @@ export interface MocoMetadata {
 
 export interface JiraMetadata {
   source: 'jira';
+  connectionId: string;              // references JiraConnectionConfig.id
   worklogId: string;
   issueKey: string;
   issueSummary: string;
