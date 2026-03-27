@@ -41,7 +41,8 @@ export const STORAGE_KEYS = {
   MORNING_GREETING: 'morning-greeting',
   RULES: 'rules',
   SYNC_RECORDS: 'sync-records',
-  RULES_MIGRATED: 'rules-migrated'
+  RULES_MIGRATED: 'rules-migrated',
+  DISMISSED_EVENTS: 'dismissed-events'
 } as const;
 
 type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

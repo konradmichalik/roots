@@ -16,7 +16,6 @@
   let { children }: { children: Snippet } = $props();
   let open = $state(false);
   let showJiraForm = $state(false);
-  let editingJiraId = $state<string | null>(null);
 </script>
 
 {#snippet mocoLogo()}
@@ -111,7 +110,7 @@
           </div>
           {#if !showJiraForm}
             <button
-              onclick={() => { editingJiraId = null; showJiraForm = true; }}
+              onclick={() => { showJiraForm = true; }}
               class="text-xs text-brand-text hover:text-brand-text/80 transition-colors"
             >
               + Add Connection
@@ -143,8 +142,8 @@
         {#if showJiraForm}
           <div class="mt-3">
             <JiraConnectionForm
-              oncomplete={() => { showJiraForm = false; editingJiraId = null; }}
-              oncancel={() => { showJiraForm = false; editingJiraId = null; }}
+              oncomplete={() => { showJiraForm = false; }}
+              oncancel={() => { showJiraForm = false; }}
             />
           </div>
         {:else if connectionsState.jiraConnections.length === 0}

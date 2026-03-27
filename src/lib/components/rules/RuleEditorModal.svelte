@@ -18,7 +18,7 @@
     getProjectById,
     getTasksForProject
   } from '../../stores/mocoProjects.svelte';
-  import { connectionsState, getConnectedJiraIds } from '../../stores/connections.svelte';
+  import { connectionsState } from '../../stores/connections.svelte';
   import {
     renderDescriptionTemplate,
     buildExampleVariables,
