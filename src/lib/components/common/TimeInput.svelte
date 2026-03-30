@@ -4,6 +4,7 @@
     timeStringToHours,
     normalizeTimeInput
   } from '../../utils/time-format';
+  import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
   import Minus from '@lucide/svelte/icons/minus';
   import Plus from '@lucide/svelte/icons/plus';
 
@@ -74,6 +75,20 @@
     value = Math.max(0, newValue);
     displayValue = hoursToTimeString(value);
   }
+
+  function roundUpToQuarter(hours: number): number {
+    return Math.ceil(hours * 4) / 4;
+  }
+
+  const roundedValue = $derived(roundUpToQuarter(value));
+  const showRoundingSuggestion = $derived(
+    value > 0 && Math.abs(value * 4 - Math.round(value * 4)) > 0.001
+  );
+
+  function applyRounding(): void {
+    value = roundedValue;
+    displayValue = hoursToTimeString(roundedValue);
+  }
 </script>
 
 <div class="flex items-center gap-1">
@@ -121,3 +136,14 @@
     </button>
   {/if}
 </div>
+{#if showRoundingSuggestion}
+  <button
+    type="button"
+    onclick={applyRounding}
+    class="mt-0.5 flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors duration-150 cursor-pointer"
+    title="Auf {hoursToTimeString(roundedValue)} aufrunden (15-Min-Taktung)"
+  >
+    <ArrowUpRight class="size-3" />
+    <span class="font-mono">{hoursToTimeString(roundedValue)}</span>
+  </button>
+{/if}
