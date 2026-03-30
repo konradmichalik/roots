@@ -132,9 +132,7 @@
 
   // Target line Y position (average across all entries to handle varied weekday hours)
   let targetHours = $derived(
-    entries.length > 0
-      ? entries.reduce((sum, e) => sum + e.target, 0) / entries.length
-      : 8
+    entries.length > 0 ? entries.reduce((sum, e) => sum + e.target, 0) / entries.length : 8
   );
   let targetY = $derived(hoursToY(targetHours));
 
