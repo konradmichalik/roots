@@ -430,7 +430,9 @@
             <span>Create Rule</span>
           </ContextMenu.Item>
         {/if}
-        <ContextMenu.Separator />
+        {#if isMocoConnected}
+          <ContextMenu.Separator />
+        {/if}
         <ContextMenu.Item onclick={handleDismiss}>
           <EyeOff class="text-muted-foreground" />
           <span>Dismiss</span>
