@@ -140,7 +140,9 @@
   <button
     type="button"
     onclick={applyRounding}
-    class="mt-0.5 flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors duration-150 cursor-pointer"
+    {disabled}
+    class="mt-0.5 flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors duration-150 cursor-pointer
+      disabled:opacity-50 disabled:cursor-not-allowed"
     title="Auf {hoursToTimeString(roundedValue)} aufrunden (15-Min-Taktung)"
   >
     <ArrowUpRight class="size-3" />
