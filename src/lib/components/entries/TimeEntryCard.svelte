@@ -5,7 +5,12 @@
   import * as ContextMenu from '$lib/components/ui/context-menu/index.js';
   import { formatHours } from '../../utils/time-format';
   import { extractFirstIssueKey } from '../../utils/jira-issue-parser';
-  import { connectionsState, getJiraBaseUrl } from '../../stores/connections.svelte';
+  import {
+    connectionsState,
+    getJiraBaseUrl,
+    getJiraConnectionState,
+    isJiraConnected
+  } from '../../stores/connections.svelte';
   import { findMatchingFavorite } from '../../stores/favorites.svelte';
   import { buildMocoPrefill } from '../../utils/moco-prefill';
   import { openStatsForTask } from '../../stores/statsModal.svelte';
@@ -73,7 +78,12 @@
     entry.metadata.source === 'outlook' ? (entry.metadata as OutlookMetadata) : null
   );
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
-  let isJiraConnected = $derived(connectionsState.jira.isConnected);
+  let isJiraActive = $derived(isJiraConnected());
+  let hasMultipleJira = $derived(connectionsState.jiraConnections.length > 1);
+  let jiraConnectionLabel = $derived.by(() => {
+    if (!jiraMeta || !hasMultipleJira) return null;
+    return getJiraConnectionState(jiraMeta.connectionId)?.label ?? null;
+  });
   let matchedFavorite = $derived(outlookMeta ? findMatchingFavorite(entry.title) : undefined);
   let syncRecord = $derived(mocoMeta ? getSyncRecordByActivityId(mocoMeta.activityId) : undefined);
 
@@ -129,7 +139,7 @@
 
   let jiraIssueUrl = $derived.by(() => {
     if (!jiraMeta) return null;
-    const baseUrl = getJiraBaseUrl();
+    const baseUrl = getJiraBaseUrl(jiraMeta.connectionId);
     if (!baseUrl) return null;
     return `${baseUrl}/browse/${jiraMeta.issueKey}`;
   });
@@ -166,7 +176,7 @@
         icon: Pencil,
         color: 'text-muted-foreground hover:text-foreground hover:bg-accent'
       } as const;
-    if (jiraMeta && isJiraConnected)
+    if (jiraMeta && isJiraActive)
       return {
         onclick: openJiraEdit,
         title: 'Edit worklog',
@@ -247,7 +257,7 @@
 {/if}
 
 <!-- Jira Edit Modal -->
-{#if jiraMeta && isJiraConnected}
+{#if jiraMeta && isJiraActive}
   <JiraEntryModal
     mode="edit"
     prefill={{
@@ -255,7 +265,8 @@
       hours: entry.hours,
       comment: entry.description ?? '',
       issueKey: jiraMeta.issueKey,
-      worklogId: jiraMeta.worklogId
+      worklogId: jiraMeta.worklogId,
+      connectionId: jiraMeta.connectionId
     }}
     defaultOpen={showJiraEditModal}
     onClose={() => (showJiraEditModal = false)}
@@ -273,7 +284,7 @@
 {/if}
 
 <!-- Jira Sync Modal (from Moco) -->
-{#if mocoMeta && mocoIssueKey && isJiraConnected}
+{#if mocoMeta && mocoIssueKey && isJiraActive}
   <JiraEntryModal
     mode="create"
     prefill={{
@@ -308,7 +319,7 @@
     prefill={{
       source: {
         type: 'jira',
-        connectionId: 'default',
+        connectionId: jiraMeta.connectionId,
         projectKey: jiraMeta.projectKey ?? jiraMeta.issueKey.split('-')[0],
         issuePattern: jiraMeta.issueKey
       }
@@ -357,7 +368,7 @@
         <span>Task Stats</span>
       </ContextMenu.Item>
 
-      {#if mocoIssueKey && isJiraConnected}
+      {#if mocoIssueKey && isJiraActive}
         <ContextMenu.Separator />
         <ContextMenu.Item onclick={openJiraSync}>
           <Upload class="text-brand-text" />
@@ -368,7 +379,7 @@
     {/if}
 
     <!-- Jira Entry Actions -->
-    {#if jiraMeta && isJiraConnected}
+    {#if jiraMeta && isJiraActive}
       <ContextMenu.Item onclick={openJiraEdit}>
         <Pencil class="text-muted-foreground" />
         <span>Edit Worklog</span>
@@ -482,6 +493,9 @@
               <Tag class="size-2.5" />
               {jiraMeta.projectKey}
             </span>
+          {/if}
+          {#if jiraConnectionLabel}
+            <span class="text-[10px] text-muted-foreground/50">{jiraConnectionLabel}</span>
           {/if}
         </div>
       {/if}

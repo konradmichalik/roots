@@ -9,12 +9,14 @@ roots supports four services. Each one is optional — connect whichever ones yo
 
 ## Supported Services
 
-| Service | Auth Method | What it provides | Required? |
-|---------|-------------|------------------|-----------|
+| Service | Auth Method | What it provides | Multi-Connection |
+|---------|-------------|------------------|-----------------|
 | [Moco](/connections/moco) | API Key | Time entries, projects, presences | No |
-| [Jira](/connections/jira) | Email + Token (Cloud) or PAT (Server) | Worklogs | No |
+| [Jira](/connections/jira) | Email + Token (Cloud) or PAT (Server) | Worklogs | **Yes** |
 | [Outlook](/connections/outlook) | OAuth 2.0 (PKCE) | Calendar events | No |
 | [Personio](/connections/personio) | Client ID + Secret | Absences, work schedule | No |
+
+All services are optional — connect whichever ones you use. Jira is the only service that supports multiple simultaneous connections (e.g. Cloud + Server during a migration).
 
 ## Connection Manager
 

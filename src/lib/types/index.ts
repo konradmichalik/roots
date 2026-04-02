@@ -1,5 +1,10 @@
 // Shared types
-export type { ServiceType, ServiceConnectionState, AllConnectionsState } from './connections';
+export type {
+  ServiceType,
+  ServiceConnectionState,
+  JiraConnectionInstance,
+  AllConnectionsState
+} from './connections';
 export { createInitialServiceState } from './connections';
 
 export type {
