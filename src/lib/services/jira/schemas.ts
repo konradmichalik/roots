@@ -63,9 +63,11 @@ export const jiraIssueSchema = z.object({
 });
 
 export const jiraSearchResponseSchema = z.object({
-  startAt: z.number(),
-  maxResults: z.number(),
-  total: z.number(),
+  startAt: z.number().optional(),
+  maxResults: z.number().optional(),
+  total: z.number().optional(),
+  isLast: z.boolean().optional(),
+  nextPageToken: z.string().optional(),
   issues: z.array(jiraIssueSchema)
 });
 

@@ -26,6 +26,14 @@ export class JiraCloudWorklogClient extends JiraWorklogClient {
     return '3';
   }
 
+  protected get searchPath(): string {
+    return '/rest/api/3/search/jql';
+  }
+
+  protected get usesTokenPagination(): boolean {
+    return true;
+  }
+
   protected getAuthHeaders(): Record<string, string> {
     const token = btoa(`${this.email}:${this.apiToken}`);
     return {
