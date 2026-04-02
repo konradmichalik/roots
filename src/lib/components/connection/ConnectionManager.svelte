@@ -8,6 +8,7 @@
     connectionsState,
     disconnectMoco,
     disconnectJira,
+    reconnectJira,
     disconnectOutlook,
     disconnectPersonio
   } from '../../stores/connections.svelte';
@@ -15,6 +16,8 @@
 
   let { children }: { children: Snippet } = $props();
   let open = $state(false);
+  let showJiraForm = $state(false);
+  let editingJiraId = $state<string | null>(null);
 </script>
 
 {#snippet mocoLogo()}
@@ -98,7 +101,7 @@
         {/if}
       </div>
 
-      <!-- Jira -->
+      <!-- Jira (multi-connection) -->
       <div class="rounded-xl border border-border p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
@@ -107,20 +110,71 @@
             </div>
             <h3 class="font-semibold text-foreground">Jira</h3>
           </div>
-          {#if connectionsState.jira.isConnected}
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-success-text">Connected</span>
-              <button
-                onclick={() => disconnectJira()}
-                class="text-xs text-muted-foreground hover:text-danger-text transition-colors"
-              >
-                Disconnect
-              </button>
-            </div>
+          {#if !showJiraForm && connectionsState.jiraConnections.length > 0}
+            <button
+              onclick={() => {
+                editingJiraId = null;
+                showJiraForm = true;
+              }}
+              class="text-xs text-brand-text hover:text-brand-text/80 transition-colors"
+            >
+              + Add Connection
+            </button>
           {/if}
         </div>
-        {#if !connectionsState.jira.isConnected}
-          <JiraConnectionForm />
+
+        <!-- Existing connections list -->
+        {#each connectionsState.jiraConnections as conn (conn.id)}
+          <div class="flex items-center justify-between py-2 border-b border-border last:border-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-foreground">{conn.label}</span>
+              {#if conn.state.isConnected}
+                <span class="text-xs text-success-text">Connected</span>
+              {:else if conn.state.isConnecting}
+                <span class="text-xs text-muted-foreground">Connecting...</span>
+              {:else if conn.state.error}
+                <span class="text-xs text-danger-text" title={conn.state.error}>Error</span>
+              {/if}
+            </div>
+            <div class="flex items-center gap-2">
+              {#if conn.state.error && !conn.state.isConnecting}
+                <button
+                  onclick={() => reconnectJira(conn.id)}
+                  class="text-xs text-brand-text hover:text-brand-text/80 transition-colors"
+                >
+                  Retry
+                </button>
+              {/if}
+              <button
+                onclick={() => disconnectJira(conn.id)}
+                class="text-xs text-muted-foreground hover:text-danger-text transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        {/each}
+
+        <!-- Add/edit form (shown inline) -->
+        {#if showJiraForm}
+          <div class="mt-3">
+            <JiraConnectionForm
+              editId={editingJiraId}
+              oncomplete={() => {
+                showJiraForm = false;
+                editingJiraId = null;
+              }}
+              oncancel={() => {
+                showJiraForm = false;
+                editingJiraId = null;
+              }}
+            />
+          </div>
+        {:else if connectionsState.jiraConnections.length === 0}
+          <JiraConnectionForm
+            oncomplete={() => {}}
+            oncancel={() => {}}
+          />
         {/if}
       </div>
 

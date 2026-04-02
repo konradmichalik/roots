@@ -13,7 +13,7 @@
     fetchDayEntries
   } from '../../stores/timeEntries.svelte';
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
-  import { connectionsState } from '../../stores/connections.svelte';
+  import { connectionsState, isJiraConnected } from '../../stores/connections.svelte';
   import { formatHours, formatBalance } from '../../utils/time-format';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
   import ConnectionManager from '../connection/ConnectionManager.svelte';
@@ -47,7 +47,7 @@
   let displayTarget = $derived(overview.presence?.hours ?? overview.requiredHours);
 
   let showOutlook = $derived(connectionsState.outlook.isConnected);
-  let showJira = $derived(connectionsState.jira.isConnected);
+  let showJira = $derived(isJiraConnected());
 
   // Rules sync
   let hasRules = $derived(rulesState.rules.length > 0 && connectionsState.moco.isConnected);
