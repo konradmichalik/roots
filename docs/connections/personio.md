@@ -49,7 +49,7 @@ roots authenticates with the Personio API, looks up your employee record by emai
 
 | Data | Description |
 |------|-------------|
-| **Absences** | Approved time-offs (vacation, sick, public holiday, etc.) |
+| **Absences** | Approved time-offs (vacation, sick leave, etc.) |
 | **Work schedule** | Your contracted hours per weekday (e.g. Mon–Fri 8h) |
 | **Absence balance** | Remaining vacation days |
 
@@ -60,6 +60,10 @@ When Personio is connected, roots automatically:
 - **Updates weekly hours** from your work schedule (e.g. 8h Mon–Fri, 0h Sat–Sun)
 - **Marks absence days** in the calendar and timeline
 - **Disables manual editing** of weekly hours and absences (Personio is the source of truth)
+
+::: info Public Holidays
+Public holidays are **not** imported from Personio (the Personio API does not expose the holiday calendar). Instead, public holidays come from [Moco's schedule data](/connections/moco#public-holidays).
+:::
 
 ::: tip
 If you disconnect Personio, manual editing of hours and absences is re-enabled.

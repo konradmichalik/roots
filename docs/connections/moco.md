@@ -47,6 +47,7 @@ roots validates the connection by calling the Moco session endpoint. On success 
 | Project tasks | `/api/v1/projects/{id}/tasks` | Tasks within a project |
 | Project reports | `/api/v1/projects/{id}` | Project details and report data |
 | Presences | `/api/v1/users/presences` | Attendance / clock-in records |
+| Schedules | `/api/v1/schedules` | Public holidays and planned absences |
 
 ## Features
 
@@ -68,6 +69,14 @@ Full CRUD operations for Moco presences (clock-in/clock-out):
 - **Toggle Home Office** mode for the day
 
 Presences are displayed as a progress bar in the timeline header, showing booked vs. unbooked time, breaks and a live "now" marker.
+
+### Public Holidays
+
+Moco is the source of truth for public holidays. roots reads the Moco schedule and automatically marks days with a "Feiertag" assignment as public holidays in the calendar. This reduces the required hours for those days to zero.
+
+::: tip
+Public holidays are configured in Moco by your company admin. They appear in the roots calendar automatically — no manual setup needed.
+:::
 
 ## Troubleshooting
 
