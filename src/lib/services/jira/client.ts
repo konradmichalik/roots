@@ -145,15 +145,14 @@ export abstract class JiraWorklogClient extends ApiClient {
 
       allIssues.push(...response.issues);
 
-      // Cloud v3 /search/jql uses isLast + nextPageToken
-      if (response.isLast !== undefined) {
-        if (response.isLast || response.issues.length === 0) break;
+      if (this.usesTokenPagination) {
+        if (response.issues.length === 0 || response.isLast === true) break;
         nextPageToken = response.nextPageToken;
         if (!nextPageToken) break;
       } else {
-        // Server v2 /search uses total + startAt
-        if (allIssues.length >= (response.total ?? 0)) break;
-        startAt += maxResults;
+        const pageSize = response.maxResults ?? response.issues.length;
+        if (allIssues.length >= (response.total ?? 0) || pageSize === 0) break;
+        startAt = (response.startAt ?? startAt) + pageSize;
       }
     }
 

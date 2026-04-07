@@ -58,7 +58,7 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
   // Set remote fields for linking and dedup (Jira only — Moco doesn't recognize 'outlook' as remote_service)
   if (rule.source.type === 'jira' && entry.metadata.source === 'jira') {
     payload.remote_service = 'jira';
-    payload.remote_id = `${entry.metadata.issueKey}#${entry.metadata.worklogId}`;
+    payload.remote_id = `${entry.metadata.connectionId}:${entry.metadata.issueKey}#${entry.metadata.worklogId}`;
   }
 
   return payload;
@@ -69,7 +69,9 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
 // ---------------------------------------------------------------------------
 
 function getSourceId(entry: UnifiedTimeEntry): string {
-  if (entry.metadata.source === 'jira') return entry.metadata.worklogId;
+  if (entry.metadata.source === 'jira') {
+    return `${entry.metadata.connectionId}:${entry.metadata.worklogId}`;
+  }
   if (entry.metadata.source === 'outlook') return entry.metadata.eventId;
   return entry.id;
 }
