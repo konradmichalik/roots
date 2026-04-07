@@ -9,7 +9,8 @@ import type {
   MocoPresence,
   MocoCreatePresence,
   MocoUpdatePresence,
-  MocoProjectReport
+  MocoProjectReport,
+  MocoSchedule
 } from './types';
 import { logger } from '../../utils/logger';
 import { validateResponse } from '../validate';
@@ -20,7 +21,8 @@ import {
   mocoPresencesSchema,
   mocoActivitySchema,
   mocoPresenceSchema,
-  mocoProjectReportSchema
+  mocoProjectReportSchema,
+  mocoSchedulesSchema
 } from './schemas';
 
 export interface MocoClientConfig extends ApiClientConfig {
@@ -187,6 +189,21 @@ export class MocoClient extends ApiClient {
   async deletePresence(id: number): Promise<void> {
     logger.info(`Deleting Moco presence ${id}`);
     await this.request<void>('DELETE', `/users/presences/${id}`);
+  }
+
+  /**
+   * Fetch schedule entries (holidays, planned absences) for a date range
+   */
+  async getSchedules(from: string, to: string): Promise<MocoSchedule[]> {
+    const userFilter = this.currentUserId ? `&user_id=${this.currentUserId}` : '';
+    logger.info(`Fetching Moco schedules: ${from} to ${to}`);
+    const raw = await this.request<MocoSchedule[]>(
+      'GET',
+      `/schedules?from=${from}&to=${to}${userFilter}`
+    );
+    const schedules = validateResponse(mocoSchedulesSchema, raw, 'Moco schedules');
+    logger.info(`Fetched ${schedules.length} Moco schedules`);
+    return schedules;
   }
 
   /**

@@ -1,7 +1,8 @@
 import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../utils/storage';
 import { logger } from '../utils/logger';
 import type { ManualAbsence, AbsenceType, PersonioAbsence, PersonioAbsenceBalance } from '../types';
-import { getPersonioClient } from './connections.svelte';
+import type { MocoSchedule } from '../services/moco/types';
+import { getPersonioClient, getMocoClient } from './connections.svelte';
 import { connectionsState } from './connections.svelte';
 import { mapTimeOffToAbsence } from '../services/personio';
 
@@ -76,7 +77,8 @@ export async function fetchPersonioAbsences(from: string, to: string): Promise<v
 
   try {
     const timeOffs = await client.getTimeOffs(from, to);
-    absencesState.personioAbsences = timeOffs.map(mapTimeOffToAbsence);
+    const mocoHolidays = absencesState.personioAbsences.filter((a) => a.source === 'moco');
+    absencesState.personioAbsences = [...timeOffs.map(mapTimeOffToAbsence), ...mocoHolidays];
     logger.store('absences', 'Loaded Personio absences', {
       count: absencesState.personioAbsences.length
     });
@@ -121,6 +123,49 @@ export async function fetchAbsenceBalances(): Promise<void> {
     });
   } catch (error) {
     logger.error('Failed to fetch year time-offs for vacation count', error);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Moco holidays (from /schedules endpoint)
+// ---------------------------------------------------------------------------
+
+function isMocoHoliday(schedule: MocoSchedule): boolean {
+  return schedule.assignment.name.toLowerCase().includes('feiertag');
+}
+
+function mapMocoScheduleToAbsence(schedule: MocoSchedule): PersonioAbsence {
+  const halfDay = schedule.am !== schedule.pm;
+  return {
+    id: `moco-schedule-${schedule.id}`,
+    source: 'moco',
+    type: 'public_holiday',
+    startDate: schedule.date,
+    endDate: schedule.date,
+    daysCount: halfDay ? 0.5 : 1,
+    halfDay,
+    status: 'approved',
+    typeName: schedule.assignment.name
+  };
+}
+
+export async function fetchMocoHolidays(from: string, to: string): Promise<void> {
+  if (!connectionsState.moco.isConnected) return;
+
+  const client = getMocoClient();
+  if (!client) return;
+
+  try {
+    const schedules = await client.getSchedules(from, to);
+    const holidays = schedules.filter(isMocoHoliday).map(mapMocoScheduleToAbsence);
+
+    // Merge with existing absences: replace previous Moco holidays, keep Personio ones
+    const nonMocoAbsences = absencesState.personioAbsences.filter((a) => a.source !== 'moco');
+    absencesState.personioAbsences = [...nonMocoAbsences, ...holidays];
+
+    logger.store('absences', 'Loaded Moco holidays', { count: holidays.length });
+  } catch (error) {
+    logger.error('Failed to fetch Moco holidays', error);
   }
 }
 

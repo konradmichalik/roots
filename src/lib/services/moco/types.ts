@@ -122,3 +122,25 @@ export interface MocoProjectReport {
   hours_remaining: number;
   costs_by_task: MocoTaskCost[];
 }
+
+export interface MocoScheduleAssignment {
+  id: number;
+  name: string;
+  code: string;
+  customer_name: string;
+  color: string;
+  type: string;
+}
+
+export interface MocoSchedule {
+  id: number;
+  date: string;
+  comment: string | null;
+  am: boolean;
+  pm: boolean;
+  symbol: string | null;
+  assignment: MocoScheduleAssignment;
+  user: MocoUser;
+  created_at: string;
+  updated_at: string;
+}

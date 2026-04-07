@@ -23,7 +23,7 @@ When Personio is connected, weekly hours are synced automatically from your work
 Mark days as absent (vacation, sick, etc.) to adjust the daily target to zero. This prevents those days from showing as "under-booked."
 
 ::: info
-When Personio is connected, absences are imported automatically and manual editing is disabled.
+When Personio is connected, absences are imported automatically and manual editing is disabled. Public holidays are imported from [Moco](/connections/moco#public-holidays), not Personio.
 :::
 
 ## Presence Management
