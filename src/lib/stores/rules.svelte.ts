@@ -91,8 +91,9 @@ function matchesJiraSource(entry: UnifiedTimeEntry, source: JiraSourceMatcher): 
 
   const meta = entry.metadata;
 
-  // Connection must match (skip check if source uses 'default' — backward compat)
-  if (source.connectionId !== 'default' && meta.connectionId !== source.connectionId) {
+  // Connection must match (skip check if source uses 'default' or undefined — backward compat)
+  const sourceConnId = source.connectionId ?? 'default';
+  if (sourceConnId !== 'default' && meta.connectionId !== sourceConnId) {
     return false;
   }
 

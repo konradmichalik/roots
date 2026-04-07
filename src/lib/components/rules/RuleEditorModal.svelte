@@ -69,7 +69,8 @@
   let sourceType = $state<'jira' | 'outlook'>('jira');
 
   // Jira source
-  let jiraConnectionId = $state(connectionsState.jiraConnections[0]?.id ?? 'default');
+  const getDefaultJiraConnectionId = () => connectionsState.jiraConnections[0]?.id ?? 'default';
+  let jiraConnectionId = $state(getDefaultJiraConnectionId());
   let jiraProjectKey = $state('');
   let jiraIssuePattern = $state('');
   let jiraEpicKey = $state('');
@@ -268,6 +269,7 @@
 
       currentStep = 1;
     } else {
+      jiraConnectionId = getDefaultJiraConnectionId();
       name = '';
       sourceType = prefill?.source?.type ?? 'jira';
       autoSync = false;
@@ -551,6 +553,7 @@
                     bind:value={jiraConnectionId}
                     class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
                   >
+                    <option value="default">Any Jira connection</option>
                     {#each connectionsState.jiraConnections as conn (conn.id)}
                       <option value={conn.id}>{conn.label}</option>
                     {/each}
