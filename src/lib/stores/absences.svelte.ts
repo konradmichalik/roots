@@ -77,7 +77,8 @@ export async function fetchPersonioAbsences(from: string, to: string): Promise<v
 
   try {
     const timeOffs = await client.getTimeOffs(from, to);
-    absencesState.personioAbsences = timeOffs.map(mapTimeOffToAbsence);
+    const mocoHolidays = absencesState.personioAbsences.filter((a) => a.source === 'moco');
+    absencesState.personioAbsences = [...timeOffs.map(mapTimeOffToAbsence), ...mocoHolidays];
     logger.store('absences', 'Loaded Personio absences', {
       count: absencesState.personioAbsences.length
     });
