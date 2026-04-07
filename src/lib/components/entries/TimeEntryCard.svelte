@@ -493,13 +493,18 @@
             </span>
           {/if}
           {#if jiraMeta.projectKey}
-            <span class="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground flex-shrink-0">
+            <span
+              class="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground flex-shrink-0"
+            >
               <Tag class="size-2.5" />
               {jiraMeta.projectKey}
             </span>
           {/if}
           {#if jiraConnectionLabel}
-            <span class="text-[10px] text-muted-foreground/50 truncate max-w-[120px]" title={jiraConnectionLabel}>{jiraConnectionLabel}</span>
+            <span
+              class="text-[10px] text-muted-foreground/50 truncate max-w-[120px]"
+              title={jiraConnectionLabel}>{jiraConnectionLabel}</span
+            >
           {/if}
         </div>
       {/if}
