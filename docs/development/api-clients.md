@@ -62,10 +62,12 @@ In browser mode, the real service URL is passed via the `X-Service-Base-Url` hea
 
 Abstract base for Jira with two implementations:
 
-| Implementation | API Version | Auth |
-|---------------|-------------|------|
-| `JiraCloudWorklogClient` | REST API v3 | Basic (email:token) |
-| `JiraServerWorklogClient` | REST API v2 | Basic or Bearer PAT |
+| Implementation | API Version | Search Endpoint | Pagination | Auth |
+|---------------|-------------|-----------------|------------|------|
+| `JiraCloudWorklogClient` | REST API v3 | `POST /rest/api/3/search/jql` | Token-based (`nextPageToken` / `isLast`) | Basic (email:token) |
+| `JiraServerWorklogClient` | REST API v2 | `POST /rest/api/2/search` | Offset-based (`startAt` / `total`) | Basic or Bearer PAT |
+
+The base class exposes `searchPath` and `usesTokenPagination` getters, overridden in the Cloud subclass to use the new `/search/jql` endpoint.
 
 Shared methods:
 
@@ -77,6 +79,8 @@ Shared methods:
 | `deleteWorklog(issueKey, id)` | Remove worklog |
 
 The JQL query: `worklogDate >= "YYYY-MM-DD" AND worklogDate <= "YYYY-MM-DD"` with pagination (50 issues per page).
+
+Each connection has its own client instance, stored in a `Map<string, JiraWorklogClient>` keyed by connection ID. The `connectionId` is threaded through `mapJiraWorklog()` into `JiraMetadata.connectionId` so every worklog can be traced back to its origin instance.
 
 ### OutlookClient
 

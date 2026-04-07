@@ -1,8 +1,18 @@
 <script lang="ts">
   import { connectJira } from '../../stores/connections.svelte';
-  import { connectionsState } from '../../stores/connections.svelte';
   import type { JiraConnectionConfig } from '../../types';
 
+  let {
+    editId = null,
+    oncomplete,
+    oncancel
+  }: {
+    editId?: string | null;
+    oncomplete: () => void;
+    oncancel: () => void;
+  } = $props();
+
+  let label = $state('');
   let instanceType = $state<'cloud' | 'server'>('cloud');
   let baseUrl = $state('');
   let email = $state('');
@@ -11,6 +21,19 @@
   let username = $state('');
   let password = $state('');
   let personalAccessToken = $state('');
+  let isSubmitting = $state(false);
+  let error = $state<string | null>(null);
+
+  let autoLabel = $derived.by(() => {
+    if (label.trim()) return label;
+    try {
+      const url = new URL(baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`);
+      const prefix = instanceType === 'cloud' ? 'Cloud' : 'Server';
+      return `${prefix} (${url.hostname})`;
+    } catch {
+      return '';
+    }
+  });
 
   function detectInstanceType(url: string): void {
     try {
@@ -44,10 +67,17 @@
       url = `https://${url}`;
     }
 
+    const base = {
+      id: editId ?? crypto.randomUUID(),
+      label: autoLabel || (instanceType === 'cloud' ? 'Jira Cloud' : 'Jira Server'),
+      baseUrl: url,
+      instanceType
+    };
+
     if (instanceType === 'cloud') {
       return {
+        ...base,
         instanceType: 'cloud',
-        baseUrl: url,
         credentials: {
           type: 'cloud',
           email: email.trim(),
@@ -57,8 +87,8 @@
     }
 
     return {
+      ...base,
       instanceType: 'server',
-      baseUrl: url,
       credentials: {
         type: 'server',
         authMethod,
@@ -72,11 +102,32 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
     if (!isValid()) return;
-    await connectJira(buildConfig());
+    isSubmitting = true;
+    error = null;
+    const success = await connectJira(buildConfig());
+    isSubmitting = false;
+    if (success) {
+      oncomplete();
+    } else {
+      error = 'Connection failed. Check your credentials.';
+    }
   }
 </script>
 
 <form onsubmit={handleSubmit} class="space-y-4">
+  <!-- Label -->
+  <div>
+    <label for="jira-label" class="block text-sm font-medium text-foreground mb-1">Label</label>
+    <input
+      id="jira-label"
+      type="text"
+      bind:value={label}
+      placeholder={autoLabel || 'e.g. Cloud Production'}
+      maxlength={64}
+      class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
+    />
+  </div>
+
   <!-- Instance Type -->
   <div class="flex gap-4">
     <label class="flex items-center gap-1.5 text-sm cursor-pointer">
@@ -101,7 +152,7 @@
       oninput={handleUrlInput}
       placeholder={instanceType === 'cloud' ? 'company.atlassian.net' : 'https://jira.company.com'}
       maxlength={256}
-      aria-describedby={connectionsState.jira.error ? 'jira-form-error' : undefined}
+      aria-describedby={error ? 'jira-form-error' : undefined}
       class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] focus:ring-ring/50 focus:border-ring transition-all duration-150"
     />
   </div>
@@ -203,17 +254,26 @@
     {/if}
   {/if}
 
-  {#if connectionsState.jira.error}
+  {#if error}
     <p id="jira-form-error" role="alert" class="text-sm text-[var(--ds-text-danger)]">
-      {connectionsState.jira.error}
+      {error}
     </p>
   {/if}
 
-  <button
-    type="submit"
-    disabled={connectionsState.jira.isConnecting || !isValid()}
-    class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
-  >
-    {connectionsState.jira.isConnecting ? 'Connecting...' : 'Connect'}
-  </button>
+  <div class="flex gap-2">
+    <button
+      type="submit"
+      disabled={isSubmitting || !isValid()}
+      class="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+    >
+      {isSubmitting ? 'Connecting...' : 'Connect'}
+    </button>
+    <button
+      type="button"
+      onclick={oncancel}
+      class="rounded-lg border border-input px-4 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-all duration-150"
+    >
+      Cancel
+    </button>
+  </div>
 </form>

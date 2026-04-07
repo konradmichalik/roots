@@ -7,6 +7,10 @@ description: Connect roots to Jira Cloud or Jira Server
 
 roots supports both **Jira Cloud** and **Jira Server / Data Center**. It imports worklogs — the time you've logged on Jira issues.
 
+::: tip Multiple Connections
+You can connect **multiple Jira instances** at the same time — for example a Cloud instance and a Server instance during a migration. Worklogs from all connections appear together in the Jira column.
+:::
+
 ## Jira Cloud
 
 ### What You Need
@@ -31,11 +35,12 @@ The token is shown only once. Store it securely before closing the dialog.
 ### Connect in roots
 
 1. Open the Connection Manager
-2. Select the **Jira** tab
-3. Choose **Cloud** as instance type
-4. Enter your Atlassian URL (e.g. `company.atlassian.net`)
-5. Enter your email and paste the API token
-6. Click **Connect**
+2. In the **Jira** section, click **+ Add Connection** (or fill the form if no connection exists yet)
+3. Optionally enter a **label** (e.g. "Cloud Production") — auto-derived from the URL if left empty
+4. Choose **Cloud** as instance type
+5. Enter your Atlassian URL (e.g. `company.atlassian.net`)
+6. Enter your email and paste the API token
+7. Click **Connect**
 
 ---
 
@@ -67,11 +72,24 @@ PAT authentication is recommended over username/password for better security and
 ### Connect in roots
 
 1. Open the Connection Manager
-2. Select the **Jira** tab
-3. Choose **Server / Data Center** as instance type
-4. Enter the full base URL of your Jira instance
-5. Select auth method (PAT or Basic) and enter credentials
-6. Click **Connect**
+2. In the **Jira** section, click **+ Add Connection**
+3. Optionally enter a **label** (e.g. "On-Premise DC")
+4. Choose **Server / Data Center** as instance type
+5. Enter the full base URL of your Jira instance
+6. Select auth method (PAT or Basic) and enter credentials
+7. Click **Connect**
+
+---
+
+## Multiple Connections
+
+You can add as many Jira connections as you need. Each connection is listed in the Connection Manager with its label and status.
+
+- Click **+ Add Connection** to add another instance
+- Click **Remove** to disconnect a single instance
+- Click **Retry** if a connection failed
+
+When multiple connections are active, each worklog card in the timeline shows a small label indicating which instance it belongs to.
 
 ---
 

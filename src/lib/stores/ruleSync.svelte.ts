@@ -17,6 +17,8 @@ import {
   getMocoClient,
   getJiraClient,
   getOutlookClient,
+  getConnectedJiraIds,
+  isJiraConnected,
   connectionsState
 } from './connections.svelte';
 import { findMatchingRules } from './rules.svelte';
@@ -56,7 +58,7 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
   // Set remote fields for linking and dedup (Jira only — Moco doesn't recognize 'outlook' as remote_service)
   if (rule.source.type === 'jira' && entry.metadata.source === 'jira') {
     payload.remote_service = 'jira';
-    payload.remote_id = `${entry.metadata.issueKey}#${entry.metadata.worklogId}`;
+    payload.remote_id = `${entry.metadata.connectionId}:${entry.metadata.issueKey}#${entry.metadata.worklogId}`;
   }
 
   return payload;
@@ -67,7 +69,9 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
 // ---------------------------------------------------------------------------
 
 function getSourceId(entry: UnifiedTimeEntry): string {
-  if (entry.metadata.source === 'jira') return entry.metadata.worklogId;
+  if (entry.metadata.source === 'jira') {
+    return `${entry.metadata.connectionId}:${entry.metadata.worklogId}`;
+  }
   if (entry.metadata.source === 'outlook') return entry.metadata.eventId;
   return entry.id;
 }
@@ -275,7 +279,6 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
   let totalErrors = 0;
 
   // Fetch entries for the range from services directly
-  const jiraClient = getJiraClient();
   const outlookClient = getOutlookClient();
   const mocoClient = getMocoClient();
 
@@ -286,18 +289,25 @@ export async function syncDateRange(from: string, to: string): Promise<BulkSyncP
 
   const fetches: Promise<void>[] = [];
 
-  if (jiraClient && connectionsState.jira.isConnected) {
-    fetches.push(
-      jiraClient
-        .getWorklogsForRange(from, to)
-        .then((worklogs) => {
-          jiraWorklogs = worklogs.map((w) => mapJiraWorklog(w, jiraClient));
-        })
-        .catch((e) => {
-          fetchErrors.push(`Jira: ${e instanceof Error ? e.message : 'Failed to fetch worklogs'}`);
-          logger.error('Bulk sync: Failed to fetch Jira worklogs', e);
-        })
-    );
+  if (isJiraConnected()) {
+    const connectionIds = getConnectedJiraIds();
+    for (const connId of connectionIds) {
+      const client = getJiraClient(connId);
+      if (!client) continue;
+      fetches.push(
+        client
+          .getWorklogsForRange(from, to)
+          .then((worklogs) => {
+            jiraWorklogs.push(...worklogs.map((w) => mapJiraWorklog(w, client, connId)));
+          })
+          .catch((e) => {
+            fetchErrors.push(
+              `Jira [${connId}]: ${e instanceof Error ? e.message : 'Failed to fetch worklogs'}`
+            );
+            logger.error(`Bulk sync: Failed to fetch Jira worklogs [${connId}]`, e);
+          })
+      );
+    }
   }
 
   if (outlookClient && connectionsState.outlook.isConnected) {

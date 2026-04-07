@@ -42,13 +42,15 @@ export function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
 // ---------------------------------------------------------------------------
 export function mapJiraWorklog(
   item: WorklogWithIssue,
-  client: JiraWorklogClient
+  client: JiraWorklogClient,
+  connectionId: string = 'default'
 ): UnifiedTimeEntry {
   const { worklog, issueKey, issueSummary, issueType, projectKey, epicKey, components, labels } =
     item;
 
   const metadata: JiraMetadata = {
     source: 'jira',
+    connectionId,
     worklogId: worklog.id,
     issueKey,
     issueSummary,
@@ -60,7 +62,7 @@ export function mapJiraWorklog(
   };
 
   return {
-    id: `jira-${worklog.id}`,
+    id: `jira-${connectionId}-${worklog.id}`,
     source: 'jira',
     date: worklog.started.split('T')[0],
     hours: secondsToHours(worklog.timeSpentSeconds),

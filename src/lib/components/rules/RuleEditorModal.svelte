@@ -69,6 +69,8 @@
   let sourceType = $state<'jira' | 'outlook'>('jira');
 
   // Jira source
+  const getDefaultJiraConnectionId = () => connectionsState.jiraConnections[0]?.id ?? 'default';
+  let jiraConnectionId = $state(getDefaultJiraConnectionId());
   let jiraProjectKey = $state('');
   let jiraIssuePattern = $state('');
   let jiraEpicKey = $state('');
@@ -109,7 +111,7 @@
     if (sourceType === 'jira') {
       return {
         type: 'jira',
-        connectionId: 'default',
+        connectionId: jiraConnectionId,
         projectKey: jiraProjectKey,
         issuePattern: jiraIssuePattern || undefined,
         epicKey: jiraEpicKey || undefined,
@@ -245,6 +247,7 @@
       selectedProjectId = editRule.target.mocoProjectId;
 
       if (editRule.source.type === 'jira') {
+        jiraConnectionId = editRule.source.connectionId ?? 'default';
         jiraProjectKey = editRule.source.projectKey;
         jiraIssuePattern = editRule.source.issuePattern ?? '';
         jiraEpicKey = editRule.source.epicKey ?? '';
@@ -266,6 +269,7 @@
 
       currentStep = 1;
     } else {
+      jiraConnectionId = getDefaultJiraConnectionId();
       name = '';
       sourceType = prefill?.source?.type ?? 'jira';
       autoSync = false;
@@ -285,6 +289,8 @@
         jiraProjectKey = '';
         jiraIssuePattern = '';
       } else if (prefill?.source?.type === 'jira') {
+        jiraConnectionId =
+          prefill.source.connectionId ?? connectionsState.jiraConnections[0]?.id ?? 'default';
         jiraProjectKey = prefill.source.projectKey;
         jiraIssuePattern = prefill.source.issuePattern ?? '';
         jiraEpicKey = prefill.source.epicKey ?? '';
@@ -534,6 +540,26 @@
 
             <!-- Source-specific forms -->
             {#if sourceType === 'jira'}
+              {#if connectionsState.jiraConnections.length > 1}
+                <div>
+                  <label
+                    for="rule-jira-connection"
+                    class="block text-sm font-medium text-foreground mb-1"
+                  >
+                    Jira Instance
+                  </label>
+                  <select
+                    id="rule-jira-connection"
+                    bind:value={jiraConnectionId}
+                    class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="default">Any Jira connection</option>
+                    {#each connectionsState.jiraConnections as conn (conn.id)}
+                      <option value={conn.id}>{conn.label}</option>
+                    {/each}
+                  </select>
+                </div>
+              {/if}
               <JiraSourceForm
                 bind:projectKey={jiraProjectKey}
                 bind:issuePattern={jiraIssuePattern}

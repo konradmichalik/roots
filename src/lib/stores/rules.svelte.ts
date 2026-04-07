@@ -91,6 +91,12 @@ function matchesJiraSource(entry: UnifiedTimeEntry, source: JiraSourceMatcher): 
 
   const meta = entry.metadata;
 
+  // Connection must match (skip check if source uses 'default' or undefined — backward compat)
+  const sourceConnId = source.connectionId ?? 'default';
+  if (sourceConnId !== 'default' && meta.connectionId !== sourceConnId) {
+    return false;
+  }
+
   // JQL mode: not yet supported (requires server-side execution)
   if (source.jql) return false;
 

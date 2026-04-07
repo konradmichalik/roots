@@ -46,6 +46,16 @@ export abstract class JiraWorklogClient extends ApiClient {
     payload: JiraCreateWorklogPayload | JiraUpdateWorklogPayload
   ): Record<string, unknown>;
 
+  /** Search endpoint path — Cloud v3 uses /search/jql, Server v2 uses /search */
+  protected get searchPath(): string {
+    return `/rest/api/${this.apiVersion}/search`;
+  }
+
+  /** Whether the search endpoint uses token-based pagination (Cloud v3) vs offset-based (Server v2) */
+  protected get usesTokenPagination(): boolean {
+    return false;
+  }
+
   async testConnection(): Promise<{ success: boolean; user?: JiraUser; error?: string }> {
     try {
       logger.connection('Testing Jira connection');
@@ -101,35 +111,49 @@ export abstract class JiraWorklogClient extends ApiClient {
     const allIssues: JiraIssue[] = [];
     let startAt = 0;
     const maxResults = 50;
+    let nextPageToken: string | undefined;
 
     logger.info(`Searching Jira issues: ${jql}`);
 
     while (true) {
-      const raw = await this.request<JiraSearchResponse>(
-        'POST',
-        `/rest/api/${this.apiVersion}/search`,
-        {
-          jql,
-          startAt,
-          maxResults,
-          fields: [
-            'summary',
-            'issuetype',
-            'project',
-            'worklog',
-            'parent',
-            'components',
-            'labels',
-            'customfield_10001'
-          ]
+      const body: Record<string, unknown> = {
+        jql,
+        maxResults,
+        fields: [
+          'summary',
+          'issuetype',
+          'project',
+          'worklog',
+          'parent',
+          'components',
+          'labels',
+          'customfield_10001'
+        ]
+      };
+
+      // Cloud v3 /search/jql uses nextPageToken; Server v2 /search uses startAt
+      if (this.usesTokenPagination) {
+        if (nextPageToken) {
+          body.nextPageToken = nextPageToken;
         }
-      );
+      } else {
+        body.startAt = startAt;
+      }
+
+      const raw = await this.request<JiraSearchResponse>('POST', this.searchPath, body);
       const response = validateResponse(jiraSearchResponseSchema, raw, 'Jira search');
 
       allIssues.push(...response.issues);
 
-      if (allIssues.length >= response.total) break;
-      startAt += maxResults;
+      if (this.usesTokenPagination) {
+        if (response.issues.length === 0 || response.isLast === true) break;
+        nextPageToken = response.nextPageToken;
+        if (!nextPageToken) break;
+      } else {
+        const pageSize = response.maxResults ?? response.issues.length;
+        if (allIssues.length >= (response.total ?? 0) || pageSize === 0) break;
+        startAt = (response.startAt ?? startAt) + pageSize;
+      }
     }
 
     logger.info(`Found ${allIssues.length} issues with worklogs`);

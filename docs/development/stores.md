@@ -33,24 +33,30 @@ export const derivedValue = $derived(fooState.items.filter(...))
 
 ### connections (`connections.svelte.ts`)
 
-Manages the lifecycle of all service connections.
+Manages the lifecycle of all service connections. Moco, Outlook and Personio are singletons. Jira uses a **registry pattern** supporting multiple simultaneous connections.
 
-**State per service:**
+**State:**
 
 ```typescript
-interface ServiceConnectionState {
-  service: ServiceType
-  isConnected: boolean
-  isConnecting: boolean
-  error: string | null
-  lastConnected: string | null
-  needsReauth: boolean       // for OAuth-based services
+interface AllConnectionsState {
+  moco: ServiceConnectionState
+  jiraConnections: JiraConnectionInstance[]  // registry, not singleton
+  outlook: ServiceConnectionState
+  personio: ServiceConnectionState
+}
+
+interface JiraConnectionInstance {
+  id: string        // crypto.randomUUID() or 'default' for migrated
+  label: string     // user-assigned or auto-derived from URL
+  state: ServiceConnectionState
 }
 ```
 
-**Functions**: `connectMoco()`, `connectJira()`, `connectOutlook()`, `connectPersonio()`, `disconnect*()`, `handleOAuthCallback()`
+**Jira functions**: `connectJira(config)`, `disconnectJira(connectionId)`, `reconnectJira(connectionId)`, `isJiraConnected()`, `getConnectedJiraIds()`, `getJiraClient(connectionId?)`, `getJiraBaseUrl(connectionId?)`, `getJiraConnectionState(connectionId)`
 
-Client instances are stored as module-level variables (not in `$state`) since they're not reactive.
+**Storage migration**: `migrateJiraSingleToMulti()` converts the old `JIRA_CONFIG` key (single object) to `JIRA_CONFIGS` (array). Runs once at startup, idempotent.
+
+Client instances are stored in module-level `Map`s (not in `$state`) since they're not reactive.
 
 ### timeEntries (`timeEntries.svelte.ts`)
 

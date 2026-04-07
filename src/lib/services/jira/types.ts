@@ -1,4 +1,6 @@
 export interface JiraConnectionConfig {
+  id: string;
+  label: string;
   instanceType: 'cloud' | 'server';
   baseUrl: string;
   credentials: JiraCredentials;
@@ -23,9 +25,11 @@ export interface JiraServerCredentials {
 }
 
 export interface JiraSearchResponse {
-  startAt: number;
-  maxResults: number;
-  total: number;
+  startAt?: number;
+  maxResults?: number;
+  total?: number;
+  isLast?: boolean;
+  nextPageToken?: string;
   issues: JiraIssue[];
 }
 

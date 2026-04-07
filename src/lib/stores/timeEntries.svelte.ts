@@ -8,7 +8,13 @@ import type {
   JiraCreateWorklogPayload,
   JiraUpdateWorklogPayload
 } from '../types';
-import { getMocoClient, getJiraClient, getOutlookClient } from './connections.svelte';
+import {
+  getMocoClient,
+  getJiraClient,
+  getOutlookClient,
+  getConnectedJiraIds,
+  isJiraConnected
+} from './connections.svelte';
 import { connectionsState } from './connections.svelte';
 import { hoursToSeconds } from '../utils/time-format';
 import { logger } from '../utils/logger';
@@ -82,8 +88,8 @@ export async function fetchDayEntries(date: string): Promise<void> {
     fetches.push(fetchMocoEntries(date, date));
   }
 
-  if (connectionsState.jira.isConnected) {
-    fetches.push(fetchJiraEntries(date, date));
+  if (isJiraConnected()) {
+    fetches.push(fetchAllJiraEntries(date, date));
   }
 
   if (connectionsState.outlook.isConnected) {
@@ -178,19 +184,45 @@ async function fetchMocoEntries(from: string, to: string): Promise<void> {
   }
 }
 
-async function fetchJiraEntries(from: string, to: string): Promise<void> {
-  const client = getJiraClient();
-  if (!client) return;
+async function fetchAllJiraEntries(from: string, to: string): Promise<void> {
+  const connectionIds = getConnectedJiraIds();
+  if (connectionIds.length === 0) return;
 
   timeEntriesState.loading.jira = true;
   timeEntriesState.errors.jira = null;
 
   try {
-    const worklogs = await client.getWorklogsForRange(from, to);
-    timeEntriesState.jiraWorklogs = anonymizeEntriesIfDemoMode(
-      worklogs.map((w) => mapJiraWorklog(w, client))
+    const results = await Promise.allSettled(
+      connectionIds.map(async (connId) => {
+        const client = getJiraClient(connId);
+        if (!client) return [];
+        const worklogs = await client.getWorklogsForRange(from, to);
+        return worklogs.map((w) => mapJiraWorklog(w, client, connId));
+      })
     );
-    logger.store('timeEntries', `Loaded ${worklogs.length} Jira worklogs`);
+
+    const allWorklogs: UnifiedTimeEntry[] = [];
+    const errors: string[] = [];
+
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        allWorklogs.push(...result.value);
+      } else {
+        const message = result.reason instanceof Error ? result.reason.message : 'Fetch failed';
+        errors.push(message);
+      }
+    }
+
+    timeEntriesState.jiraWorklogs = anonymizeEntriesIfDemoMode(allWorklogs);
+
+    if (errors.length > 0) {
+      timeEntriesState.errors.jira = errors.join('; ');
+    }
+
+    logger.store(
+      'timeEntries',
+      `Loaded ${allWorklogs.length} Jira worklogs from ${connectionIds.length} connections`
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch Jira worklogs';
     timeEntriesState.errors.jira = message;
@@ -284,8 +316,11 @@ export async function deleteMocoActivity(id: number, date: string): Promise<bool
 // ---------------------------------------------------------------------------
 // Jira worklog mutations
 // ---------------------------------------------------------------------------
-export async function createJiraWorklog(data: JiraCreateWorklog): Promise<boolean> {
-  const client = getJiraClient();
+export async function createJiraWorklog(
+  data: JiraCreateWorklog,
+  connectionId?: string
+): Promise<boolean> {
+  const client = getJiraClient(connectionId);
   if (!client) {
     toast.error('Jira not connected');
     return false;
@@ -317,9 +352,10 @@ export async function updateJiraWorklog(
   worklogId: string,
   data: JiraUpdateWorklog,
   date: string,
-  originalDate?: string
+  originalDate?: string,
+  connectionId?: string
 ): Promise<boolean> {
-  const client = getJiraClient();
+  const client = getJiraClient(connectionId);
   if (!client) {
     toast.error('Jira not connected');
     return false;
@@ -360,9 +396,10 @@ export async function updateJiraWorklog(
 export async function deleteJiraWorklog(
   issueKey: string,
   worklogId: string,
-  date: string
+  date: string,
+  connectionId?: string
 ): Promise<boolean> {
-  const client = getJiraClient();
+  const client = getJiraClient(connectionId);
   if (!client) {
     toast.error('Jira not connected');
     return false;
