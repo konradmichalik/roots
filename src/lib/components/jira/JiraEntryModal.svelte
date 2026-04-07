@@ -150,7 +150,7 @@
       const success = await deleteJiraWorklog(
         prefill.issueKey,
         prefill.worklogId,
-        date,
+        prefill.date ?? date,
         prefill.connectionId
       );
       if (success) {

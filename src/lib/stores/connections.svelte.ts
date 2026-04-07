@@ -187,6 +187,8 @@ export async function connectJira(config: JiraConnectionConfig): Promise<boolean
     instance = connectionsState.jiraConnections.find((c) => c.id === config.id)!;
   }
 
+  const hadPriorClient = jiraClients.has(config.id);
+
   instance.state.isConnecting = true;
   instance.state.error = null;
 
@@ -223,8 +225,11 @@ export async function connectJira(config: JiraConnectionConfig): Promise<boolean
     instance.state.isConnecting = false;
     instance.state.error = message;
     instance.state.lastConnected = null;
-    jiraClients.delete(config.id);
-    jiraConfigs.delete(config.id);
+    // Only tear down client/config if this was a new connection — preserve prior working state
+    if (!hadPriorClient) {
+      jiraClients.delete(config.id);
+      jiraConfigs.delete(config.id);
+    }
     logger.error(`Jira [${config.label}] connection failed`, error);
     return false;
   }
@@ -341,8 +346,8 @@ export function getJiraClient(connectionId?: string): JiraWorklogClient | null {
   if (connectionId) {
     return jiraClients.get(connectionId) ?? null;
   }
-  for (const [, client] of jiraClients) {
-    return client;
+  if (jiraClients.size === 1) {
+    return jiraClients.values().next().value ?? null;
   }
   return null;
 }
@@ -355,8 +360,8 @@ export function getJiraBaseUrl(connectionId?: string): string | null {
   if (connectionId) {
     return jiraConfigs.get(connectionId)?.baseUrl ?? null;
   }
-  for (const [, config] of jiraConfigs) {
-    return config.baseUrl;
+  if (jiraConfigs.size === 1) {
+    return jiraConfigs.values().next().value?.baseUrl ?? null;
   }
   return null;
 }

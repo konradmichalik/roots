@@ -78,7 +78,11 @@
     entry.metadata.source === 'outlook' ? (entry.metadata as OutlookMetadata) : null
   );
   let isMocoConnected = $derived(connectionsState.moco.isConnected);
-  let isJiraActive = $derived(isJiraConnected());
+  let hasAnyJiraConnected = $derived(isJiraConnected());
+  let isEntryJiraConnected = $derived.by(() => {
+    if (!jiraMeta) return false;
+    return getJiraConnectionState(jiraMeta.connectionId)?.state.isConnected === true;
+  });
   let hasMultipleJira = $derived(connectionsState.jiraConnections.length > 1);
   let jiraConnectionLabel = $derived.by(() => {
     if (!jiraMeta || !hasMultipleJira) return null;
@@ -176,7 +180,7 @@
         icon: Pencil,
         color: 'text-muted-foreground hover:text-foreground hover:bg-accent'
       } as const;
-    if (jiraMeta && isJiraActive)
+    if (jiraMeta && isEntryJiraConnected)
       return {
         onclick: openJiraEdit,
         title: 'Edit worklog',
@@ -257,7 +261,7 @@
 {/if}
 
 <!-- Jira Edit Modal -->
-{#if jiraMeta && isJiraActive}
+{#if jiraMeta && isEntryJiraConnected}
   <JiraEntryModal
     mode="edit"
     prefill={{
@@ -284,7 +288,7 @@
 {/if}
 
 <!-- Jira Sync Modal (from Moco) -->
-{#if mocoMeta && mocoIssueKey && isJiraActive}
+{#if mocoMeta && mocoIssueKey && hasAnyJiraConnected}
   <JiraEntryModal
     mode="create"
     prefill={{
@@ -368,7 +372,7 @@
         <span>Task Stats</span>
       </ContextMenu.Item>
 
-      {#if mocoIssueKey && isJiraActive}
+      {#if mocoIssueKey && hasAnyJiraConnected}
         <ContextMenu.Separator />
         <ContextMenu.Item onclick={openJiraSync}>
           <Upload class="text-brand-text" />
@@ -379,7 +383,7 @@
     {/if}
 
     <!-- Jira Entry Actions -->
-    {#if jiraMeta && isJiraActive}
+    {#if jiraMeta && isEntryJiraConnected}
       <ContextMenu.Item onclick={openJiraEdit}>
         <Pencil class="text-muted-foreground" />
         <span>Edit Worklog</span>
