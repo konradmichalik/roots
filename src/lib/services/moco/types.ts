@@ -135,7 +135,7 @@ export interface MocoScheduleAssignment {
 export interface MocoSchedule {
   id: number;
   date: string;
-  comment: string;
+  comment: string | null;
   am: boolean;
   pm: boolean;
   symbol: string | null;

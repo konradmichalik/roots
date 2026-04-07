@@ -115,7 +115,7 @@ export const mocoScheduleAssignmentSchema = z.object({
 export const mocoScheduleSchema = z.object({
   id: z.number(),
   date: z.string(),
-  comment: z.string(),
+  comment: z.string().nullable(),
   am: z.boolean(),
   pm: z.boolean(),
   symbol: z.string().nullable(),
