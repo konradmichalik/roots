@@ -120,7 +120,7 @@
               </div>
             </Tooltip.Trigger>
             <Tooltip.Content side="bottom" sideOffset={4}>
-              Absences managed by Personio
+              Absences managed by Personio. Public holidays from Moco.
             </Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
