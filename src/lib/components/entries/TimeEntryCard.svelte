@@ -474,32 +474,37 @@
           {mocoMeta.customerName}
         </span>
       {:else if jiraMeta}
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 min-w-0">
           {#if jiraIssueUrl}
             <a
               href={jiraIssueUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text hover:bg-brand/20 transition-colors"
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text hover:bg-brand/20 transition-colors flex-shrink-0"
               onclick={(e) => e.stopPropagation()}
             >
               {jiraMeta.issueKey}
             </a>
           {:else}
             <span
-              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text"
+              class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/5 text-brand-text flex-shrink-0"
             >
               {jiraMeta.issueKey}
             </span>
           {/if}
           {#if jiraMeta.projectKey}
-            <span class="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
+            <span
+              class="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground flex-shrink-0"
+            >
               <Tag class="size-2.5" />
               {jiraMeta.projectKey}
             </span>
           {/if}
           {#if jiraConnectionLabel}
-            <span class="text-[10px] text-muted-foreground/50">{jiraConnectionLabel}</span>
+            <span
+              class="text-[10px] text-muted-foreground/50 truncate max-w-[120px]"
+              title={jiraConnectionLabel}>{jiraConnectionLabel}</span
+            >
           {/if}
         </div>
       {/if}
