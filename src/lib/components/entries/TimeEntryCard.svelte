@@ -459,7 +459,7 @@
 
 {#snippet cardContent()}
   <div class="relative flex items-start justify-between gap-2">
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0 space-y-0.5">
       <!-- Primary context (top-left): time for Outlook, customer for Moco, ticket badge for Jira -->
       {#if outlookMeta?.isAllDay}
         <span class="text-[11px] font-medium text-muted-foreground leading-tight">All day</span>
@@ -469,7 +469,7 @@
         </span>
       {:else if mocoMeta?.customerName}
         <span
-          class="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider leading-none"
+          class="block text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider leading-none truncate"
         >
           {mocoMeta.customerName}
         </span>
