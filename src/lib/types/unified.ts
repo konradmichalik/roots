@@ -111,17 +111,17 @@ export interface DayOverview {
   presenceBalance?: number; // mocoTotal - presence hours (if presence exists)
 }
 
-// Mapped from Personio TimeOff records
+// Mapped from Personio TimeOff records or Moco schedule entries
 export interface PersonioAbsence {
   id: string;
-  source: 'personio';
+  source: 'personio' | 'moco';
   type: AbsenceType;
   startDate: string;
   endDate: string;
   daysCount: number;
   halfDay: boolean;
   note?: string;
-  personioId: number;
+  personioId?: number;
   status: string;
   typeName: string;
 }

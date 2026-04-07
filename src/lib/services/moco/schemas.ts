@@ -102,3 +102,27 @@ export const mocoProjectReportSchema = z.object({
   hours_remaining: z.number(),
   costs_by_task: z.array(mocoTaskCostSchema)
 });
+
+export const mocoScheduleAssignmentSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  code: z.string(),
+  customer_name: z.string(),
+  color: z.string(),
+  type: z.string()
+});
+
+export const mocoScheduleSchema = z.object({
+  id: z.number(),
+  date: z.string(),
+  comment: z.string(),
+  am: z.boolean(),
+  pm: z.boolean(),
+  symbol: z.string().nullable(),
+  assignment: mocoScheduleAssignmentSchema,
+  user: mocoUserSchema,
+  created_at: z.string(),
+  updated_at: z.string()
+});
+
+export const mocoSchedulesSchema = z.array(mocoScheduleSchema);

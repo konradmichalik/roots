@@ -2,7 +2,7 @@ import type { UnifiedTimeEntry, DayOverview, MocoMetadata } from '../types';
 import { getMocoClient } from './connections.svelte';
 import { connectionsState } from './connections.svelte';
 import { settingsState } from './settings.svelte';
-import { getAbsenceForDate, fetchPersonioAbsences } from './absences.svelte';
+import { getAbsenceForDate, fetchPersonioAbsences, fetchMocoHolidays } from './absences.svelte';
 import { fetchPresences, getPresenceForDate } from './presences.svelte';
 import {
   isWeekend,
@@ -68,6 +68,11 @@ export async function fetchMonthCache(from: string, to: string): Promise<void> {
   // Fetch Personio absences for this month (fire-and-forget)
   fetchPersonioAbsences(from, to).catch((error) => {
     logger.error('Failed to fetch Personio absences', error);
+  });
+
+  // Fetch Moco holidays (from schedules) for this month (fire-and-forget)
+  fetchMocoHolidays(from, to).catch((error) => {
+    logger.error('Failed to fetch Moco holidays', error);
   });
 
   const monthKey = from;
