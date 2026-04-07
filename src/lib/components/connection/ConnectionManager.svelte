@@ -171,10 +171,7 @@
             />
           </div>
         {:else if connectionsState.jiraConnections.length === 0}
-          <JiraConnectionForm
-            oncomplete={() => {}}
-            oncancel={() => {}}
-          />
+          <JiraConnectionForm oncomplete={() => {}} oncancel={() => {}} />
         {/if}
       </div>
 

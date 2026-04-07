@@ -69,9 +69,7 @@
   let sourceType = $state<'jira' | 'outlook'>('jira');
 
   // Jira source
-  let jiraConnectionId = $state(
-    connectionsState.jiraConnections[0]?.id ?? 'default'
-  );
+  let jiraConnectionId = $state(connectionsState.jiraConnections[0]?.id ?? 'default');
   let jiraProjectKey = $state('');
   let jiraIssuePattern = $state('');
   let jiraEpicKey = $state('');
@@ -289,7 +287,8 @@
         jiraProjectKey = '';
         jiraIssuePattern = '';
       } else if (prefill?.source?.type === 'jira') {
-        jiraConnectionId = prefill.source.connectionId ?? connectionsState.jiraConnections[0]?.id ?? 'default';
+        jiraConnectionId =
+          prefill.source.connectionId ?? connectionsState.jiraConnections[0]?.id ?? 'default';
         jiraProjectKey = prefill.source.projectKey;
         jiraIssuePattern = prefill.source.issuePattern ?? '';
         jiraEpicKey = prefill.source.epicKey ?? '';

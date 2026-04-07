@@ -365,16 +365,12 @@ export function isJiraConnected(): boolean {
   return connectionsState.jiraConnections.some((c) => c.state.isConnected);
 }
 
-export function getJiraConnectionState(
-  connectionId: string
-): JiraConnectionInstance | undefined {
+export function getJiraConnectionState(connectionId: string): JiraConnectionInstance | undefined {
   return connectionsState.jiraConnections.find((c) => c.id === connectionId);
 }
 
 export function getConnectedJiraIds(): string[] {
-  return connectionsState.jiraConnections
-    .filter((c) => c.state.isConnected)
-    .map((c) => c.id);
+  return connectionsState.jiraConnections.filter((c) => c.state.isConnected).map((c) => c.id);
 }
 
 async function persistJiraConfigs(): Promise<void> {

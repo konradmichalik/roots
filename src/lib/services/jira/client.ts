@@ -140,11 +140,7 @@ export abstract class JiraWorklogClient extends ApiClient {
         body.startAt = startAt;
       }
 
-      const raw = await this.request<JiraSearchResponse>(
-        'POST',
-        this.searchPath,
-        body
-      );
+      const raw = await this.request<JiraSearchResponse>('POST', this.searchPath, body);
       const response = validateResponse(jiraSearchResponseSchema, raw, 'Jira search');
 
       allIssues.push(...response.issues);
