@@ -247,7 +247,7 @@
       selectedProjectId = editRule.target.mocoProjectId;
 
       if (editRule.source.type === 'jira') {
-        jiraConnectionId = editRule.source.connectionId;
+        jiraConnectionId = editRule.source.connectionId ?? 'default';
         jiraProjectKey = editRule.source.projectKey;
         jiraIssuePattern = editRule.source.issuePattern ?? '';
         jiraEpicKey = editRule.source.epicKey ?? '';
