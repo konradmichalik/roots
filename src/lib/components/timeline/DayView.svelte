@@ -19,7 +19,7 @@
   import ConnectionManager from '../connection/ConnectionManager.svelte';
   import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
   import { rulesState, getStaleRules, findMatchingRules } from '../../stores/rules.svelte';
-  import { syncDay, detectHoursChanges } from '../../stores/ruleSync.svelte';
+  import { syncDay, detectHoursChanges, getSourceId } from '../../stores/ruleSync.svelte';
   import { isSynced } from '../../stores/syncRecords.svelte';
   import { isDismissed } from '../../stores/dismissedEvents.svelte';
   import type { SyncPreview, UnifiedTimeEntry, OutlookMetadata } from '../../types';
@@ -70,12 +70,7 @@
       if (entry.hours <= 0) continue;
       const rules = findMatchingRules(entry);
       if (rules.length === 0) continue;
-      const sourceId =
-        entry.metadata.source === 'jira'
-          ? entry.metadata.worklogId
-          : entry.metadata.source === 'outlook'
-            ? entry.metadata.eventId
-            : entry.id;
+      const sourceId = getSourceId(entry);
       if (!isSynced(entry.source as 'jira' | 'outlook', sourceId)) {
         count++;
       }

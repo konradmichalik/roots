@@ -68,7 +68,7 @@ function buildMocoPayload(entry: UnifiedTimeEntry, rule: Rule): MocoCreateActivi
 // Get source ID for dedup
 // ---------------------------------------------------------------------------
 
-function getSourceId(entry: UnifiedTimeEntry): string {
+export function getSourceId(entry: UnifiedTimeEntry): string {
   if (entry.metadata.source === 'jira') {
     return `${entry.metadata.connectionId}:${entry.metadata.worklogId}`;
   }
