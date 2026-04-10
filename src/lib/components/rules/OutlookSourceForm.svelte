@@ -2,6 +2,7 @@
   import TimeInput from '../common/TimeInput.svelte';
   import type { OutlookSourceMatcher } from '../../types';
   import Info from '@lucide/svelte/icons/info';
+  import Clock from '@lucide/svelte/icons/clock';
 
   let {
     pattern = $bindable(''),
@@ -18,6 +19,10 @@
   <p class="text-xs text-muted-foreground flex items-center gap-1">
     <Info class="size-3 flex-shrink-0" />
     Events matching this pattern will be transferred.
+  </p>
+  <p class="text-xs text-muted-foreground flex items-center gap-1">
+    <Clock class="size-3 flex-shrink-0" />
+    Sync happens after the event ends — future events won't be synced yet.
   </p>
   <div>
     <label for="outlook-pattern" class="block text-sm font-medium text-foreground mb-1"

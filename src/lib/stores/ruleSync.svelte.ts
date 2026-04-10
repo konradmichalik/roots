@@ -29,7 +29,7 @@ import {
   buildJiraVariables,
   buildOutlookVariables
 } from '../utils/description-template';
-import { addDays } from '../utils/date-helpers';
+import { addDays, isOutlookEventEnded } from '../utils/date-helpers';
 import { logger } from '../utils/logger';
 
 // ---------------------------------------------------------------------------
@@ -114,6 +114,15 @@ function buildPreview(
     if (effectiveHours <= 0) {
       skipped.push({ sourceEntry: entry, reason: 'zero_hours' });
       continue;
+    }
+
+    // Outlook events: skip if not yet ended
+    if (entry.metadata.source === 'outlook') {
+      const meta = entry.metadata as OutlookMetadata;
+      if (!isOutlookEventEnded(entry.date, entry.endTime, meta.isAllDay)) {
+        skipped.push({ sourceEntry: entry, reason: 'not_ended' });
+        continue;
+      }
     }
 
     if (options.autoOnly && !rule.autoSync) continue;

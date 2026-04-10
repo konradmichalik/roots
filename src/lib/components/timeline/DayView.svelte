@@ -15,6 +15,7 @@
   import { getRawPresencesForDate } from '../../stores/presences.svelte';
   import { connectionsState, isJiraConnected } from '../../stores/connections.svelte';
   import { formatHours, formatBalance } from '../../utils/time-format';
+  import { isOutlookEventEnded } from '../../utils/date-helpers';
   import { buildMatchResult } from '../../stores/entryMatching.svelte';
   import ConnectionManager from '../connection/ConnectionManager.svelte';
   import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
@@ -68,6 +69,11 @@
     let count = 0;
     for (const entry of sourceEntries) {
       if (entry.hours <= 0) continue;
+      // Skip future Outlook events
+      if (entry.metadata.source === 'outlook') {
+        const meta = entry.metadata as OutlookMetadata;
+        if (!isOutlookEventEnded(entry.date, entry.endTime, meta.isAllDay)) continue;
+      }
       const rules = findMatchingRules(entry);
       if (rules.length === 0) continue;
       const sourceId = getSourceId(entry);
