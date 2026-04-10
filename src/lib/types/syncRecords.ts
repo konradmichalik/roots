@@ -28,7 +28,7 @@ export interface SyncCandidate {
 
 export interface SkippedEntry {
   sourceEntry: UnifiedTimeEntry;
-  reason: 'already_synced' | 'zero_hours' | 'moco_remote_exists';
+  reason: 'already_synced' | 'zero_hours' | 'moco_remote_exists' | 'not_ended';
   existingSyncRecord?: SyncRecord;
 }
 
