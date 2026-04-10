@@ -15,7 +15,12 @@
   } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
-  import { startWatcher, stopWatcher, watcherState, handleWatcherSyncClose } from '../../stores/eventSyncWatcher.svelte';
+  import {
+    startWatcher,
+    stopWatcher,
+    watcherState,
+    handleWatcherSyncClose
+  } from '../../stores/eventSyncWatcher.svelte';
   import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';

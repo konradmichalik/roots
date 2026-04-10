@@ -15,7 +15,11 @@ export const toastState = $state<{ toasts: Toast[] }>({
   toasts: []
 });
 
-export function showToast(type: ToastType, message: string, options?: Partial<Pick<Toast, 'persistent' | 'actionLabel' | 'onAction'>>): string {
+export function showToast(
+  type: ToastType,
+  message: string,
+  options?: Partial<Pick<Toast, 'persistent' | 'actionLabel' | 'onAction'>>
+): string {
   const id = crypto.randomUUID();
   const newToast: Toast = { id, type, message, ...options };
 
@@ -31,9 +35,7 @@ export function showToast(type: ToastType, message: string, options?: Partial<Pi
 }
 
 export function updateToast(id: string, message: string): void {
-  toastState.toasts = toastState.toasts.map((t) =>
-    t.id === id ? { ...t, message } : t
-  );
+  toastState.toasts = toastState.toasts.map((t) => (t.id === id ? { ...t, message } : t));
 }
 
 export function dismissToast(id: string): void {
