@@ -28,6 +28,19 @@ export const watcherState = $state<WatcherState>({
   showSyncPreview: false
 });
 
+function clearToast(): void {
+  if (watcherState.toastId) {
+    dismissToast(watcherState.toastId);
+    watcherState.toastId = null;
+  }
+}
+
+function syncMessage(count: number): string {
+  return count === 1
+    ? '1 Outlook-Termin bereit zum Syncen'
+    : `${count} Outlook-Termine bereit zum Syncen`;
+}
+
 function getEndedUnsyncedOutlookEntries(): UnifiedTimeEntry[] {
   const todayStr = today();
   const outlookEntries = timeEntriesState.outlookEvents.filter((e) => e.date === todayStr);
@@ -52,19 +65,13 @@ async function tick(): Promise<void> {
   // Reset on date change
   if (watcherState.lastDate !== todayStr) {
     watcherState.notifiedEventIds = new Set();
-    if (watcherState.toastId) {
-      dismissToast(watcherState.toastId);
-      watcherState.toastId = null;
-    }
+    clearToast();
     watcherState.lastDate = todayStr;
   }
 
   const endedEntries = getEndedUnsyncedOutlookEntries();
   if (endedEntries.length === 0) {
-    if (watcherState.toastId) {
-      dismissToast(watcherState.toastId);
-      watcherState.toastId = null;
-    }
+    clearToast();
     return;
   }
 
@@ -119,17 +126,11 @@ async function tick(): Promise<void> {
   const totalManualPending = manualEntries.length;
 
   if (totalManualPending === 0) {
-    if (watcherState.toastId) {
-      dismissToast(watcherState.toastId);
-      watcherState.toastId = null;
-    }
+    clearToast();
     return;
   }
 
-  const message =
-    totalManualPending === 1
-      ? '1 Outlook-Termin bereit zum Syncen'
-      : `${totalManualPending} Outlook-Termine bereit zum Syncen`;
+  const message = syncMessage(totalManualPending);
 
   if (watcherState.toastId) {
     updateToast(watcherState.toastId, message);
@@ -166,15 +167,10 @@ export function handleWatcherSyncClose(): void {
     return rules.length > 0 && !rules[0].autoSync;
   });
 
-  if (remaining.length === 0 && watcherState.toastId) {
-    dismissToast(watcherState.toastId);
-    watcherState.toastId = null;
-  } else if (remaining.length > 0 && watcherState.toastId) {
-    const message =
-      remaining.length === 1
-        ? '1 Outlook-Termin bereit zum Syncen'
-        : `${remaining.length} Outlook-Termine bereit zum Syncen`;
-    updateToast(watcherState.toastId, message);
+  if (remaining.length === 0) {
+    clearToast();
+  } else if (watcherState.toastId) {
+    updateToast(watcherState.toastId, syncMessage(remaining.length));
   }
 }
 
@@ -194,9 +190,6 @@ export function stopWatcher(): void {
     clearInterval(watcherState.intervalId);
     watcherState.intervalId = null;
   }
-  if (watcherState.toastId) {
-    dismissToast(watcherState.toastId);
-    watcherState.toastId = null;
-  }
+  clearToast();
   logger.store('eventSyncWatcher', 'Watcher stopped');
 }
