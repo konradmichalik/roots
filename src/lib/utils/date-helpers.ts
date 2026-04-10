@@ -162,3 +162,34 @@ export function formatDateTime(isoString: string): string {
     minute: '2-digit'
   });
 }
+
+/**
+ * Check whether an Outlook event has ended based on its endTime.
+ * All-day events are considered ended at 23:59 of their date.
+ * Past dates are always considered ended.
+ */
+export function isOutlookEventEnded(
+  eventDate: string,
+  endTime: string | undefined,
+  isAllDay: boolean
+): boolean {
+  const now = new Date();
+  const todayStr = toDateString(now);
+
+  // Past dates: always ended
+  if (eventDate < todayStr) return true;
+
+  // Future dates: never ended
+  if (eventDate > todayStr) return false;
+
+  // Today: check time
+  if (isAllDay) {
+    // All-day events end at 23:59
+    return now.getHours() >= 23 && now.getMinutes() >= 59;
+  }
+
+  if (!endTime) return true; // No endTime → treat as ended
+
+  const [hours, minutes] = endTime.split(':').map(Number);
+  return now.getHours() > hours || (now.getHours() === hours && now.getMinutes() >= minutes);
+}
