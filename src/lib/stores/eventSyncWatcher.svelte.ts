@@ -4,11 +4,12 @@ import { findMatchingRules } from './rules.svelte';
 import { isSynced } from './syncRecords.svelte';
 import { isDismissed } from './dismissedEvents.svelte';
 import { getSourceId, syncDay, executeSyncCandidates } from './ruleSync.svelte';
-import { showToast, updateToast, dismissToast, toast } from './toast.svelte';
+import { showToast, updateToast, dismissToast, toast, toastState } from './toast.svelte';
 import { isOutlookEventEnded, today } from '../utils/date-helpers';
 import { logger } from '../utils/logger';
 
 const POLL_INTERVAL = 60_000;
+let tickInFlight = false;
 
 interface WatcherState {
   notifiedEventIds: Set<string>;
@@ -59,87 +60,110 @@ function getEndedUnsyncedOutlookEntries(): UnifiedTimeEntry[] {
   });
 }
 
-async function tick(): Promise<void> {
-  const todayStr = today();
-
-  // Reset on date change
-  if (watcherState.lastDate !== todayStr) {
-    watcherState.notifiedEventIds = new Set();
-    clearToast();
-    watcherState.lastDate = todayStr;
-  }
-
-  const endedEntries = getEndedUnsyncedOutlookEntries();
-  if (endedEntries.length === 0) {
-    clearToast();
-    return;
-  }
-
-  const autoSyncEntries: UnifiedTimeEntry[] = [];
-  const manualEntries: UnifiedTimeEntry[] = [];
-
-  for (const entry of endedEntries) {
-    const rules = findMatchingRules(entry);
-    const rule = rules[0];
-    if (rule.autoSync) {
-      autoSyncEntries.push(entry);
-    } else {
-      manualEntries.push(entry);
-    }
-  }
-
-  // Execute auto-sync for new entries
-  const newAutoEntries = autoSyncEntries.filter(
-    (e) => !watcherState.notifiedEventIds.has((e.metadata as OutlookMetadata).eventId)
+function isToastActive(): boolean {
+  return (
+    watcherState.toastId !== null && toastState.toasts.some((t) => t.id === watcherState.toastId)
   );
-  if (newAutoEntries.length > 0) {
-    try {
-      const preview = await syncDay(todayStr, { autoOnly: true });
-      if (preview.pending.length > 0) {
-        const result = await executeSyncCandidates(preview.pending, true);
-        if (result.created.length > 0) {
-          toast.success(
-            `${result.created.length} Outlook-${result.created.length === 1 ? 'Termin' : 'Termine'} automatisch gesynced`
-          );
-        }
-        if (result.failed.length > 0) {
-          toast.error(`${result.failed.length} Auto-Sync fehlgeschlagen`);
-        }
-      }
-    } catch (error) {
-      logger.error('eventSyncWatcher: Auto-sync failed', error);
-    }
-    for (const entry of newAutoEntries) {
-      watcherState.notifiedEventIds.add((entry.metadata as OutlookMetadata).eventId);
-    }
-  }
+}
 
-  // Handle manual entries
-  const newManualEntries = manualEntries.filter(
-    (e) => !watcherState.notifiedEventIds.has((e.metadata as OutlookMetadata).eventId)
-  );
+function showOrUpdateManualToast(count: number): void {
+  const message = syncMessage(count);
 
-  for (const entry of newManualEntries) {
-    watcherState.notifiedEventIds.add((entry.metadata as OutlookMetadata).eventId);
-  }
-
-  const totalManualPending = manualEntries.length;
-
-  if (totalManualPending === 0) {
-    clearToast();
-    return;
-  }
-
-  const message = syncMessage(totalManualPending);
-
-  if (watcherState.toastId) {
-    updateToast(watcherState.toastId, message);
+  if (isToastActive()) {
+    updateToast(watcherState.toastId!, message);
   } else {
     watcherState.toastId = showToast('action', message, {
       persistent: true,
       actionLabel: 'Syncen',
       onAction: () => openPendingSyncPreview()
     });
+  }
+}
+
+async function tick(): Promise<void> {
+  if (tickInFlight) return;
+  tickInFlight = true;
+
+  try {
+    const todayStr = today();
+
+    // Reset on date change
+    if (watcherState.lastDate !== todayStr) {
+      watcherState.notifiedEventIds = new Set();
+      clearToast();
+      watcherState.lastDate = todayStr;
+    }
+
+    const endedEntries = getEndedUnsyncedOutlookEntries();
+    if (endedEntries.length === 0) {
+      clearToast();
+      return;
+    }
+
+    const autoSyncEntries: UnifiedTimeEntry[] = [];
+    const manualEntries: UnifiedTimeEntry[] = [];
+
+    for (const entry of endedEntries) {
+      const rules = findMatchingRules(entry);
+      const rule = rules[0];
+      if (rule.autoSync) {
+        autoSyncEntries.push(entry);
+      } else {
+        manualEntries.push(entry);
+      }
+    }
+
+    // Execute auto-sync for new entries (Outlook only)
+    const newAutoEntries = autoSyncEntries.filter(
+      (e) => !watcherState.notifiedEventIds.has((e.metadata as OutlookMetadata).eventId)
+    );
+    if (newAutoEntries.length > 0) {
+      try {
+        const newAutoSourceIds = new Set(newAutoEntries.map((e) => getSourceId(e)));
+        const preview = await syncDay(todayStr, { autoOnly: true });
+        const pending = preview.pending.filter(
+          (c) =>
+            c.sourceEntry.metadata.source === 'outlook' &&
+            newAutoSourceIds.has(getSourceId(c.sourceEntry))
+        );
+        if (pending.length > 0) {
+          const result = await executeSyncCandidates(pending, true);
+          if (result.created.length > 0) {
+            toast.success(
+              `${result.created.length} Outlook-${result.created.length === 1 ? 'Termin' : 'Termine'} automatisch gesynced`
+            );
+          }
+          if (result.failed.length > 0) {
+            toast.error(`${result.failed.length} Auto-Sync fehlgeschlagen`);
+          }
+        }
+      } catch (error) {
+        logger.error('eventSyncWatcher: Auto-sync failed', error);
+      }
+      for (const entry of newAutoEntries) {
+        watcherState.notifiedEventIds.add((entry.metadata as OutlookMetadata).eventId);
+      }
+    }
+
+    // Handle manual entries
+    const newManualEntries = manualEntries.filter(
+      (e) => !watcherState.notifiedEventIds.has((e.metadata as OutlookMetadata).eventId)
+    );
+
+    for (const entry of newManualEntries) {
+      watcherState.notifiedEventIds.add((entry.metadata as OutlookMetadata).eventId);
+    }
+
+    const totalManualPending = manualEntries.length;
+
+    if (totalManualPending === 0) {
+      clearToast();
+      return;
+    }
+
+    showOrUpdateManualToast(totalManualPending);
+  } finally {
+    tickInFlight = false;
   }
 }
 
@@ -169,8 +193,8 @@ export function handleWatcherSyncClose(): void {
 
   if (remaining.length === 0) {
     clearToast();
-  } else if (watcherState.toastId) {
-    updateToast(watcherState.toastId, syncMessage(remaining.length));
+  } else {
+    showOrUpdateManualToast(remaining.length);
   }
 }
 

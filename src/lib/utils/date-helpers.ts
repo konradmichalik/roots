@@ -188,7 +188,7 @@ export function isOutlookEventEnded(
     return now.getHours() >= 23 && now.getMinutes() >= 59;
   }
 
-  if (!endTime) return true; // No endTime → treat as ended
+  if (!endTime) return false; // No endTime → cannot determine, keep ineligible
 
   const [hours, minutes] = endTime.split(':').map(Number);
   return now.getHours() > hours || (now.getHours() === hours && now.getMinutes() >= minutes);
