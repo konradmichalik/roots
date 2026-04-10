@@ -15,6 +15,8 @@
   } from '../../stores/timeEntries.svelte';
   import { connectionsState } from '../../stores/connections.svelte';
   import { initializeAutoRefresh, cleanupAutoRefresh } from '../../stores/autoRefresh.svelte';
+  import { startWatcher, stopWatcher, watcherState, handleWatcherSyncClose } from '../../stores/eventSyncWatcher.svelte';
+  import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
   import { isTauri } from '../../utils/storage';
@@ -70,6 +72,7 @@
     const dayPromise = fetchDayEntries(dateNavState.selectedDate);
     fetchMonth();
     initializeAutoRefresh();
+    startWatcher();
 
     // Check morning greeting after initial data is loaded
     dayPromise.then(() => checkMorningGreeting());
@@ -99,6 +102,7 @@
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cleanupAutoRefresh();
+      stopWatcher();
     };
   });
 
@@ -151,4 +155,12 @@
 
   <ToastContainer />
   <MorningModal bind:open={showMorningModal} onClose={handleMorningClose} />
+
+  {#if watcherState.syncPreview && watcherState.showSyncPreview}
+    <SyncPreviewDialog
+      preview={watcherState.syncPreview}
+      defaultOpen={true}
+      onClose={handleWatcherSyncClose}
+    />
+  {/if}
 </div>
