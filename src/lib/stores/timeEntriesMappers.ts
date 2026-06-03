@@ -6,6 +6,21 @@ import { getDayOfWeekIndex } from '../utils/date-helpers';
 import { secondsToHours } from '../utils/time-format';
 import { extractFirstIssueKey } from '../utils/jira-issue-parser';
 
+// remote_id format for Jira: "<connectionId>:<issueKey>#<worklogId>"
+// Parse structurally so UUID-shaped connectionIds (e.g. "...-cca4-4532-...")
+// don't get mis-matched as issue keys by the loose regex scan.
+function parseMocoRemoteTicketKey(
+  remoteId: string | null,
+  remoteService: string | null
+): string | undefined {
+  if (!remoteId) return undefined;
+  const target =
+    remoteService === 'jira' && remoteId.includes(':')
+      ? remoteId.slice(remoteId.indexOf(':') + 1).split('#')[0]
+      : remoteId;
+  return extractFirstIssueKey(target) ?? undefined;
+}
+
 // ---------------------------------------------------------------------------
 // Moco
 // ---------------------------------------------------------------------------
@@ -19,8 +34,7 @@ export function mapMocoActivity(activity: MocoActivity): UnifiedTimeEntry {
     taskName: activity.task.name,
     customerName: activity.customer.name,
     billable: activity.billable,
-    remoteTicketKey:
-      (activity.remote_id ? extractFirstIssueKey(activity.remote_id) : null) ?? undefined,
+    remoteTicketKey: parseMocoRemoteTicketKey(activity.remote_id, activity.remote_service),
     remoteService: activity.remote_service,
     remoteId: activity.remote_id
   };
