@@ -38,6 +38,9 @@ Roots aggregates your work time from multiple services into a single desktop app
 
 ### Homebrew (recommended)
 
+<a href="https://github.com/konradmichalik/homebrew-tap"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fkonradmichalik.github.io%2Fhomebrew-tap%2Fbadges%2Froots-version.json&style=flat-square&logo=homebrew" alt="Homebrew version" /></a>
+<a href="https://github.com/konradmichalik/homebrew-tap"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fkonradmichalik.github.io%2Fhomebrew-tap%2Fbadges%2Froots-downloads.json&style=flat-square&logo=homebrew" alt="Homebrew downloads" /></a>
+
 ```bash
 brew tap konradmichalik/tap
 brew install --cask roots
