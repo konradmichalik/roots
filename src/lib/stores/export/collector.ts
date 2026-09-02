@@ -12,11 +12,10 @@ const TTL_SECONDS_BY_INTERVAL: Record<AutoRefreshInterval, number> = {
   '30min': 30 * 60,
   '1hour': 60 * 60
 };
-const DEFAULT_TTL_SECONDS = 5 * 60;
 
 export function collectExportInput(now: Date = new Date()): ExportSerializerInput {
   const mocoConnected = connectionsState.moco.isConnected;
-  const ttlSeconds = TTL_SECONDS_BY_INTERVAL[autoRefreshState.interval] ?? DEFAULT_TTL_SECONDS;
+  const ttlSeconds = TTL_SECONDS_BY_INTERVAL[autoRefreshState.interval];
 
   const input: ExportSerializerInput = { now, ttlSeconds, mocoConnected };
 
