@@ -1,4 +1,7 @@
 mod export;
+mod settings_file;
+
+use tauri::Manager;
 
 #[tauri::command]
 async fn http_post_form(url: String, body: String) -> Result<String, String> {
@@ -24,6 +27,16 @@ async fn http_post_form(url: String, body: String) -> Result<String, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .setup(|app| {
+            // Runs before the frontend first loads the store, so the mode is in place from the
+            // very first save. See settings_file for why doing it once is enough.
+            if let Ok(dir) = app.path().app_data_dir() {
+                if let Err(e) = settings_file::restrict_settings_file(&dir) {
+                    eprintln!("Failed to restrict settings.json permissions: {e}");
+                }
+            }
+            Ok(())
+        })
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
