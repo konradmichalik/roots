@@ -1,3 +1,5 @@
+mod export;
+
 #[tauri::command]
 async fn http_post_form(url: String, body: String) -> Result<String, String> {
     let client = reqwest::Client::new();
@@ -26,7 +28,11 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_deep_link::init())
-        .invoke_handler(tauri::generate_handler![http_post_form])
+        .invoke_handler(tauri::generate_handler![
+            http_post_form,
+            export::write_export_file,
+            export::delete_export_file
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
