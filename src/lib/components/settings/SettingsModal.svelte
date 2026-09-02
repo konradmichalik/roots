@@ -60,6 +60,10 @@
     updateSettings({ showSmartSuggestions: enabled });
   }
 
+  function handleExportDataToggle(enabled: boolean): void {
+    updateSettings({ exportDataForExternalApps: enabled });
+  }
+
   let cachedMonths = $derived(getCachedMonthCount());
 
   async function handleClearCache(): Promise<void> {
@@ -273,6 +277,23 @@
             />
             <span class="text-xs text-muted-foreground">%</span>
           </div>
+        </div>
+
+        <div class="border-t border-border"></div>
+
+        <!-- External App Export -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-semibold text-foreground">Export for External Apps</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">
+              Write a small data.json snapshot (today/week/gaps/vacation) to the app's data
+              directory on every refresh, for external consumers like a Stream Deck plugin.
+            </p>
+          </div>
+          <Switch
+            checked={settingsState.exportDataForExternalApps}
+            onCheckedChange={handleExportDataToggle}
+          />
         </div>
       </Tabs.Content>
 

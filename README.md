@@ -33,6 +33,7 @@ Roots aggregates your work time from multiple services into a single desktop app
 - **Personio Sync** — Work schedule and absence import with automatic weekday-hours update
 - **Native Desktop App** — Lightweight Tauri 2 app; no browser CORS issues
 - **Dark / Light Mode** — Nord-palette design tokens with full theme support
+- **External app export** — Optionally write `data.json` snapshots (today/week/gaps/vacation) to `~/Library/Application Support/com.roots.time-overview/data.json` on every data refresh for external consumers like Stream Deck plugins. Off by default; toggle in Settings → Features.
 
 ## 🔥 Installation
 

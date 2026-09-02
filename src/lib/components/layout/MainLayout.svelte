@@ -21,6 +21,7 @@
     watcherState,
     handleWatcherSyncClose
   } from '../../stores/eventSyncWatcher.svelte';
+  import { initializeExportWatcher, cleanupExportWatcher } from '../../stores/export.svelte';
   import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
@@ -78,6 +79,7 @@
     fetchMonth();
     initializeAutoRefresh();
     startWatcher();
+    initializeExportWatcher();
 
     // Check morning greeting after initial data is loaded
     dayPromise.then(() => checkMorningGreeting());
@@ -108,6 +110,7 @@
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cleanupAutoRefresh();
       stopWatcher();
+      cleanupExportWatcher();
     };
   });
 
