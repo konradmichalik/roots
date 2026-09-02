@@ -1,13 +1,17 @@
 use std::fs;
 use std::io;
-use std::path::Path;
 #[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
+use std::path::Path;
 use tauri::{AppHandle, Manager};
 
 const EXPORT_FILE_NAME: &str = "data.json";
 const EXPORT_TMP_FILE_NAME: &str = "data.json.tmp";
 
+// Deliberately does not fsync the temp file or the directory before the rename below. This
+// is an ephemeral, frequently-rewritten snapshot file, not a durability-critical record: a
+// crash mid-write can at worst leave the previous version or nothing, never a corrupt or
+// partial file, since the rename itself is atomic.
 fn write_atomically(dir: &Path, contents: &str) -> io::Result<()> {
     fs::create_dir_all(dir)?;
     let tmp_path = dir.join(EXPORT_TMP_FILE_NAME);
@@ -25,7 +29,7 @@ fn delete_if_exists(dir: &Path) -> io::Result<()> {
     match fs::remove_file(dir.join(EXPORT_FILE_NAME)) {
         Ok(()) => Ok(()),
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
@@ -46,7 +50,11 @@ mod tests {
     use super::*;
 
     fn temp_dir(label: &str) -> std::path::PathBuf {
-        std::env::temp_dir().join(format!("roots-export-test-{}-{}", label, std::process::id()))
+        std::env::temp_dir().join(format!(
+            "roots-export-test-{}-{}",
+            label,
+            std::process::id()
+        ))
     }
 
     #[test]
@@ -68,7 +76,11 @@ mod tests {
         let dir = temp_dir("perms");
         write_atomically(&dir, "{}").unwrap();
 
-        let mode = fs::metadata(dir.join(EXPORT_FILE_NAME)).unwrap().permissions().mode() & 0o777;
+        let mode = fs::metadata(dir.join(EXPORT_FILE_NAME))
+            .unwrap()
+            .permissions()
+            .mode()
+            & 0o777;
         assert_eq!(mode, 0o600);
 
         fs::remove_dir_all(&dir).ok();

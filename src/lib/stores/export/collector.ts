@@ -2,10 +2,12 @@ import { connectionsState } from '../connections.svelte';
 import { getCachedDayOverview, getOpenHoursDays } from '../timeEntriesCache.svelte';
 import { getVacationSummary } from '../absences.svelte';
 import { autoRefreshState } from '../autoRefresh.svelte';
+import type { AutoRefreshInterval } from '../autoRefresh.svelte';
 import { getWeekDates, getMonthStart, today } from '../../utils/date-helpers';
 import type { ExportSerializerInput } from './types';
 
-const TTL_SECONDS_BY_INTERVAL: Record<string, number> = {
+const TTL_SECONDS_BY_INTERVAL: Record<AutoRefreshInterval, number> = {
+  off: 5 * 60,
   '5min': 5 * 60,
   '30min': 30 * 60,
   '1hour': 60 * 60
