@@ -12,6 +12,9 @@ import { buildExportPayload } from './export/serializer';
 const DEBOUNCE_MS = 500;
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let disposeExportWatcher: (() => void) | undefined;
+// Chains write/delete calls so a later one can never complete before an earlier one -
+// otherwise a slow write could finish after a subsequent delete and recreate the file.
+let pendingOperation: Promise<void> = Promise.resolve();
 
 async function writeExportFile(): Promise<void> {
   const payload = buildExportPayload(collectExportInput());
@@ -40,11 +43,10 @@ async function deleteExportFile(): Promise<void> {
 function scheduleExportSync(): void {
   if (debounceTimer) clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
-    if (settingsState.exportDataForExternalApps) {
-      void writeExportFile();
-    } else {
-      void deleteExportFile();
-    }
+    const enabled = settingsState.exportDataForExternalApps;
+    pendingOperation = pendingOperation.then(() =>
+      enabled ? writeExportFile() : deleteExportFile()
+    );
   }, DEBOUNCE_MS);
 }
 
