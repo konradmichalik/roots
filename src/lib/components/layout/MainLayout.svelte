@@ -21,7 +21,7 @@
     watcherState,
     handleWatcherSyncClose
   } from '../../stores/eventSyncWatcher.svelte';
-  import { initializeExportWatcher } from '../../stores/export.svelte';
+  import { initializeExportWatcher, cleanupExportWatcher } from '../../stores/export.svelte';
   import SyncPreviewDialog from '../rules/SyncPreviewDialog.svelte';
   import { getStorageItemAsync, saveStorage, STORAGE_KEYS } from '../../utils/storage';
   import { today } from '../../utils/date-helpers';
@@ -110,6 +110,7 @@
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cleanupAutoRefresh();
       stopWatcher();
+      cleanupExportWatcher();
     };
   });
 

@@ -10,6 +10,7 @@ import { buildExportPayload } from './export/serializer';
 
 const DEBOUNCE_MS = 500;
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+let disposeExportWatcher: (() => void) | undefined;
 
 async function writeExportFile(): Promise<void> {
   const payload = buildExportPayload(collectExportInput());
@@ -48,8 +49,9 @@ function scheduleExportSync(): void {
 
 export function initializeExportWatcher(): void {
   if (!isTauri()) return;
+  if (disposeExportWatcher) return;
 
-  $effect.root(() => {
+  disposeExportWatcher = $effect.root(() => {
     $effect(() => {
       void settingsState.exportDataForExternalApps;
       void connectionsState.moco.isConnected;
@@ -63,4 +65,15 @@ export function initializeExportWatcher(): void {
   });
 
   logger.store('export', 'Watcher initialized');
+}
+
+export function cleanupExportWatcher(): void {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+    debounceTimer = undefined;
+  }
+  if (disposeExportWatcher) {
+    disposeExportWatcher();
+    disposeExportWatcher = undefined;
+  }
 }
