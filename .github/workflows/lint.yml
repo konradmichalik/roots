@@ -32,3 +32,13 @@ jobs:
 
       - name: Type check (svelte-check & tsc)
         run: npm run check
+
+      - name: Test (Vitest)
+        run: npm run test
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test (Cargo)
+        working-directory: src-tauri
+        run: cargo test
