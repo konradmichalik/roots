@@ -25,6 +25,7 @@ export interface AppSettings {
   frequentlyUsedCollapsed: boolean;
   suggestionCollapsed: boolean;
   billableTarget: number;
+  exportDataForExternalApps: boolean;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -49,7 +50,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   favoritesSidebarCollapsed: false,
   frequentlyUsedCollapsed: false,
   suggestionCollapsed: false,
-  billableTarget: 80
+  billableTarget: 80,
+  exportDataForExternalApps: false
 };
 
 export const settingsState = $state<AppSettings>({ ...DEFAULT_SETTINGS });
