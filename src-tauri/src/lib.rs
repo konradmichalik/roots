@@ -1,4 +1,7 @@
 mod export;
+mod settings_file;
+
+use tauri::Manager;
 
 #[tauri::command]
 async fn http_post_form(url: String, body: String) -> Result<String, String> {
@@ -23,7 +26,7 @@ async fn http_post_form(url: String, body: String) -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
@@ -33,6 +36,18 @@ pub fn run() {
             export::write_export_file,
             export::delete_export_file
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+    // Deliberately between build() and run(): Builder::run is just build()?.run(), and Tauri
+    // creates the configured windows inside its own setup phase, which run() drives. Hardening
+    // here therefore precedes the first webview, so no frontend save can create settings.json
+    // ahead of it. See settings_file for why doing it once is enough.
+    if let Ok(dir) = app.path().app_data_dir() {
+        if let Err(e) = settings_file::restrict_settings_file(&dir) {
+            eprintln!("Failed to restrict settings.json permissions: {e}");
+        }
+    }
+
+    app.run(|_, _| {});
 }
