@@ -23,7 +23,8 @@ export function collectExportInput(now: Date = new Date()): ExportSerializerInpu
     const todayOverview = getCachedDayOverview(todayStr, getMonthStart(todayStr));
     input.today = { actual: todayOverview.totals.actual, required: todayOverview.requiredHours };
 
-    const weekOverviews = getWeekDates(todayStr).map((date) =>
+    const weekDatesUntilYesterday = getWeekDates(todayStr).filter((date) => date < todayStr);
+    const weekOverviews = weekDatesUntilYesterday.map((date) =>
       getCachedDayOverview(date, getMonthStart(date))
     );
     input.week = {
