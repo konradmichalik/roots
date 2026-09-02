@@ -1,7 +1,7 @@
 use std::fs;
-use std::io;
+use std::io::{self, Write};
 #[cfg(unix)]
-use std::os::unix::fs::PermissionsExt;
+use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
 use tauri::{AppHandle, Manager};
 
@@ -17,20 +17,40 @@ fn write_atomically(dir: &Path, contents: &str) -> io::Result<()> {
     let tmp_path = dir.join(EXPORT_TMP_FILE_NAME);
     let target_path = dir.join(EXPORT_FILE_NAME);
 
-    fs::write(&tmp_path, contents)?;
+    // Create with 0600 from the outset (not via a follow-up set_permissions) so there is no
+    // window where the tmp file exists under the process umask's more permissive default.
+    #[cfg(unix)]
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode(0o600)
+        .open(&tmp_path)?;
+    #[cfg(not(unix))]
+    let mut file = fs::File::create(&tmp_path)?;
 
+    file.write_all(contents.as_bytes())?;
+    drop(file);
+
+    // Belt-and-suspenders: .mode() above only governs a freshly created file. If a previous
+    // failed write left a stale tmp file behind with different permissions, enforce 0600 here too.
     #[cfg(unix)]
     fs::set_permissions(&tmp_path, fs::Permissions::from_mode(0o600))?;
 
     fs::rename(&tmp_path, &target_path)
 }
 
-fn delete_if_exists(dir: &Path) -> io::Result<()> {
-    match fs::remove_file(dir.join(EXPORT_FILE_NAME)) {
+fn remove_if_present(path: &Path) -> io::Result<()> {
+    match fs::remove_file(path) {
         Ok(()) => Ok(()),
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
         Err(e) => Err(e),
     }
+}
+
+fn delete_if_exists(dir: &Path) -> io::Result<()> {
+    remove_if_present(&dir.join(EXPORT_FILE_NAME))?;
+    remove_if_present(&dir.join(EXPORT_TMP_FILE_NAME))
 }
 
 #[tauri::command]
@@ -104,6 +124,18 @@ mod tests {
 
         delete_if_exists(&dir).unwrap();
         assert!(!dir.join(EXPORT_FILE_NAME).exists());
+
+        fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn delete_also_removes_a_leftover_tmp_file() {
+        let dir = temp_dir("delete-tmp");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join(EXPORT_TMP_FILE_NAME), "{}").unwrap();
+
+        delete_if_exists(&dir).unwrap();
+        assert!(!dir.join(EXPORT_TMP_FILE_NAME).exists());
 
         fs::remove_dir_all(&dir).ok();
     }
