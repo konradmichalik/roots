@@ -4,6 +4,7 @@ import { settingsState } from './settings.svelte';
 import { connectionsState } from './connections.svelte';
 import { monthCacheState } from './timeEntriesCache.svelte';
 import { absencesState } from './absences.svelte';
+import { presencesState } from './presences.svelte';
 import { autoRefreshState } from './autoRefresh.svelte';
 import { collectExportInput } from './export/collector';
 import { buildExportPayload } from './export/serializer';
@@ -57,6 +58,10 @@ export function initializeExportWatcher(): void {
       void connectionsState.moco.isConnected;
       void connectionsState.personio.isConnected;
       void monthCacheState.cache;
+      void settingsState.weekdayHours;
+      void presencesState.cache;
+      void absencesState.absences;
+      void absencesState.personioAbsences;
       void absencesState.absenceBalances;
       void absencesState.yearVacationDaysTaken;
       void autoRefreshState.interval;
